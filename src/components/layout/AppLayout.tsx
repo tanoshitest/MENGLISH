@@ -51,6 +51,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
           {filteredNav.map((item) => {
             const active = location.pathname === item.path;
+            const label = item.path === "/classes" 
+              ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+              : item.label;
             return (
               <button
                 key={item.path}
@@ -62,7 +65,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 }`}
               >
                 <item.icon className="w-4 h-4 flex-shrink-0" />
-                {item.label}
+                {label}
               </button>
             );
           })}
@@ -112,6 +115,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
                 {filteredNav.map((item) => {
                   const active = location.pathname === item.path;
+                  const label = item.path === "/classes" 
+                    ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+                    : item.label;
                   return (
                     <button
                       key={item.path}
@@ -123,7 +129,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       }`}
                     >
                       <item.icon className="w-4 h-4" />
-                      {item.label}
+                      {label}
                     </button>
                   );
                 })}
@@ -154,7 +160,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               {currentPage && (
                 <>
                   <currentPage.icon className="w-4 h-4" />
-                  <span className="font-medium text-foreground">{currentPage.label}</span>
+                  <span className="font-medium text-foreground">
+                    {currentPage.path === "/classes" 
+                      ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+                      : currentPage.label}
+                  </span>
                 </>
               )}
             </div>
