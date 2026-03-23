@@ -92,19 +92,18 @@ export interface Teacher {
   id: string;
   name: string;
   avatar: string;
-  email: string;
-  phone: string;
   specialty: string;
   hoursThisMonth: number;
   totalClasses: number;
   avgRating: number;
-  status: "active" | "inactive";
+  email: string;
+  phone: string;
 }
 
 export const teachers: Teacher[] = [
-  { id: "TCH001", name: "Lê Hoàng Nam", avatar: "HN", email: "hoangnam@school.com", phone: "0911223344", specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, status: "active" },
-  { id: "TCH002", name: "Sarah Johnson", avatar: "SJ", email: "sarah@school.com", phone: "0922334455", specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, status: "active" },
-  { id: "TCH003", name: "Nguyễn Thị Phượng", avatar: "TP", email: "phuong@school.com", phone: "0933445566", specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, status: "active" },
+  { id: "TCH001", name: "Lê Hoàng Nam", avatar: "HN", specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, email: "namlh@menglish.edu.vn", phone: "0912345678" },
+  { id: "TCH002", name: "Sarah Johnson", avatar: "SJ", specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, email: "sarah.j@menglish.edu.vn", phone: "0923456789" },
+  { id: "TCH003", name: "Nguyễn Thị Phượng", avatar: "TP", specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, email: "phuongnt@menglish.edu.vn", phone: "0934567890" },
 ];
 
 // ---- Classes ----
