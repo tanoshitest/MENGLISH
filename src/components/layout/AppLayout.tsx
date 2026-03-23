@@ -22,7 +22,6 @@ const navItems: NavItem[] = [
   { label: "Lớp học", path: "/classes", icon: School },
   { label: "Học sinh", path: "/students", icon: GraduationCap },
   { label: "Giáo viên", path: "/teachers", icon: UserCog },
-  { label: "Chăm sóc KH", path: "/tickets", icon: Headphones },
   { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Tài liệu", path: "/documents", icon: FileText },
