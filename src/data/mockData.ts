@@ -339,3 +339,21 @@ export const fillRateData = [
   { name: "IELTS B2", fill: 83, max: 100 },
   { name: "Starter A1", fill: 60, max: 100 },
 ];
+
+// ---- Notifications ----
+export interface NotificationItem {
+  id: string;
+  title: string;
+  content: string;
+  time: string;
+  isRead: boolean;
+  type: "info" | "warning" | "success";
+  role: Role | "all";
+}
+
+export const notifications: NotificationItem[] = [
+  { id: "NTF001", title: "Yêu cầu chuyển lớp", content: "PH Nguyễn Văn Hùng vừa gửi yêu cầu chuyển lớp cho học sinh Nguyễn Minh Anh.", time: "10 phút trước", isRead: false, type: "warning", role: "admin" },
+  { id: "NTF002", title: "Học phí đến hạn", content: "Học sinh Phạm Đức Khang quá hạn đóng học phí 5 ngày.", time: "1 giờ trước", isRead: false, type: "info", role: "admin" },
+  { id: "NTF003", title: "Đề thi mới", content: "Admin vừa cập nhật đề thi Mock Test B2 mới.", time: "2 giờ trước", isRead: true, type: "success", role: "teacher" },
+  { id: "NTF004", title: "Nhắc nhở điểm danh", content: "Bạn chưa điểm danh lớp CLS001 ngày hôm qua.", time: "1 ngày trước", isRead: false, type: "warning", role: "teacher" },
+];

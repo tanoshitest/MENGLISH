@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
-  ChevronRight, School, FileText
+  ChevronRight, School, FileText, Bell
 } from "lucide-react";
+import { notifications } from "@/data/mockData";
+import { toast } from "sonner";
 
 interface NavItem {
   label: string;
@@ -33,6 +35,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const filteredNav = navItems.filter((item) => !item.adminOnly || isAdmin);
   const currentPage = navItems.find((n) => n.path === location.pathname);
@@ -169,6 +172,70 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {/* Notifications */}
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 hover:bg-secondary rounded-full transition-colors relative"
+              >
+                <Bell className="w-5 h-5 text-muted-foreground" />
+                {notifications.filter(n => (n.role === "all" || n.role === role) && !n.isRead).length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full border-2 border-card" />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showNotifications && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setShowNotifications(false)} 
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 bg-card border rounded-lg shadow-xl z-20 overflow-hidden"
+                    >
+                      <div className="p-3 border-b bg-secondary/10 flex items-center justify-between">
+                        <span className="font-bold text-sm">Thông báo</span>
+                        <button className="text-[10px] text-primary hover:underline">Đánh dấu đã đọc</button>
+                      </div>
+                      <div className="max-h-[400px] overflow-y-auto">
+                        {notifications
+                          .filter(n => n.role === "all" || n.role === role)
+                          .map((n) => (
+                            <div 
+                              key={n.id} 
+                              className={`p-4 border-b last:border-0 hover:bg-secondary/20 transition-colors cursor-pointer ${!n.isRead ? "bg-primary/5 border-l-2 border-l-primary" : ""}`}
+                            >
+                              <div className="flex justify-between items-start mb-1">
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                                  n.type === "warning" ? "bg-destructive/10 text-destructive" : 
+                                  n.type === "success" ? "bg-success/10 text-success" : 
+                                  "bg-primary/10 text-primary"
+                                }`}>
+                                  {n.type}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground">{n.time}</span>
+                              </div>
+                              <p className="text-xs font-bold mb-0.5">{n.title}</p>
+                              <p className="text-[11px] text-muted-foreground leading-relaxed">{n.content}</p>
+                            </div>
+                          ))}
+                        {notifications.filter(n => n.role === "all" || n.role === role).length === 0 && (
+                          <div className="p-8 text-center text-sm text-muted-foreground">Không có thông báo nào.</div>
+                        )}
+                      </div>
+                      <div className="p-2 border-t text-center">
+                        <button className="text-xs text-muted-foreground hover:text-primary">Xem tất cả thông báo</button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
             <button
               onClick={toggleRole}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors hover:bg-secondary"

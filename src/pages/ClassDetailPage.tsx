@@ -4,7 +4,7 @@ import { classes, students, teachers, attendanceRecords, AttendanceRecord } from
 import { 
   ChevronLeft, Users, Calendar, MapPin, CheckCircle, 
   XCircle, Clock, Save, FileSpreadsheet, UserPlus, 
-  Trash2, Search, Edit3, UserCog
+  Trash2, Search, Edit3, UserCog, AlertCircle
 } from "lucide-react";
 import { useRole } from "@/contexts/RoleContext";
 import { toast } from "sonner";
@@ -105,6 +105,26 @@ const ClassDetailPage = () => {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-secondary/10">
         <div className="max-w-5xl mx-auto space-y-6">
+          
+          {/* Detailed alerts for Teachers */}
+          {!isAdmin && (
+            <div className="space-y-2">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-3 shadow-sm">
+                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-amber-800">Sắp tới bài kiểm tra định kỳ</p>
+                  <p className="text-xs text-amber-700">Lớp {classData.name} sẽ có bài kiểm tra Reading & Writing vào buổi học kế tiếp (24/03). Vui lòng chuẩn bị tài liệu.</p>
+                </div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3 shadow-sm">
+                <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-blue-800">Sắp kết thúc khóa học</p>
+                  <p className="text-xs text-blue-700">Khóa học hiện tại còn 4 buổi nữa là kết thúc ({classData.endDate}). Vui lòng hoàn tất bảng điểm cuối khóa.</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {activeTab === "info" && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
