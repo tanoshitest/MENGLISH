@@ -1,7 +1,10 @@
 import { classes, teachers } from "@/data/mockData";
 import { MapPin, Users, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const ClassesPage = () => (
+const ClassesPage = () => {
+  const navigate = useNavigate();
+  return (
   <div className="p-4 md:p-6 space-y-4">
     <div className="flex items-center justify-between">
       <h1 className="text-xl font-bold">Lớp học</h1>
@@ -25,7 +28,11 @@ const ClassesPage = () => (
             {classes.map((cls) => {
               const teacher = teachers.find((t) => t.id === cls.teacherId);
               return (
-                <tr key={cls.id} className="hover:bg-secondary/30 cursor-pointer transition-colors">
+                <tr 
+                  key={cls.id} 
+                  className="hover:bg-secondary/30 cursor-pointer transition-colors"
+                  onClick={() => navigate(`/classes/${cls.id}`)}
+                >
                   <td className="px-4 py-3">
                     <p className="font-medium">{cls.name}</p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{cls.room}</p>
@@ -48,7 +55,8 @@ const ClassesPage = () => (
         </table>
       </div>
     </div>
-  </div>
-);
+    </div>
+  );
+};
 
 export default ClassesPage;

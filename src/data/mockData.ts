@@ -257,6 +257,27 @@ export const documents: DocumentItem[] = [
   { id: "DOC007", title: "Kế hoạch giảng dạy quý 1/2025", type: "xlsx", classId: "all", uploadDate: "2025-01-01", size: "0.3 MB", addedBy: "Admin" },
 ];
 
+// ---- Attendance ----
+export interface AttendanceRecord {
+  id: string;
+  classId: string;
+  studentId: string;
+  date: string;
+  status: "present" | "absent" | "late";
+  note?: string;
+}
+
+export const attendanceRecords: AttendanceRecord[] = [
+  { id: "ATT001", classId: "CLS001", studentId: "STU001", date: "2025-03-24", status: "present" },
+  { id: "ATT002", classId: "CLS001", studentId: "STU002", date: "2025-03-24", status: "late", note: "Kẹt xe" },
+  { id: "ATT003", classId: "CLS001", studentId: "STU003", date: "2025-03-24", status: "present" },
+  { id: "ATT004", classId: "CLS001", studentId: "STU004", date: "2025-03-24", status: "absent", note: "Ốm" },
+  { id: "ATT005", classId: "CLS001", studentId: "STU001", date: "2025-03-22", status: "present" },
+  { id: "ATT006", classId: "CLS001", studentId: "STU002", date: "2025-03-22", status: "present" },
+  { id: "ATT007", classId: "CLS002", studentId: "STU002", date: "2025-03-24", status: "present" },
+  { id: "ATT008", classId: "CLS003", studentId: "STU001", date: "2025-03-24", status: "present" },
+];
+
 // ---- Teacher Schedule (for Calendar) ----
 export interface ScheduleEvent {
   id: string;

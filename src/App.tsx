@@ -17,6 +17,7 @@ import FinancePage from "@/pages/FinancePage";
 import TasksPage from "@/pages/TasksPage";
 import SettingsPage from "@/pages/SettingsPage";
 import DocumentsPage from "@/pages/DocumentsPage";
+import ClassDetailPage from "@/pages/ClassDetailPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/crm" element={<CRMPage />} />
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/classes" element={<ClassesPage />} />
+              <Route path="/classes/:id" element={<ClassDetailPage />} />
               <Route path="/students" element={<StudentsPage />} />
               <Route path="/students/:id" element={<StudentDetailPage />} />
               <Route path="/teachers" element={<TeachersPage />} />
