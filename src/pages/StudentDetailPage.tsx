@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { students, classes } from "@/data/mockData";
+import { students, classes, attendanceRecords } from "@/data/mockData";
 import { ArrowLeft, BookOpen, CalendarCheck, DollarSign, MessageSquare, User } from "lucide-react";
 import { useState } from "react";
 
@@ -26,6 +26,7 @@ const StudentDetailPage = () => {
   const tabs = [
     { key: "info", label: "Thông tin chung" },
     { key: "history", label: "Lịch sử học" },
+    { key: "attendance", label: "Điểm danh" },
     { key: "exams", label: "Kết quả thi" },
   ];
 
@@ -141,6 +142,48 @@ const StudentDetailPage = () => {
                 </div>
               ))}
               {studentClasses.length === 0 && <p className="text-sm text-muted-foreground">Chưa có lịch sử học.</p>}
+            </div>
+          )}
+
+          {activeTab === "attendance" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 font-medium text-muted-foreground">Lớp học</th>
+                    <th className="text-left py-2 font-medium text-muted-foreground">Ngày</th>
+                    <th className="text-center py-2 font-medium text-muted-foreground">Trạng thái</th>
+                    <th className="text-left py-2 font-medium text-muted-foreground">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {attendanceRecords
+                    .filter((r) => r.studentId === student.id)
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .map((r) => {
+                      const cls = classes.find((c) => c.id === r.classId);
+                      return (
+                        <tr key={r.id}>
+                          <td className="py-2">{cls?.name || r.classId}</td>
+                          <td className="py-2 text-muted-foreground">{r.date}</td>
+                          <td className="py-2 text-center">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                              r.status === "present" ? "bg-success/10 text-success" : 
+                              r.status === "absent" ? "bg-destructive/10 text-destructive" : 
+                              "bg-kpi-orange/10 text-kpi-orange"
+                            }`}>
+                              {r.status === "present" ? "Có mặt" : r.status === "absent" ? "Vắng" : "Muộn"}
+                            </span>
+                          </td>
+                          <td className="py-2 text-xs text-muted-foreground italic">{r.note || "-"}</td>
+                        </tr>
+                      );
+                    })}
+                  {attendanceRecords.filter((r) => r.studentId === student.id).length === 0 && (
+                    <tr><td colSpan={4} className="py-4 text-center text-muted-foreground">Chưa có dữ liệu điểm danh.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
 

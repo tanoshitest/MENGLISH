@@ -276,6 +276,10 @@ export const attendanceRecords: AttendanceRecord[] = [
   { id: "ATT006", classId: "CLS001", studentId: "STU002", date: "2025-03-22", status: "present" },
   { id: "ATT007", classId: "CLS002", studentId: "STU002", date: "2025-03-24", status: "present" },
   { id: "ATT008", classId: "CLS003", studentId: "STU001", date: "2025-03-24", status: "present" },
+  { id: "ATT009", classId: "CLS001", studentId: "STU001", date: "2025-03-20", status: "present" },
+  { id: "ATT010", classId: "CLS001", studentId: "STU001", date: "2025-03-18", status: "absent", note: "Bận việc gia đình" },
+  { id: "ATT011", classId: "CLS003", studentId: "STU001", date: "2025-03-17", status: "present" },
+  { id: "ATT012", classId: "CLS001", studentId: "STU001", date: "2025-03-15", status: "late", note: "Xe hỏng" },
 ];
 
 // ---- Teacher Schedule (for Calendar) ----
