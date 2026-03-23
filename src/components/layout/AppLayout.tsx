@@ -20,11 +20,11 @@ const navItems: NavItem[] = [
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
   { label: "Khóa học", path: "/courses", icon: BookOpen },
   { label: "Lớp học", path: "/classes", icon: School },
-  { label: "Học sinh", path: "/students", icon: GraduationCap },
-  { label: "Giáo viên", path: "/teachers", icon: UserCog },
+  { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
+  { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
   { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
-  { label: "Tài liệu", path: "/documents", icon: FileText },
+  { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Cấu hình", path: "/settings", icon: Settings, adminOnly: true },
 ];
 
