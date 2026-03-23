@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
-  ChevronRight, School
+  ChevronRight, School, FileText
 } from "lucide-react";
 
 interface NavItem {
@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
   { label: "Chăm sóc KH", path: "/tickets", icon: Headphones },
   { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
+  { label: "Tài liệu", path: "/documents", icon: FileText },
   { label: "Cấu hình", path: "/settings", icon: Settings, adminOnly: true },
 ];
 
