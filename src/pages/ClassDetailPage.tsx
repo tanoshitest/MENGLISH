@@ -16,24 +16,23 @@ const ClassDetailPage = () => {
   const [activeTab, setActiveTab] = useState<"info" | "students" | "attendance" | "grades">("info");
 
   const classData = classes.find((c) => c.id === id);
-  if (!classData) return <div className="p-10 text-center">Lớp học không tồn tại</div>;
 
-  const classStudents = students.filter((s) => s.classIds.includes(classData.id));
-  const teacher = teachers.find((t) => t.id === classData.teacherId);
+  const classStudents = classData ? students.filter((s) => s.classIds.includes(classData.id)) : [];
+  const teacher = classData ? teachers.find((t) => t.id === classData.teacherId) : null;
 
-  // Mock attendance for today
+  // All hooks must be before any early return
   const todayRaw = new Date().toISOString().split('T')[0];
   const [attendanceDate, setAttendanceDate] = useState(todayRaw);
-  
-  // Local state for demo purposes
   const [localAttendance, setLocalAttendance] = useState<Record<string, "present" | "absent" | "late">>(() => {
     const initial: Record<string, "present" | "absent" | "late"> = {};
     classStudents.forEach(s => {
-      const record = attendanceRecords.find(r => r.studentId === s.id && r.date === attendanceDate && r.classId === classData.id);
+      const record = attendanceRecords.find(r => r.studentId === s.id && r.date === todayRaw && r.classId === id);
       initial[s.id] = record?.status || "present";
     });
     return initial;
   });
+
+  if (!classData) return <div className="p-10 text-center">Lớp học không tồn tại</div>;
 
   const handleAttendanceChange = (studentId: string, status: "present" | "absent" | "late") => {
     setLocalAttendance(prev => ({ ...prev, [studentId]: status }));
