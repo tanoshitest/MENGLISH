@@ -358,3 +358,25 @@ export const notifications: NotificationItem[] = [
   { id: "NTF003", title: "Đề thi mới", content: "Admin vừa cập nhật đề thi Mock Test B2 mới.", time: "2 giờ trước", isRead: true, type: "success", role: "teacher" },
   { id: "NTF004", title: "Nhắc nhở điểm danh", content: "Bạn chưa điểm danh lớp CLS001 ngày hôm qua.", time: "1 ngày trước", isRead: false, type: "warning", role: "teacher" },
 ];
+
+// ---- Timekeeping (Chấm công) ----
+export interface TimekeepingRecord {
+  id: string;
+  teacherId: string;
+  date: string; // YYYY-MM-DD
+  checkInTime: string | null; // HH:mm
+  checkOutTime: string | null; // HH:mm
+  location: { lat: number; lng: number } | null;
+  status: "on-time" | "late" | "missing-checkout" | "absent";
+  note?: string;
+}
+
+export const timekeepingRecords: TimekeepingRecord[] = [
+  { id: "TK001", teacherId: "TCH001", date: "2025-03-24", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
+  { id: "TK002", teacherId: "TCH002", date: "2025-03-24", checkInTime: "08:15", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817 }, status: "late", note: "Xe hỏng ngang đường" },
+  { id: "TK003", teacherId: "TCH003", date: "2025-03-24", checkInTime: "07:50", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
+  { id: "TK004", teacherId: "TCH001", date: "2025-03-23", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
+  { id: "TK005", teacherId: "TCH002", date: "2025-03-23", checkInTime: "08:00", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
+  { id: "TK006", teacherId: "TCH003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817 }, status: "missing-checkout" },
+  { id: "TK007", teacherId: "TCH001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817 }, status: "late" },
+];

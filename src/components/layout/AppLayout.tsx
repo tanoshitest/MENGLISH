@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
-  ChevronRight, School, FileText, Bell, Calendar
+  ChevronRight, School, FileText, Bell, Calendar, Option,
+  Fingerprint
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
+  { label: "Chấm công", path: "/timekeeping", icon: Fingerprint },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -57,6 +59,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
                 : item.path === "/schedule"
                 ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                : item.path === "/timekeeping"
+                ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                 : item.label;
             return (
               <button
@@ -123,6 +127,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
                         : item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                        : item.path === "/timekeeping"
+                        ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                         : item.label;
                   return (
                     <button
@@ -171,6 +177,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
                       : currentPage.path === "/schedule"
                       ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                      : currentPage.path === "/timekeeping"
+                      ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                       : currentPage.label}
                   </span>
                 </>
