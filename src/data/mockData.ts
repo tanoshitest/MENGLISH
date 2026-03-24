@@ -98,12 +98,18 @@ export interface Teacher {
   avgRating: number;
   email: string;
   phone: string;
+  contractInfo: {
+    type: string;
+    baseSalary: number;
+    startDate: string;
+    endDate: string | null;
+  };
 }
 
 export const teachers: Teacher[] = [
-  { id: "TCH001", name: "Lê Hoàng Nam", avatar: "HN", specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, email: "namlh@menglish.edu.vn", phone: "0912345678" },
-  { id: "TCH002", name: "Sarah Johnson", avatar: "SJ", specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, email: "sarah.j@menglish.edu.vn", phone: "0923456789" },
-  { id: "TCH003", name: "Nguyễn Thị Phượng", avatar: "TP", specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, email: "phuongnt@menglish.edu.vn", phone: "0934567890" },
+  { id: "TCH001", name: "Lê Hoàng Nam", avatar: "HN", specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, email: "namlh@menglish.edu.vn", phone: "0912345678", contractInfo: { type: "Toàn thời gian", baseSalary: 15000000, startDate: "2022-01-15", endDate: null } },
+  { id: "TCH002", name: "Sarah Johnson", avatar: "SJ", specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, email: "sarah.j@menglish.edu.vn", phone: "0923456789", contractInfo: { type: "Bán thời gian", baseSalary: 8000000, startDate: "2023-06-01", endDate: "2025-06-01" } },
+  { id: "TCH003", name: "Nguyễn Thị Phượng", avatar: "TP", specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, email: "phuongnt@menglish.edu.vn", phone: "0934567890", contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2021-09-10", endDate: null } },
 ];
 
 // ---- Classes ----
