@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { teachers } from "@/data/mockData";
-import { Search, Filter, Star, Clock, BookOpen, MoreVertical, Mail, Phone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, Filter, Star, BookOpen, MoreVertical, Mail, Phone } from "lucide-react";
 
 const TeachersPage = () => {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   const filtered = teachers.filter(
     (t) => t.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -51,7 +53,11 @@ const TeachersPage = () => {
             </thead>
             <tbody className="divide-y relative">
               {filtered.map((t) => (
-                <tr key={t.id} className="hover:bg-secondary/20 transition-colors group cursor-pointer">
+                <tr
+                  key={t.id}
+                  className="hover:bg-secondary/20 transition-colors group cursor-pointer"
+                  onClick={() => navigate(`/teachers/${t.id}`)}
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold ring-2 ring-primary/5">
@@ -73,8 +79,8 @@ const TeachersPage = () => {
                     <div className="flex flex-col items-center">
                       <span className="font-bold text-primary">{t.hoursThisMonth}h</span>
                       <div className="w-20 h-1 bg-secondary rounded-full mt-1.5 overflow-hidden">
-                        <div 
-                          className="h-full bg-primary transition-all duration-500" 
+                        <div
+                          className="h-full bg-primary transition-all duration-500"
                           style={{ width: `${Math.min((t.hoursThisMonth / 60) * 100, 100)}%` }}
                         ></div>
                       </div>
@@ -88,12 +94,15 @@ const TeachersPage = () => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <Star className="w-3.5 h-3.5 fill-kpi-orange text-kpi-orange" />
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span className="font-bold">{t.avgRating}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button className="p-1.5 hover:bg-secondary rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                    <button
+                      className="p-1.5 hover:bg-secondary rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MoreVertical className="w-4 h-4 text-muted-foreground" />
                     </button>
                   </td>
@@ -104,7 +113,7 @@ const TeachersPage = () => {
                   <td colSpan={6} className="py-12 text-center">
                     <div className="flex flex-col items-center text-muted-foreground">
                       <Search className="w-8 h-8 opacity-20 mb-2" />
-                      <p className="italic text-sm">Không tìm thấy giáo viên tương ứng với bộ lọc.</p>
+                      <p className="italic text-sm">Không tìm thấy giáo viên tương ứng.</p>
                     </div>
                   </td>
                 </tr>
