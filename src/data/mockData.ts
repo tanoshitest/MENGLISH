@@ -372,17 +372,17 @@ export interface TimekeepingRecord {
   date: string; // YYYY-MM-DD
   checkInTime: string | null; // HH:mm
   checkOutTime: string | null; // HH:mm
-  location: { lat: number; lng: number } | null;
+  location: { lat: number; lng: number; name?: string } | null;
   status: "on-time" | "late" | "missing-checkout" | "absent";
   note?: string;
 }
 
 export const timekeepingRecords: TimekeepingRecord[] = [
-  { id: "TK001", teacherId: "TCH001", date: "2025-03-24", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
-  { id: "TK002", teacherId: "TCH002", date: "2025-03-24", checkInTime: "08:15", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817 }, status: "late", note: "Xe hỏng ngang đường" },
-  { id: "TK003", teacherId: "TCH003", date: "2025-03-24", checkInTime: "07:50", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
-  { id: "TK004", teacherId: "TCH001", date: "2025-03-23", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
-  { id: "TK005", teacherId: "TCH002", date: "2025-03-23", checkInTime: "08:00", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817 }, status: "on-time" },
-  { id: "TK006", teacherId: "TCH003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817 }, status: "missing-checkout" },
-  { id: "TK007", teacherId: "TCH001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817 }, status: "late" },
+  { id: "TK001", teacherId: "TCH001", date: "2025-03-24", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK002", teacherId: "TCH002", date: "2025-03-24", checkInTime: "08:15", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late", note: "Xe hỏng ngang đường" },
+  { id: "TK003", teacherId: "TCH003", date: "2025-03-24", checkInTime: "07:50", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK004", teacherId: "TCH001", date: "2025-03-23", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK005", teacherId: "TCH002", date: "2025-03-23", checkInTime: "08:00", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK006", teacherId: "TCH003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "missing-checkout" },
+  { id: "TK007", teacherId: "TCH001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
 ];

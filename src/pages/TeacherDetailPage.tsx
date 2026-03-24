@@ -273,6 +273,7 @@ const TeacherDetailPage = () => {
                        <thead className="text-[10px] font-black uppercase text-muted-foreground bg-secondary/20">
                           <tr>
                              <th className="px-6 py-3 text-left">Ngày</th>
+                             <th className="px-6 py-3 text-center">Vị trí</th>
                              <th className="px-6 py-3 text-center">Giờ Vào</th>
                              <th className="px-6 py-3 text-center">Giờ Ra</th>
                              <th className="px-6 py-3 text-right">Trạng thái</th>
@@ -282,6 +283,7 @@ const TeacherDetailPage = () => {
                           {teacherTimekeeping.map(record => (
                             <tr key={record.id} className="hover:bg-primary/5">
                                <td className="px-6 py-4 font-bold">{record.date}</td>
+                               <td className="px-6 py-4 text-center font-bold text-xs">{record.location?.name || '--'}</td>
                                <td className="px-6 py-4 text-center font-mono text-primary font-bold">{record.checkInTime || "--:--"}</td>
                                <td className="px-6 py-4 text-center font-mono font-bold">{record.checkOutTime || "--:--"}</td>
                                <td className="px-6 py-4 text-right">

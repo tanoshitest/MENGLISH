@@ -52,7 +52,7 @@ const TimekeepingPage = () => {
            date: todayDate,
            checkInTime: type === "in" ? newTime : null,
            checkOutTime: type === "out" ? newTime : null,
-           location: { lat: 21.0285, lng: 105.8048 },
+           location: { lat: 21.0285, lng: 105.8048, name: "Menglish Ba Đình" },
            status: "on-time"
          }, ...records]);
       }
@@ -105,6 +105,7 @@ const TimekeepingPage = () => {
                   <th className="px-6 py-3 text-center">Giờ vào</th>
                   <th className="px-6 py-3 text-center">Giờ ra</th>
                   <th className="px-6 py-3 text-center">Trạng thái</th>
+                  <th className="px-6 py-3 text-left">Vị trí</th>
                   <th className="px-6 py-3 text-right">Tọa độ</th>
                 </tr>
               </thead>
@@ -135,6 +136,7 @@ const TimekeepingPage = () => {
                            record.status === 'late' ? 'Đi muộn' : 'Thiếu Checkout'}
                         </span>
                       </td>
+                      <td className="px-6 py-4 text-left font-bold text-xs">{record.location?.name || 'Chưa rõ'}</td>
                       <td className="px-6 py-4 text-right">
                         {record.location ? (
                           <button onClick={() => toast.info(`Tọa độ: ${record.location?.lat}, ${record.location?.lng}`)} className="text-primary hover:underline group inline-flex items-center gap-1 text-[10px] font-medium">
@@ -228,6 +230,7 @@ const TimekeepingPage = () => {
                     <thead className="text-[10px] font-black uppercase text-muted-foreground bg-secondary/20">
                        <tr>
                           <th className="px-6 py-3 text-left">Ngày</th>
+                          <th className="px-6 py-3 text-center">Vị trí</th>
                           <th className="px-6 py-3 text-center">Giờ Vào</th>
                           <th className="px-6 py-3 text-center">Giờ Ra</th>
                           <th className="px-6 py-3 text-center">Ghi chú</th>
@@ -237,6 +240,7 @@ const TimekeepingPage = () => {
                        {records.filter(r => r.teacherId === currentTeacherId).map(record => (
                          <tr key={record.id} className="hover:bg-primary/5">
                             <td className="px-6 py-4 font-bold">{record.date}</td>
+                            <td className="px-6 py-4 text-center text-xs font-bold">{record.location?.name || '--'}</td>
                             <td className="px-6 py-4 text-center font-mono text-primary font-bold">{record.checkInTime || "--:--"}</td>
                             <td className="px-6 py-4 text-center font-mono font-bold">{record.checkOutTime || "--:--"}</td>
                             <td className="px-6 py-4 text-center">
