@@ -27,7 +27,6 @@ const navItems: NavItem[] = [
   { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
-  { label: "Cấu hình", path: "/settings", icon: Settings, adminOnly: true },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
