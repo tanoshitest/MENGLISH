@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
   { label: "Lớp học", path: "/classes", icon: School },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
   { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
-  { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
+  { label: "Học phí", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
