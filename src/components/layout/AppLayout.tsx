@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
-  ChevronRight, School, FileText, Bell
+  ChevronRight, School, FileText, Bell, Calendar
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ const navItems: NavItem[] = [
   { label: "Tài chính", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
+  { label: "Lịch dạy", path: "/schedule", icon: Calendar },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,9 +53,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
           {filteredNav.map((item) => {
             const active = location.pathname === item.path;
-            const label = item.path === "/classes" 
-              ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
-              : item.label;
+              const label = item.path === "/classes" 
+                ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+                : item.path === "/schedule"
+                ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                : item.label;
             return (
               <button
                 key={item.path}
@@ -116,9 +119,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
                 {filteredNav.map((item) => {
                   const active = location.pathname === item.path;
-                  const label = item.path === "/classes" 
-                    ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
-                    : item.label;
+                      const label = item.path === "/classes" 
+                        ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+                        : item.path === "/schedule"
+                        ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                        : item.label;
                   return (
                     <button
                       key={item.path}
@@ -164,6 +169,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <span className="font-medium text-foreground">
                     {currentPage.path === "/classes" 
                       ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
+                      : currentPage.path === "/schedule"
+                      ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : currentPage.label}
                   </span>
                 </>
