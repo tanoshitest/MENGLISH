@@ -21,6 +21,7 @@ import ClassDetailPage from "@/pages/ClassDetailPage";
 import SchedulePage from "@/pages/SchedulePage";
 import TeacherDetailPage from "@/pages/TeacherDetailPage";
 import TimekeepingPage from "@/pages/TimekeepingPage";
+import AccountingPage from "@/pages/AccountingPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/teachers/:id" element={<TeacherDetailPage />} />
               <Route path="/tickets" element={<TicketsPage />} />
               <Route path="/finance" element={<FinancePage />} />
+              <Route path="/accounting" element={<AccountingPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/timekeeping" element={<TimekeepingPage />} />

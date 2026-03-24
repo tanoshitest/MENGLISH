@@ -386,3 +386,23 @@ export const timekeepingRecords: TimekeepingRecord[] = [
   { id: "TK006", teacherId: "TCH003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "missing-checkout" },
   { id: "TK007", teacherId: "TCH001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
 ];
+
+// ---- Accounting (Kế toán Thu Chi) ----
+export interface Transaction {
+  id: string;
+  type: "income" | "expense";
+  category: "Học phí" | "Lương" | "Mặt bằng" | "Marketing" | "Khác";
+  amount: number;
+  date: string; // YYYY-MM-DD
+  description: string;
+  createdBy: string;
+}
+
+export const transactions: Transaction[] = [
+  { id: "TRX001", type: "income", category: "Học phí", amount: 15000000, date: "2025-03-24", description: "Thu học phí học sinh Nguyễn Minh Anh (IELTS Cấp tốc)", createdBy: "Admin" },
+  { id: "TRX002", type: "income", category: "Học phí", amount: 8000000, date: "2025-03-23", description: "Thu học phí Phạm Hữu Nam (Trọn gói B1)", createdBy: "Admin" },
+  { id: "TRX003", type: "expense", category: "Mặt bằng", amount: 25000000, date: "2025-03-15", description: "Thanh toán mặt bằng tháng 3/2025", createdBy: "Admin" },
+  { id: "TRX004", type: "expense", category: "Marketing", amount: 5000000, date: "2025-03-20", description: "Chạy ads Facebook tháng 3", createdBy: "Admin" },
+  { id: "TRX005", type: "expense", category: "Lương", amount: 45000000, date: "2025-03-05", description: "Chi lương Giảng viên tháng 2", createdBy: "Admin" },
+  { id: "TRX006", type: "income", category: "Khác", amount: 2000000, date: "2025-03-22", description: "Bán giáo trình", createdBy: "Admin" },
+];

@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
   ChevronRight, School, FileText, Bell, Calendar, Option,
-  Fingerprint
+  Fingerprint, Wallet
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
   { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
   { label: "Học phí", path: "/finance", icon: DollarSign, adminOnly: true },
+  { label: "Kế toán", path: "/accounting", icon: Wallet, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
