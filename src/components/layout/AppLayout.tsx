@@ -163,7 +163,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Menu className="w-5 h-5" />
             </button>
             <div className="odoo-breadcrumb">
-              {currentPage && (
+              {currentPage ? (
                 <>
                   <currentPage.icon className="w-4 h-4" />
                   <span className="font-medium text-foreground">
@@ -174,6 +174,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       : currentPage.label}
                   </span>
                 </>
+              ) : (
+                <div className="flex items-center gap-2">
+                   <ChevronRight className="w-3 h-3 text-muted-foreground" />
+                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Chi tiết</span>
+                </div>
               )}
             </div>
           </div>
@@ -257,18 +262,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname + role}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="h-full"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <div className="h-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>
