@@ -125,13 +125,16 @@ export interface ClassItem {
   startDate: string;
   endDate: string;
   status: "active" | "upcoming" | "completed";
+  levelId?: string;
 }
 
 export const classes: ClassItem[] = [
-  { id: "CLS001", name: "IELTS B1 - Sáng T2/T4/T6", course: "IELTS Foundation", teacherId: "TCH001", schedule: "T2, T4, T6 | 8:00-9:30", room: "Room A1", studentCount: 12, maxStudents: 15, startDate: "2024-09-16", endDate: "2025-03-16", status: "active" },
-  { id: "CLS002", name: "English A2 - Chiều T3/T5", course: "General English A2", teacherId: "TCH002", schedule: "T3, T5 | 14:00-15:30", room: "Room B2", studentCount: 8, maxStudents: 12, startDate: "2024-10-01", endDate: "2025-04-01", status: "active" },
-  { id: "CLS003", name: "IELTS B2 - Tối T2/T4/T6", course: "IELTS Advanced", teacherId: "TCH001", schedule: "T2, T4, T6 | 18:30-20:00", room: "Room A2", studentCount: 10, maxStudents: 12, startDate: "2024-06-01", endDate: "2025-06-01", status: "active" },
-  { id: "CLS004", name: "Starter A1 - Sáng T7/CN", course: "English Starter", teacherId: "TCH003", schedule: "T7, CN | 9:00-11:00", room: "Room C1", studentCount: 6, maxStudents: 10, startDate: "2025-01-11", endDate: "2025-07-11", status: "active" },
+  { id: "CLS001", name: "IELTS B1 - Sáng T2/T4/T6", course: "IELTS Foundation", teacherId: "TCH001", schedule: "T2, T4, T6 | 8:00-9:30", room: "Room A1", studentCount: 12, maxStudents: 15, startDate: "2024-09-16", endDate: "2025-03-16", status: "active", levelId: "LVL_I_1" },
+  { id: "CLS002", name: "English A2 - Chiều T3/T5", course: "General English A2", teacherId: "TCH002", schedule: "T3, T5 | 14:00-15:30", room: "Room B2", studentCount: 8, maxStudents: 12, startDate: "2024-10-01", endDate: "2025-04-01", status: "active", levelId: "LVL_S_2" },
+  { id: "CLS003", name: "IELTS B2 - Tối T2/T4/T6", course: "IELTS Advanced", teacherId: "TCH001", schedule: "T2, T4, T6 | 18:30-20:00", room: "Room A2", studentCount: 10, maxStudents: 12, startDate: "2024-06-01", endDate: "2025-06-01", status: "active", levelId: "LVL_I_2" },
+  { id: "CLS004", name: "Starter A1 - Sáng T7/CN", course: "English Starter", teacherId: "TCH003", schedule: "T7, CN | 9:00-11:00", room: "Room C1", studentCount: 6, maxStudents: 10, startDate: "2025-01-11", endDate: "2025-07-11", status: "active", levelId: "LVL_S_1" },
+  { id: "CLS005", name: "Business 1 - Tối T2/T4/T6", course: "Business English 1", teacherId: "TCH003", schedule: "T2, T4, T6 | 19:30-21:00", room: "Room B1", studentCount: 15, maxStudents: 15, startDate: "2025-02-01", endDate: "2025-05-01", status: "active", levelId: "LVL_B_1" },
+  { id: "CLS006", name: "Tiền Tiểu Học 1 (T7/CN)", course: "Kids Pre-School", teacherId: "TCH002", schedule: "T7, CN | 14:00-16:00", room: "Room C2", studentCount: 12, maxStudents: 15, startDate: "2025-03-01", endDate: "2025-09-01", status: "active", levelId: "LVL_K_1" },
 ];
 
 // ---- CRM Leads ----
@@ -403,6 +406,48 @@ export const transactions: Transaction[] = [
   { id: "TRX002", type: "income", category: "Học phí", amount: 8000000, date: "2025-03-23", description: "Thu học phí Phạm Hữu Nam (Trọn gói B1)", createdBy: "Admin" },
   { id: "TRX003", type: "expense", category: "Mặt bằng", amount: 25000000, date: "2025-03-15", description: "Thanh toán mặt bằng tháng 3/2025", createdBy: "Admin" },
   { id: "TRX004", type: "expense", category: "Marketing", amount: 5000000, date: "2025-03-20", description: "Chạy ads Facebook tháng 3", createdBy: "Admin" },
-  { id: "TRX005", type: "expense", category: "Lương", amount: 45000000, date: "2025-03-05", description: "Chi lương Giảng viên tháng 2", createdBy: "Admin" },
   { id: "TRX006", type: "income", category: "Khác", amount: 2000000, date: "2025-03-22", description: "Bán giáo trình", createdBy: "Admin" },
+];
+
+// ---- Course Hierarchy (Khóa học lồng nhau) ----
+export interface CourseCategory {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+}
+
+export interface CourseLevel {
+  id: string;
+  categoryId: string;
+  name: string;
+  durationInMonths: number;
+  fee: number;
+}
+
+export const courseCategories: CourseCategory[] = [
+  { id: "CAT_S", name: "Sơ cấp", description: "Dành cho người mất gốc hoặc bắt đầu từ con số 0.", color: "bg-blue-500" },
+  { id: "CAT_T", name: "Trung cấp", description: "Củng cố ngữ pháp, giao tiếp căn bản hàng ngày.", color: "bg-green-500" },
+  { id: "CAT_K", name: "Sắp vào lớp 1 (Tiền Tiểu học)", description: "Chương trình làm quen Tiếng Anh cho trẻ em 5-6 tuổi.", color: "bg-amber-500" },
+  { id: "CAT_I", name: "Luyện thi IELTS", description: "Chuyên sâu luyện thi chứng chỉ IELTS.", color: "bg-rose-500" },
+];
+
+export const courseLevels: CourseLevel[] = [
+  // Sơ cấp
+  { id: "LVL_S_1", categoryId: "CAT_S", name: "Sơ cấp 1", durationInMonths: 3, fee: 3000000 },
+  { id: "LVL_S_2", categoryId: "CAT_S", name: "Sơ cấp 2", durationInMonths: 3, fee: 3200000 },
+  { id: "LVL_S_3", categoryId: "CAT_S", name: "Sơ cấp 3", durationInMonths: 3, fee: 3500000 },
+  // Trung cấp
+  { id: "LVL_T_1", categoryId: "CAT_T", name: "Trung cấp 1", durationInMonths: 4, fee: 4000000 },
+  { id: "LVL_T_2", categoryId: "CAT_T", name: "Trung cấp 2", durationInMonths: 4, fee: 4500000 },
+  // Tiền tiểu học
+  { id: "LVL_K_1", categoryId: "CAT_K", name: "Tiền tiểu học 1", durationInMonths: 6, fee: 5000000 },
+  { id: "LVL_K_2", categoryId: "CAT_K", name: "Tiền tiểu học 2", durationInMonths: 6, fee: 5500000 },
+  // IELTS
+  { id: "LVL_I_1", categoryId: "CAT_I", name: "IELTS Foundation (4.5)", durationInMonths: 3, fee: 6000000 },
+  { id: "LVL_I_2", categoryId: "CAT_I", name: "IELTS Intensive (6.5)", durationInMonths: 4, fee: 8000000 },
+  // Lạc rớt lại cho code có thể tham chiếu
+  { id: "LVL_G_1", categoryId: "CAT_S", name: "General 1", durationInMonths: 2, fee: 2000000 },
+  { id: "LVL_G_2", categoryId: "CAT_S", name: "General 2", durationInMonths: 2, fee: 2500000 },
+  { id: "LVL_B_1", categoryId: "CAT_T", name: "Business 1", durationInMonths: 3, fee: 4000000 },
 ];
