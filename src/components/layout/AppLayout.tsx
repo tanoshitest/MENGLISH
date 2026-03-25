@@ -330,15 +330,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
                 <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { changeRole("admin"); toast.success("Đã chuyển sang Admin"); }}>
+                <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
                   <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
                   Admin
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { changeRole("teacher"); toast.success("Đã chuyển sang Giảng viên"); }}>
+                <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
                   <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
                   Giảng viên
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { changeRole("parent"); toast.success("Đã chuyển sang Phụ huynh"); }}>
+                <DropdownMenuItem onClick={() => { changeRole("parent"); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
                   <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
                   Phụ huynh
                 </DropdownMenuItem>
