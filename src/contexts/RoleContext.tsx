@@ -6,15 +6,26 @@ interface RoleContextType {
   toggleRole: () => void;
   isAdmin: boolean;
   isTeacher: boolean;
+  isParent: boolean;
 }
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<Role>("admin");
-  const toggleRole = useCallback(() => setRole((r) => (r === "admin" ? "teacher" : "admin")), []);
+  const toggleRole = useCallback(() => setRole((r) => {
+    if (r === "admin") return "teacher";
+    if (r === "teacher") return "parent";
+    return "admin";
+  }), []);
   return (
-    <RoleContext.Provider value={{ role, toggleRole, isAdmin: role === "admin", isTeacher: role === "teacher" }}>
+    <RoleContext.Provider value={{ 
+      role, 
+      toggleRole, 
+      isAdmin: role === "admin", 
+      isTeacher: role === "teacher",
+      isParent: role === "parent"
+    }}>
       {children}
     </RoleContext.Provider>
   );

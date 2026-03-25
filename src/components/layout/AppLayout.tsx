@@ -16,12 +16,13 @@ interface NavItem {
   path: string;
   icon: React.ElementType;
   adminOnly?: boolean;
+  parentOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
-  { label: "Khóa học", path: "/courses", icon: BookOpen },
+  { label: "Quản lý khóa học", path: "/courses", icon: BookOpen },
   { label: "Lớp học", path: "/classes", icon: School },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
   { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
@@ -31,16 +32,20 @@ const navItems: NavItem[] = [
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
   { label: "Chấm công", path: "/timekeeping", icon: Fingerprint },
+  { label: "Góc Phụ huynh", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { role, toggleRole, isAdmin } = useRole();
+  const { role, toggleRole, isAdmin, isTeacher, isParent } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const filteredNav = navItems.filter((item) => !item.adminOnly || isAdmin);
+  const filteredNav = navItems.filter((item) => {
+    if (isParent) return item.parentOnly;
+    return !item.parentOnly && (!item.adminOnly || isAdmin);
+  });
   const currentPage = navItems.find((n) => n.path === location.pathname);
 
   return (
@@ -152,8 +157,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   onClick={toggleRole}
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground"
                 >
-                  <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : "bg-kpi-green"}`} />
-                  {isAdmin ? "Admin" : "Giảng viên"}
+                  <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
+                  {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
                 </button>
               </div>
             </motion.aside>

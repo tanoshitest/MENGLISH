@@ -22,6 +22,7 @@ import SchedulePage from "@/pages/SchedulePage";
 import TeacherDetailPage from "@/pages/TeacherDetailPage";
 import TimekeepingPage from "@/pages/TimekeepingPage";
 import AccountingPage from "@/pages/AccountingPage";
+import ParentDashboard from "@/pages/ParentDashboard";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/timekeeping" element={<TimekeepingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/parent-portal" element={<ParentDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>

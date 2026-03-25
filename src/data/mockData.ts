@@ -2,7 +2,7 @@
 // MOCK DATA - School Management System
 // ============================================================
 
-export type Role = "admin" | "teacher";
+export type Role = "admin" | "teacher" | "parent";
 
 // ---- Students ----
 export interface Student {
@@ -450,4 +450,18 @@ export const courseLevels: CourseLevel[] = [
   { id: "LVL_G_1", categoryId: "CAT_S", name: "General 1", durationInMonths: 2, fee: 2000000 },
   { id: "LVL_G_2", categoryId: "CAT_S", name: "General 2", durationInMonths: 2, fee: 2500000 },
   { id: "LVL_B_1", categoryId: "CAT_T", name: "Business 1", durationInMonths: 3, fee: 4000000 },
+];
+
+// ---- Parent Mock Data ----
+export interface Grade {
+  subject: string;
+  midterm: number;
+  final: number;
+  comments: string;
+}
+
+export const mockGrades: Grade[] = [
+  { subject: "Ngữ pháp Căn bản", midterm: 8.5, final: 9.0, comments: "Học sinh hiểu bài nhanh, làm bài tập đầy đủ." },
+  { subject: "Giao tiếp Tình huống", midterm: 7.0, final: 8.5, comments: "Cần mạnh dạn phát biểu hơn trên lớp." },
+  { subject: "Tiếng Anh Nghe Hiểu", midterm: 8.0, final: 8.5, comments: "Kỹ năng nghe tốt, cần luyện thêm phản xạ." },
 ];
