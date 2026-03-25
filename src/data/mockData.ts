@@ -465,3 +465,20 @@ export const mockGrades: Grade[] = [
   { subject: "Giao tiếp Tình huống", midterm: 7.0, final: 8.5, comments: "Cần mạnh dạn phát biểu hơn trên lớp." },
   { subject: "Tiếng Anh Nghe Hiểu", midterm: 8.0, final: 8.5, comments: "Kỹ năng nghe tốt, cần luyện thêm phản xạ." },
 ];
+
+export interface Homework {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: "submitted" | "pending" | "late";
+  score?: number;
+  comments?: string;
+}
+
+export const mockHomeworks: Homework[] = [
+  { id: "HW001", title: "Unit 1: Present Simple Exercises", dueDate: "2025-03-01", status: "submitted", score: 9.5, comments: "Làm bài rất tốt, chữ viết cẩn thận." },
+  { id: "HW002", title: "Unit 2: Vocabulary Matching", dueDate: "2025-03-10", status: "submitted", score: 8.0, comments: "Sai một số từ vựng nâng cao, cần ôn thêm." },
+  { id: "HW003", title: "Unit 3: Speaking Video Recording", dueDate: "2025-03-18", status: "submitted", score: 9.0, comments: "Phát âm tiến bộ, tự tin." },
+  { id: "HW004", title: "Unit 4: Reading Comprehension", dueDate: "2025-03-25", status: "pending" },
+  { id: "HW005", title: "Unit 5: Grammar Quiz", dueDate: "2025-03-30", status: "pending" },
+];
