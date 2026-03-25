@@ -59,7 +59,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 bg-sidebar border-r border-sidebar-border flex-shrink-0">
+      {!isParent && (
+        <aside className="hidden lg:flex flex-col w-60 bg-sidebar border-r border-sidebar-border flex-shrink-0">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-sidebar-border">
           <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
             <School className="w-4 h-4 text-primary-foreground" />
@@ -122,10 +123,12 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </aside>
+        </aside>
+      )}
 
       {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
+      {!isParent && (
+        <AnimatePresence>
         {sidebarOpen && (
           <>
             <motion.div
@@ -212,16 +215,19 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </motion.aside>
           </>
         )}
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="h-14 bg-card border-b flex items-center justify-between px-4 flex-shrink-0" style={{ boxShadow: "var(--topbar-shadow)" }}>
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground">
-              <Menu className="w-5 h-5" />
-            </button>
+            {!isParent && (
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground mr-1">
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
             <div className="odoo-breadcrumb">
               {currentPage ? (
                 <>
@@ -309,16 +315,35 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </AnimatePresence>
             </div>
 
-            <button
-              onClick={toggleRole}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors hover:bg-secondary"
-            >
-              <div className={`w-2 h-2 rounded-full transition-colors ${isAdmin ? "bg-kpi-blue" : "bg-kpi-green"}`} />
-              Switch: {isAdmin ? "Admin" : "Giảng viên"}
-            </button>
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
-              {isAdmin ? "AD" : "GV"}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center gap-3 cursor-pointer select-none">
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors hover:bg-secondary">
+                    <div className={`w-2 h-2 rounded-full transition-colors ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
+                    Switch: {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
+                  </div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold ${isAdmin ? 'bg-primary' : isTeacher ? 'bg-kpi-green' : 'bg-purple-500'}`}>
+                    {isAdmin ? "AD" : isTeacher ? "GV" : "PH"}
+                  </div>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
+                <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => { changeRole("admin"); toast.success("Đã chuyển sang Admin"); }}>
+                  <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
+                  Admin
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { changeRole("teacher"); toast.success("Đã chuyển sang Giảng viên"); }}>
+                  <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
+                  Giảng viên
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { changeRole("parent"); toast.success("Đã chuyển sang Phụ huynh"); }}>
+                  <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
+                  Phụ huynh
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 

@@ -482,3 +482,19 @@ export const mockHomeworks: Homework[] = [
   { id: "HW004", title: "Unit 4: Reading Comprehension", dueDate: "2025-03-25", status: "pending" },
   { id: "HW005", title: "Unit 5: Grammar Quiz", dueDate: "2025-03-30", status: "pending" },
 ];
+
+export interface TuitionRecord {
+  id: string;
+  studentId: string;
+  month: string;
+  amount: number;
+  dueDate: string;
+  status: "paid" | "unpaid";
+  paymentDate?: string;
+}
+
+export const mockTuitions: TuitionRecord[] = [
+  { id: "BILL001", studentId: "STU001", month: "Tháng 03/2025", amount: 15000000, dueDate: "2025-03-20", status: "paid", paymentDate: "2025-03-24" },
+  { id: "BILL002", studentId: "STU001", month: "Tháng 02/2025", amount: 15000000, dueDate: "2025-02-20", status: "paid", paymentDate: "2025-02-18" },
+  { id: "BILL003", studentId: "STU001", month: "Tháng 01/2025", amount: 15000000, dueDate: "2025-01-20", status: "paid", paymentDate: "2025-01-15" },
+];
