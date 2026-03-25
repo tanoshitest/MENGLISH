@@ -4,6 +4,7 @@ import type { Role } from "@/data/mockData";
 interface RoleContextType {
   role: Role;
   toggleRole: () => void;
+  changeRole: (r: Role) => void;
   isAdmin: boolean;
   isTeacher: boolean;
   isParent: boolean;
@@ -18,10 +19,13 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (r === "teacher") return "parent";
     return "admin";
   }), []);
+  const changeRole = useCallback((newRole: Role) => setRole(newRole), []);
+  
   return (
     <RoleContext.Provider value={{ 
       role, 
       toggleRole, 
+      changeRole,
       isAdmin: role === "admin", 
       isTeacher: role === "teacher",
       isParent: role === "parent"

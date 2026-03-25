@@ -9,6 +9,14 @@ import {
   Fingerprint, Wallet
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 interface NavItem {
@@ -36,7 +44,7 @@ const navItems: NavItem[] = [
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { role, toggleRole, isAdmin, isTeacher, isParent } = useRole();
+  const { role, toggleRole, changeRole, isAdmin, isTeacher, isParent } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -84,16 +92,35 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             );
           })}
         </nav>
-        <div className="p-3 border-t border-sidebar-border">
+        <div className="p-3 border-t border-sidebar-border relative">
           <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>
-          <button
-            onClick={toggleRole}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-          >
-            <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : "bg-kpi-green"}`} />
-            {isAdmin ? "Admin" : "Giảng viên"}
-            <ChevronRight className="w-3 h-3 ml-auto" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground hover:bg-primary hover:text-primary-foreground transition-colors outline-none cursor-pointer"
+              >
+                <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
+                {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
+                <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
+              <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => { changeRole("admin"); toast.success("Đã chuyển sang Admin"); }}>
+                <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
+                Admin
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { changeRole("teacher"); toast.success("Đã chuyển sang Giảng viên"); }}>
+                <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
+                Giảng viên
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { changeRole("parent"); toast.success("Đã chuyển sang Phụ huynh"); }}>
+                <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
+                Phụ huynh
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
@@ -153,13 +180,34 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 })}
               </nav>
               <div className="p-3 border-t border-sidebar-border">
-                <button
-                  onClick={toggleRole}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground"
-                >
-                  <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
-                  {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
-                </button>
+                <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground outline-none cursor-pointer"
+                    >
+                      <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
+                      {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
+                      <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
+                    <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => { changeRole("admin"); setSidebarOpen(false); toast.success("Đã chuyển sang Admin"); }}>
+                      <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
+                      Admin
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => { changeRole("teacher"); setSidebarOpen(false); toast.success("Đã chuyển sang Giảng viên"); }}>
+                      <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
+                      Giảng viên
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => { changeRole("parent"); setSidebarOpen(false); toast.success("Đã chuyển sang Phụ huynh"); }}>
+                      <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
+                      Phụ huynh
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </motion.aside>
           </>
