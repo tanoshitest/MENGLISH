@@ -87,17 +87,36 @@ export const students: Student[] = [
   },
 ];
 
-// ---- Teachers ----
-export interface Teacher {
+// ---- Branches ----
+export interface Branch {
+  id: string;
+  name: string;
+  location: string;
+  phone: string;
+}
+
+export const branches: Branch[] = [
+  { id: "BR001", name: "MENGLISH - Cầu Giấy", location: "8 Xuân Thủy, Cầu Giấy, HN", phone: "024.123.456" },
+  { id: "BR002", name: "MENGLISH - Quận 1", location: "15 Lê Thánh Tôn, Quận 1, HCM", phone: "028.987.654" },
+  { id: "BR003", name: "MENGLISH - Online", location: "Hệ thống học trực tuyến", phone: "1900.555.666" },
+];
+
+// ---- Users (Giảng viên, Vận hành, Trợ giảng...) ----
+export type AppUserRole = "teacher" | "ta" | "ops" | "accounting" | "admin";
+
+export interface AppUser {
   id: string;
   name: string;
   avatar: string;
-  specialty: string;
-  hoursThisMonth: number;
-  totalClasses: number;
-  avgRating: number;
+  role: AppUserRole;
+  branchId: string;
+  specialty?: string; // Only for teachers/TAs
+  hoursThisMonth?: number;
+  totalClasses?: number;
+  avgRating?: number;
   email: string;
   phone: string;
+  status: "active" | "inactive";
   contractInfo: {
     type: string;
     baseSalary: number;
@@ -106,11 +125,46 @@ export interface Teacher {
   };
 }
 
-export const teachers: Teacher[] = [
-  { id: "TCH001", name: "Lê Hoàng Nam", avatar: "HN", specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, email: "namlh@menglish.edu.vn", phone: "0912345678", contractInfo: { type: "Toàn thời gian", baseSalary: 15000000, startDate: "2022-01-15", endDate: null } },
-  { id: "TCH002", name: "Sarah Johnson", avatar: "SJ", specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, email: "sarah.j@menglish.edu.vn", phone: "0923456789", contractInfo: { type: "Bán thời gian", baseSalary: 8000000, startDate: "2023-06-01", endDate: "2025-06-01" } },
-  { id: "TCH003", name: "Nguyễn Thị Phượng", avatar: "TP", specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, email: "phuongnt@menglish.edu.vn", phone: "0934567890", contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2021-09-10", endDate: null } },
+export const users: AppUser[] = [
+  { 
+    id: "USR001", name: "Lê Hoàng Nam", avatar: "HN", role: "teacher", branchId: "BR001",
+    specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, 
+    email: "namlh@menglish.edu.vn", phone: "0912345678", status: "active",
+    contractInfo: { type: "Toàn thời gian", baseSalary: 15000000, startDate: "2022-01-15", endDate: null } 
+  },
+  { 
+    id: "USR002", name: "Sarah Johnson", avatar: "SJ", role: "teacher", branchId: "BR002",
+    specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, 
+    email: "sarah.j@menglish.edu.vn", phone: "0923456789", status: "active",
+    contractInfo: { type: "Bán thời gian", baseSalary: 8000000, startDate: "2023-06-01", endDate: "2025-06-01" } 
+  },
+  { 
+    id: "USR003", name: "Nguyễn Thị Phượng", avatar: "TP", role: "teacher", branchId: "BR001",
+    specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, 
+    email: "phuongnt@menglish.edu.vn", phone: "0934567890", status: "active",
+    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2021-09-10", endDate: null } 
+  },
+  { 
+    id: "USR004", name: "Trần Minh Đức", avatar: "MD", role: "ta", branchId: "BR001",
+    specialty: "IELTS Support", hoursThisMonth: 20, totalClasses: 2,
+    email: "ductm@menglish.edu.vn", phone: "0944555666", status: "active",
+    contractInfo: { type: "Bán thời gian", baseSalary: 4000000, startDate: "2024-01-10", endDate: null } 
+  },
+  { 
+    id: "USR005", name: "Phạm Hồng Nhung", avatar: "HN", role: "ops", branchId: "BR002",
+    email: "nhungph@menglish.edu.vn", phone: "0966777888", status: "active",
+    contractInfo: { type: "Toàn thời gian", baseSalary: 10000000, startDate: "2023-11-01", endDate: null } 
+  },
+  { 
+    id: "USR006", name: "Hoàng Gia Bảo", avatar: "GB", role: "accounting", branchId: "BR001",
+    email: "baohg@menglish.edu.vn", phone: "0977888999", status: "active",
+    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2023-08-15", endDate: null } 
+  },
 ];
+
+// Re-export teachers for legacy support
+export const teachers = users.filter(u => u.role === "teacher");
+export type Teacher = AppUser;
 
 // ---- Classes ----
 export interface ClassItem {

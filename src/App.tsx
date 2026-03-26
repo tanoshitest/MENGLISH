@@ -10,7 +10,7 @@ import CRMPage from "@/pages/CRMPage";
 import CoursesPage from "@/pages/CoursesPage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentDetailPage from "@/pages/StudentDetailPage";
-import TeachersPage from "@/pages/TeachersPage";
+import UserManagementPage from "@/pages/UserManagementPage";
 import TicketsPage from "@/pages/TicketsPage";
 import FinancePage from "@/pages/FinancePage";
 import TasksPage from "@/pages/TasksPage";
@@ -40,7 +40,7 @@ const App = () => (
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/students" element={<StudentsPage />} />
               <Route path="/students/:id" element={<StudentDetailPage />} />
-              <Route path="/teachers" element={<TeachersPage />} />
+              <Route path="/users" element={<UserManagementPage />} />
               <Route path="/teachers/:id" element={<TeacherDetailPage />} />
               <Route path="/tickets" element={<TicketsPage />} />
               <Route path="/finance" element={<FinancePage />} />

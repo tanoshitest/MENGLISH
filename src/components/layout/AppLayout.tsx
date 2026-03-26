@@ -32,7 +32,7 @@ const navItems: NavItem[] = [
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
   { label: "Quản lý khóa học", path: "/courses", icon: BookOpen },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
-  { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
+  { label: "Quản lý User", path: "/users", icon: UserCog },
   { label: "Học phí", path: "/finance", icon: DollarSign, adminOnly: true },
   { label: "Kế toán", path: "/accounting", icon: Wallet, adminOnly: true },
   { label: "Tasks & HR", path: "/tasks", icon: ClipboardList },
@@ -164,6 +164,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                       : item.path === "/documents"
                         ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
+                      : item.path === "/users"
+                        ? "Quản lý User"
                       : item.label;
                   return (
                     <button
@@ -238,6 +240,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                       : currentPage.path === "/documents"
                       ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
+                      : currentPage.path === "/users"
+                      ? "Quản lý User"
                       : currentPage.label}
                   </span>
                 </>
