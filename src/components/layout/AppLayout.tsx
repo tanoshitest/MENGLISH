@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
   ChevronRight, School, FileText, Bell, Calendar, Option,
-  Fingerprint, Wallet
+  Fingerprint, Wallet, MessageCircle
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import {
@@ -25,19 +25,26 @@ interface NavItem {
   icon: React.ElementType;
   adminOnly?: boolean;
   parentOnly?: boolean;
+  teacherOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
-  { label: "Quản lý khóa học", path: "/courses", icon: BookOpen },
-  { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
-  { label: "Quản lý User", path: "/users", icon: UserCog },
+  { label: "Lớp học của tôi", path: "/my-classes", icon: BookOpen, teacherOnly: true },
+  { label: "Quản lý khóa học", path: "/courses", icon: BookOpen, adminOnly: true },
+  { label: "Quản lý học sinh", path: "/students", icon: GraduationCap, adminOnly: true },
+  { label: "Quản lý User", path: "/users", icon: UserCog, adminOnly: true },
   { label: "Tài chính", path: "/financial", icon: DollarSign, adminOnly: true },
   { label: "Phân công công việc", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
-  { label: "Chấm công", path: "/timekeeping", icon: Fingerprint },
-  { label: "Góc Phụ huynh", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
+  { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint },
+  // Parent Items
+  { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
+  { label: "Lớp học & Kết quả", path: "/parent-portal?tab=grades", icon: BookOpen, parentOnly: true },
+  { label: "Học phí & Lịch sử", path: "/parent-portal?tab=finance", icon: Wallet, parentOnly: true },
+  { label: "Tin tức & Sự kiện", path: "/parent-portal?tab=news", icon: Bell, parentOnly: true },
+  { label: "Liên hệ Trung tâm", path: "/parent-portal?tab=contact", icon: MessageCircle, parentOnly: true },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,15 +56,17 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const filteredNav = navItems.filter((item) => {
     if (isParent) return item.parentOnly;
-    return !item.parentOnly && (!item.adminOnly || isAdmin);
+    if (item.parentOnly) return false;
+    if (item.adminOnly && !isAdmin) return false;
+    if (item.teacherOnly && !isTeacher) return false;
+    return true;
   });
   const currentPage = navItems.find((n) => n.path === location.pathname);
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop Sidebar */}
-      {!isParent && (
-        <aside className="hidden lg:flex flex-col w-60 bg-sidebar border-r border-sidebar-border flex-shrink-0">
+      {/* Universal Sidebar - (Admin Style for All) */}
+      <aside className="hidden lg:flex flex-col w-60 bg-sidebar border-r border-sidebar-border flex-shrink-0">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-sidebar-border">
           <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
             <School className="w-4 h-4 text-primary-foreground" />
@@ -67,7 +76,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
           {filteredNav.map((item) => {
             const active = location.pathname === item.path;
-              const label = item.path === "/classes" 
+              const label = item.path === "/tasks"
+                ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
+                : item.path === "/classes" 
                 ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
                 : item.path === "/schedule"
                 ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
@@ -105,27 +116,25 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
               <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { changeRole("admin"); toast.success("Đã chuyển sang Admin"); }}>
+              <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
                 <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
                 Admin
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { changeRole("teacher"); toast.success("Đã chuyển sang Giảng viên"); }}>
+              <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
                 <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
                 Giảng viên
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { changeRole("parent"); toast.success("Đã chuyển sang Phụ huynh"); }}>
+              <DropdownMenuItem onClick={() => { changeRole("parent"); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
                 <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
                 Phụ huynh
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        </aside>
-      )}
+      </aside>
 
       {/* Mobile Sidebar Overlay */}
-      {!isParent && (
-        <AnimatePresence>
+      <AnimatePresence>
         {sidebarOpen && (
           <>
             <motion.div
@@ -156,7 +165,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
                 {filteredNav.map((item) => {
                   const active = location.pathname === item.path;
-                      const label = item.path === "/schedule"
+                      const label = item.path === "/tasks"
+                        ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
+                      : item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : item.path === "/timekeeping"
                         ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
@@ -164,8 +175,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
                       : item.path === "/users"
                         ? "Quản lý User"
-                      : item.path === "/tasks"
-                        ? "Phân công công việc"
                       : item.label;
                   return (
                     <button
@@ -198,15 +207,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
                     <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => { changeRole("admin"); setSidebarOpen(false); toast.success("Đã chuyển sang Admin"); }}>
+                    <DropdownMenuItem onClick={() => { changeRole("admin"); setSidebarOpen(false); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
                       <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
                       Admin
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { changeRole("teacher"); setSidebarOpen(false); toast.success("Đã chuyển sang Giảng viên"); }}>
+                    <DropdownMenuItem onClick={() => { changeRole("teacher"); setSidebarOpen(false); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
                       <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
                       Giảng viên
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { changeRole("parent"); setSidebarOpen(false); toast.success("Đã chuyển sang Phụ huynh"); }}>
+                    <DropdownMenuItem onClick={() => { changeRole("parent"); setSidebarOpen(false); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
                       <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
                       Phụ huynh
                     </DropdownMenuItem>
@@ -216,34 +225,31 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </motion.aside>
           </>
         )}
-        </AnimatePresence>
-      )}
+      </AnimatePresence>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="h-14 bg-card border-b flex items-center justify-between px-4 flex-shrink-0" style={{ boxShadow: "var(--topbar-shadow)" }}>
           <div className="flex items-center gap-3">
-            {!isParent && (
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground mr-1">
-                <Menu className="w-5 h-5" />
-              </button>
-            )}
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground mr-1">
+              <Menu className="w-5 h-5" />
+            </button>
             <div className="odoo-breadcrumb">
               {currentPage ? (
                 <>
                   <currentPage.icon className="w-4 h-4" />
                   <span className="font-medium text-foreground">
-                    {currentPage.path === "/schedule"
-                      ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
+                      {currentPage.path === "/tasks"
+                        ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
+                      : currentPage.path === "/schedule"
+                        ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : currentPage.path === "/timekeeping"
-                      ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
+                        ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                       : currentPage.path === "/documents"
-                      ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
+                        ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
                       : currentPage.path === "/users"
-                      ? "Quản lý User"
-                      : currentPage.path === "/tasks"
-                      ? "Phân công công việc"
+                        ? "Quản lý User"
                       : currentPage.label}
                   </span>
                 </>
@@ -319,41 +325,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 )}
               </AnimatePresence>
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-3 cursor-pointer select-none">
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors hover:bg-secondary">
-                    <div className={`w-2 h-2 rounded-full transition-colors ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
-                    Switch: {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
-                  </div>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold ${isAdmin ? 'bg-primary' : isTeacher ? 'bg-kpi-green' : 'bg-purple-500'}`}>
-                    {isAdmin ? "AD" : isTeacher ? "GV" : "PH"}
-                  </div>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
-                <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
-                  <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
-                  Admin
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
-                  <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
-                  Giảng viên
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { changeRole("parent"); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
-                  <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-                  Phụ huynh
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Page content - Native App Scrolling for All */}
+        <main className="flex-1 overflow-hidden">
           <div className="h-full">
             {children}
           </div>

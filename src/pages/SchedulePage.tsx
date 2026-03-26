@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRole } from "@/contexts/RoleContext";
+import { useNavigate } from "react-router-dom";
 import { teacherSchedule, classes, users } from "@/data/mockData";
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, 
@@ -39,6 +40,7 @@ const PERIODS = {
 
 const SchedulePage = () => {
   const { isAdmin } = useRole();
+  const navigate = useNavigate();
   const [filterTeacher, setFilterTeacher] = useState("all");
   const [filterClass, setFilterClass] = useState("all");
   const [viewType, setViewType] = useState<"detail" | "overview">("detail");
@@ -49,10 +51,11 @@ const SchedulePage = () => {
   const getEvent = (classId: string, dayLabel: string, periodId: string) => {
     // In real app, we would map date and period. For demo, we'll randomize or match some.
     // Let's match by classId and day for demo purposes.
-    return teacherSchedule.find(s => 
-      (filterClass === "all" || s.classId === filterClass) &&
-      (filterTeacher === "all" || s.teacherId === filterTeacher)
-    );
+    return teacherSchedule.find(s => {
+      const cls = classes.find(c => c.id === s.classId);
+      return (filterClass === "all" || s.classId === filterClass) &&
+             (filterTeacher === "all" || cls?.teacherId === filterTeacher);
+    });
   };
 
   return (
@@ -159,7 +162,8 @@ const SchedulePage = () => {
                         {sessIdx === 0 && pIdx === 0 && (
                           <td 
                             rowSpan={PERIODS.morning.length + PERIODS.afternoon.length + PERIODS.evening.length} 
-                            className="p-4 border-r border-b text-center sticky left-0 z-10 bg-card group-hover:bg-primary/5 transition-colors border-l-4 border-l-primary"
+                            className="p-4 border-r border-b text-center sticky left-0 z-10 bg-card group-hover:bg-primary/5 transition-colors border-l-4 border-l-primary cursor-pointer"
+                            onClick={() => navigate(`/classes/${cls.id}`)}
                           >
                             <span className="text-lg font-black text-primary">{cls.name.split(" ")[0]}</span>
                           </td>
@@ -197,7 +201,8 @@ const SchedulePage = () => {
                                 <motion.div 
                                   initial={{ opacity: 0, scale: 0.95 }}
                                   animate={{ opacity: 1, scale: 1 }}
-                                  className={`p-3 rounded-xl border shadow-sm relative overflow-hidden h-full flex flex-col justify-center min-h-[60px] ${
+                                  onClick={() => navigate(`/classes/${cls.id}`)}
+                                  className={`p-3 rounded-xl border shadow-sm relative overflow-hidden h-full flex flex-col justify-center min-h-[60px] cursor-pointer hover:shadow-md transition-all ${
                                     event.id === "EVT001" ? "bg-blue-50 border-blue-200 text-blue-700" :
                                     event.id === "EVT002" ? "bg-purple-50 border-purple-200 text-purple-700" :
                                     "bg-amber-50 border-amber-200 text-amber-700"
@@ -206,7 +211,12 @@ const SchedulePage = () => {
                                   {/* Label "OFF" in image */}
                                   <span className="absolute top-1 left-1 bg-muted-foreground/20 text-[6px] px-1 rounded uppercase font-bold text-muted-foreground">OFF</span>
                                   
-                                  <p className="text-[11px] font-black leading-tight mb-1">{users.find(u => u.id === event.teacherId)?.name || "Giảng viên"}</p>
+                                  <p className="text-[11px] font-black leading-tight mb-1">
+                                    {(() => {
+                                      const cls = classes.find(c => c.id === event.classId);
+                                      return users.find(u => u.id === cls?.teacherId)?.name || "Giảng viên";
+                                    })()}
+                                  </p>
                                   <div className="flex items-center gap-1 opacity-60">
                                     <MapPin className="w-2.5 h-2.5" />
                                     <span className="text-[9px] font-bold uppercase">{event.room}</span>

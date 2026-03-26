@@ -27,63 +27,70 @@ export interface Student {
 
 export const students: Student[] = [
   {
-    id: "STU001", name: "Nguyễn Minh Anh", avatar: "MA", email: "minhanh@email.com", phone: "0901234567",
-    level: "B1 - Intermediate", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001", "CLS003"],
-    totalFee: 12000000, paidFee: 9000000, attendanceCount: 42, parentName: "Nguyễn Văn Hùng", parentPhone: "0912345678",
-    dob: "2008-03-22",
-    notes: [
-      { author: "Trần Thị Lan (Sales)", date: "2024-09-10", content: "Phụ huynh quan tâm khóa IELTS, cần tư vấn thêm lộ trình." },
-      { author: "Lê Hoàng Nam (GV)", date: "2024-11-05", content: "Học sinh tiến bộ tốt về Speaking, cần cải thiện Writing Task 2." },
-    ],
-    examResults: [
-      { exam: "Placement Test", score: 5.5, date: "2024-09-14", skill: "Overall" },
-      { exam: "Mid-term B1", score: 7.0, date: "2024-11-20", skill: "Reading" },
-      { exam: "Mid-term B1", score: 6.0, date: "2024-11-20", skill: "Writing" },
-    ],
+    id: "STU001", name: "Đăng Khoa Bing", avatar: "DK", email: "dkkhoa@email.com", phone: "0901234501",
+    level: "4CLC 2", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 45, parentName: "Bố Khoa", parentPhone: "0912345601",
+    dob: "2015-03-22", notes: [], examResults: []
   },
   {
-    id: "STU002", name: "Trần Quốc Bảo", avatar: "QB", email: "quocbao@email.com", phone: "0907654321",
-    level: "A2 - Elementary", enrollDate: "2024-10-01", status: "active", classIds: ["CLS002"],
-    totalFee: 8000000, paidFee: 8000000, attendanceCount: 30, parentName: "Trần Thị Mai", parentPhone: "0923456789",
-    dob: "2009-07-11",
-    notes: [
-      { author: "Phạm Thị Hoa (Sales)", date: "2024-09-28", content: "Đăng ký online, đã test đầu vào A2." },
-    ],
-    examResults: [
-      { exam: "Placement Test", score: 3.5, date: "2024-09-30", skill: "Overall" },
-    ],
+    id: "STU002", name: "Bảo Thư Mimi", avatar: "BT", email: "baothu@email.com", phone: "0901234502",
+    level: "4CLC 2", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 44, parentName: "Mẹ Thư", parentPhone: "0912345602",
+    dob: "2015-07-11", notes: [], examResults: []
   },
   {
-    id: "STU003", name: "Lê Thị Hương", avatar: "TH", email: "huongle@email.com", phone: "0918765432",
-    level: "B2 - Upper Intermediate", enrollDate: "2024-06-01", status: "active", classIds: ["CLS003"],
-    totalFee: 15000000, paidFee: 15000000, attendanceCount: 65, parentName: "Lê Văn Tâm", parentPhone: "0934567890",
-    dob: "2006-12-05",
-    notes: [],
-    examResults: [
-      { exam: "IELTS Mock", score: 6.5, date: "2024-12-10", skill: "Overall" },
-    ],
+    id: "STU003", name: "Thành Vinh Brian", avatar: "TV", email: "thanhvinh@email.com", phone: "0901234503",
+    level: "4CLC 2", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 43, parentName: "Bố Vinh", parentPhone: "0912345603",
+    dob: "2015-12-05", notes: [], examResults: []
   },
   {
-    id: "STU004", name: "Phạm Đức Khang", avatar: "DK", email: "duckhang@email.com", phone: "0945678901",
-    level: "A1 - Beginner", enrollDate: "2025-01-10", status: "active", classIds: ["CLS004"],
-    totalFee: 6000000, paidFee: 3000000, attendanceCount: 8, parentName: "Phạm Minh Tuấn", parentPhone: "0956789012",
-    dob: "2010-05-18",
-    notes: [
-      { author: "Trần Thị Lan (Sales)", date: "2025-01-08", content: "Học sinh mới, cần theo dõi sát tháng đầu." },
-    ],
-    examResults: [],
+    id: "STU004", name: "Jessica", avatar: "JS", email: "jessica@email.com", phone: "0901234504",
+    level: "4CLC 2", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 42, parentName: "Parent Jessica", parentPhone: "0912345604",
+    dob: "2015-05-18", notes: [], examResults: []
   },
   {
-    id: "STU005", name: "Võ Ngọc Trâm", avatar: "NT", email: "ngoctram@email.com", phone: "0967890123",
-    level: "B1 - Intermediate", enrollDate: "2024-08-20", status: "inactive", classIds: [],
-    totalFee: 12000000, paidFee: 6000000, attendanceCount: 25, parentName: "Võ Văn Sơn", parentPhone: "0978901234",
-    dob: "2007-09-30",
-    notes: [
-      { author: "Admin", date: "2024-12-01", content: "Tạm nghỉ do lý do cá nhân. Dự kiến quay lại tháng 3/2025." },
-    ],
-    examResults: [
-      { exam: "Mid-term B1", score: 5.5, date: "2024-11-20", skill: "Overall" },
-    ],
+    id: "STU005", name: "Thiện Nhân Tom", avatar: "TN", email: "thiennhan@email.com", phone: "0901234505",
+    level: "4CLC 2", enrollDate: "2024-09-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 46, parentName: "Bố Nhân", parentPhone: "0912345605",
+    dob: "2015-09-30", notes: [], examResults: []
+  },
+  {
+    id: "STU006", name: "Hà Anh Kuromi", avatar: "HA", email: "haanh@email.com", phone: "0901234506",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Mẹ Hà Anh", parentPhone: "0912345606",
+    dob: "2015-04-12", notes: [], examResults: []
+  },
+  {
+    id: "STU007", name: "Peter Nhật Anh", avatar: "NA", email: "nhatanh@email.com", phone: "0901234507",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Bố Nhật Anh", parentPhone: "0912345607",
+    dob: "2015-05-15", notes: [], examResults: []
+  },
+  {
+    id: "STU008", name: "Minh Thảo Rosy", avatar: "MT", email: "minhthao@email.com", phone: "0901234508",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Mẹ Minh Thảo", parentPhone: "0912345608",
+    dob: "2015-06-20", notes: [], examResults: []
+  },
+  {
+    id: "STU009", name: "Minh Hải Tony", avatar: "MH", email: "minhhai@email.com", phone: "0901234509",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Bố Minh Hải", parentPhone: "0912345609",
+    dob: "2015-07-25", notes: [], examResults: []
+  },
+  {
+    id: "STU010", name: "Hoàng Anh Robert", avatar: "RA", email: "hoanganh@email.com", phone: "0901234510",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Bố Hoàng Anh", parentPhone: "0912345610",
+    dob: "2015-08-30", notes: [], examResults: []
+  },
+  {
+    id: "STU011", name: "Minh Anh Mina", avatar: "MA", email: "mina@email.com", phone: "0901234511",
+    level: "4CLC 2", enrollDate: "2025-02-15", status: "active", classIds: ["CLS001"],
+    totalFee: 12000000, paidFee: 12000000, attendanceCount: 12, parentName: "Nguyễn Văn Hùng", parentPhone: "0912345611",
+    dob: "2015-09-05", notes: [], examResults: []
   },
 ];
 
@@ -122,43 +129,44 @@ export interface AppUser {
     baseSalary: number;
     startDate: string;
     endDate: string | null;
+    contractFile?: string;
   };
 }
 
 export const users: AppUser[] = [
   { 
-    id: "USR001", name: "Lê Hoàng Nam", avatar: "HN", role: "teacher", branchId: "BR001",
-    specialty: "IELTS Writing & Speaking", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.8, 
-    email: "namlh@menglish.edu.vn", phone: "0912345678", status: "active",
-    contractInfo: { type: "Toàn thời gian", baseSalary: 15000000, startDate: "2022-01-15", endDate: null } 
+    id: "USR001", name: "Ms. Thu Trang", avatar: "TT", role: "teacher", branchId: "BR001",
+    specialty: "English Foundation & Kids", hoursThisMonth: 48, totalClasses: 3, avgRating: 4.9, 
+    email: "thutrang@menglish.edu.vn", phone: "0912345678", status: "active",
+    contractInfo: { type: "Toàn thời gian", baseSalary: 15000000, startDate: "2022-01-15", endDate: null, contractFile: "hop-dong-lao-dong-thutrang.pdf" } 
   },
   { 
     id: "USR002", name: "Sarah Johnson", avatar: "SJ", role: "teacher", branchId: "BR002",
     specialty: "General English & Pronunciation", hoursThisMonth: 36, totalClasses: 2, avgRating: 4.9, 
     email: "sarah.j@menglish.edu.vn", phone: "0923456789", status: "active",
-    contractInfo: { type: "Bán thời gian", baseSalary: 8000000, startDate: "2023-06-01", endDate: "2025-06-01" } 
+    contractInfo: { type: "Bán thời gian", baseSalary: 8000000, startDate: "2023-06-01", endDate: "2025-06-01", contractFile: "contract-sarah-j.pdf" } 
   },
   { 
     id: "USR003", name: "Nguyễn Thị Phượng", avatar: "TP", role: "teacher", branchId: "BR001",
     specialty: "TOEIC & Business English", hoursThisMonth: 40, totalClasses: 3, avgRating: 4.6, 
     email: "phuongnt@menglish.edu.vn", phone: "0934567890", status: "active",
-    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2021-09-10", endDate: null } 
+    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2021-09-10", endDate: null, contractFile: "hdld-phuongnt.pdf" } 
   },
   { 
     id: "USR004", name: "Trần Minh Đức", avatar: "MD", role: "ta", branchId: "BR001",
     specialty: "IELTS Support", hoursThisMonth: 20, totalClasses: 2,
     email: "ductm@menglish.edu.vn", phone: "0944555666", status: "active",
-    contractInfo: { type: "Bán thời gian", baseSalary: 4000000, startDate: "2024-01-10", endDate: null } 
+    contractInfo: { type: "Bán thời gian", baseSalary: 4000000, startDate: "2024-01-10", endDate: null, contractFile: "hdld-duc.pdf" } 
   },
   { 
     id: "USR005", name: "Phạm Hồng Nhung", avatar: "HN", role: "ops", branchId: "BR002",
     email: "nhungph@menglish.edu.vn", phone: "0966777888", status: "active",
-    contractInfo: { type: "Toàn thời gian", baseSalary: 10000000, startDate: "2023-11-01", endDate: null } 
+    contractInfo: { type: "Toàn thời gian", baseSalary: 10000000, startDate: "2023-11-01", endDate: null, contractFile: "hop-dong-nhung.pdf" } 
   },
   { 
     id: "USR006", name: "Hoàng Gia Bảo", avatar: "GB", role: "accounting", branchId: "BR001",
     email: "baohg@menglish.edu.vn", phone: "0977888999", status: "active",
-    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2023-08-15", endDate: null } 
+    contractInfo: { type: "Toàn thời gian", baseSalary: 12000000, startDate: "2023-08-15", endDate: null, contractFile: "contract-gb.pdf" } 
   },
 ];
 
@@ -183,12 +191,12 @@ export interface ClassItem {
 }
 
 export const classes: ClassItem[] = [
-  { id: "CLS001", name: "IELTS B1 - Sáng T2/T4/T6", course: "IELTS Foundation", teacherId: "TCH001", schedule: "T2, T4, T6 | 8:00-9:30", room: "Room A1", studentCount: 12, maxStudents: 15, startDate: "2024-09-16", endDate: "2025-03-16", status: "active", levelId: "LVL_I_1" },
-  { id: "CLS002", name: "English A2 - Chiều T3/T5", course: "General English A2", teacherId: "TCH002", schedule: "T3, T5 | 14:00-15:30", room: "Room B2", studentCount: 8, maxStudents: 12, startDate: "2024-10-01", endDate: "2025-04-01", status: "active", levelId: "LVL_S_2" },
-  { id: "CLS003", name: "IELTS B2 - Tối T2/T4/T6", course: "IELTS Advanced", teacherId: "TCH001", schedule: "T2, T4, T6 | 18:30-20:00", room: "Room A2", studentCount: 10, maxStudents: 12, startDate: "2024-06-01", endDate: "2025-06-01", status: "active", levelId: "LVL_I_2" },
-  { id: "CLS004", name: "Starter A1 - Sáng T7/CN", course: "English Starter", teacherId: "TCH003", schedule: "T7, CN | 9:00-11:00", room: "Room C1", studentCount: 6, maxStudents: 10, startDate: "2025-01-11", endDate: "2025-07-11", status: "active", levelId: "LVL_S_1" },
-  { id: "CLS005", name: "Business 1 - Tối T2/T4/T6", course: "Business English 1", teacherId: "TCH003", schedule: "T2, T4, T6 | 19:30-21:00", room: "Room B1", studentCount: 15, maxStudents: 15, startDate: "2025-02-01", endDate: "2025-05-01", status: "active", levelId: "LVL_B_1" },
-  { id: "CLS006", name: "Tiền Tiểu Học 1 (T7/CN)", course: "Kids Pre-School", teacherId: "TCH002", schedule: "T7, CN | 14:00-16:00", room: "Room C2", studentCount: 12, maxStudents: 15, startDate: "2025-03-01", endDate: "2025-09-01", status: "active", levelId: "LVL_K_1" },
+  { id: "CLS001", name: "4CLC 2 - T3/T7", course: "4CLC 2", teacherId: "USR001", schedule: "T3, T7 | 17:30-19:00", room: "Room A1", studentCount: 11, maxStudents: 15, startDate: "2024-09-16", endDate: "2025-03-16", status: "active", levelId: "LVL_I_1" },
+  { id: "CLS002", name: "English A2 - Chiều T3/T5", course: "General English A2", teacherId: "USR002", schedule: "T3, T5 | 14:00-15:30", room: "Room B2", studentCount: 8, maxStudents: 12, startDate: "2024-10-01", endDate: "2025-04-01", status: "active", levelId: "LVL_S_2" },
+  { id: "CLS003", name: "IELTS B2 - Tối T2/T4/T6", course: "IELTS Advanced", teacherId: "USR002", schedule: "T2, T4, T6 | 18:30-20:00", room: "Room A2", studentCount: 10, maxStudents: 12, startDate: "2024-06-01", endDate: "2025-06-01", status: "active", levelId: "LVL_I_2" },
+  { id: "CLS004", name: "Starter A1 - Sáng T7/CN", course: "English Starter", teacherId: "USR003", schedule: "T7, CN | 9:00-11:00", room: "Room C1", studentCount: 6, maxStudents: 10, startDate: "2025-01-11", endDate: "2025-07-11", status: "active", levelId: "LVL_S_1" },
+  { id: "CLS005", name: "Business 1 - Tối T2/T4/T6", course: "Business English 1", teacherId: "USR002", schedule: "T2, T4, T6 | 19:30-21:00", room: "Room B1", studentCount: 15, maxStudents: 15, startDate: "2025-02-01", endDate: "2025-05-01", status: "active", levelId: "LVL_B_1" },
+  { id: "CLS006", name: "Tiền Tiểu Học 1 (T7/CN)", course: "Kids Pre-School", teacherId: "USR002", schedule: "T7, CN | 14:00-16:00", room: "Room C2", studentCount: 12, maxStudents: 15, startDate: "2025-03-01", endDate: "2025-09-01", status: "active", levelId: "LVL_K_1" },
 ];
 
 // ---- CRM Leads ----
@@ -298,6 +306,9 @@ export const tasks: Task[] = [
   { id: "TSK003", title: "Gửi báo cáo tháng 2 cho BGĐ", assignee: "Admin", stage: "done", priority: "high", dueDate: "2025-03-10" },
   { id: "TSK004", title: "Họp review chương trình IELTS", assignee: "Nguyễn Thị Phượng", stage: "todo", priority: "medium", dueDate: "2025-03-30" },
   { id: "TSK005", title: "Cập nhật tài liệu Speaking Part 2", assignee: "Sarah Johnson", stage: "in_progress", priority: "low", dueDate: "2025-04-01" },
+  { id: "TSK006", title: "Chấm điểm bài tập viết Unit 4", assignee: "Sarah Johnson", stage: "todo", priority: "high", dueDate: "2025-03-27" },
+  { id: "TSK007", title: "Gửi thông báo họp phụ huynh CLS002", assignee: "Sarah Johnson", stage: "todo", priority: "medium", dueDate: "2025-03-29" },
+  { id: "TSK008", title: "Hoàn thành nhận xét tháng 3", assignee: "Sarah Johnson", stage: "done", priority: "high", dueDate: "2025-03-24" },
 ];
 
 // ---- Documents ----
@@ -432,22 +443,23 @@ export interface TimekeepingRecord {
   checkInTime: string | null; // HH:mm
   checkOutTime: string | null; // HH:mm
   location: { lat: number; lng: number; name?: string } | null;
-  status: "on-time" | "late" | "missing-checkout" | "absent";
+  status: "on-time" | "late" | "missing-checkout" | "absent" | "early-leave";
   note?: string;
 }
 
 export const timekeepingRecords: TimekeepingRecord[] = [
-  { id: "TK001", teacherId: "TCH001", date: "2025-03-24", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK002", teacherId: "TCH002", date: "2025-03-24", checkInTime: "08:15", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late", note: "Xe hỏng ngang đường" },
-  { id: "TK003", teacherId: "TCH003", date: "2025-03-24", checkInTime: "07:50", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK004", teacherId: "TCH001", date: "2025-03-23", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK005", teacherId: "TCH002", date: "2025-03-23", checkInTime: "08:00", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK006", teacherId: "TCH003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "missing-checkout" },
-  { id: "TK007", teacherId: "TCH001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
-  { id: "TK008", teacherId: "TCH001", date: "2025-03-21", checkInTime: "07:50", checkOutTime: "17:10", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK009", teacherId: "TCH001", date: "2025-03-20", checkInTime: "08:10", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
-  { id: "TK010", teacherId: "TCH001", date: "2025-03-19", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
-  { id: "TK011", teacherId: "TCH001", date: "2025-03-18", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK001", teacherId: "USR001", date: "2025-03-24", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK002", teacherId: "USR002", date: "2025-03-24", checkInTime: "08:15", checkOutTime: null, location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late", note: "Xe hỏng ngang đường" },
+  { id: "TK003", teacherId: "USR003", date: "2025-03-24", checkInTime: "07:50", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK004", teacherId: "USR001", date: "2025-03-23", checkInTime: "07:55", checkOutTime: "17:30", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK005", teacherId: "USR002", date: "2025-03-23", checkInTime: "08:00", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK006", teacherId: "USR003", date: "2025-03-23", checkInTime: "07:40", checkOutTime: null, location: { lat: 21.328511, lng: 105.844817, name: "Menglish Quận 1" }, status: "missing-checkout" },
+  { id: "TK007", teacherId: "USR001", date: "2025-03-22", checkInTime: "08:05", checkOutTime: "17:05", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
+  { id: "TK008", teacherId: "USR001", date: "2025-03-21", checkInTime: "07:50", checkOutTime: "15:30", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "early-leave", note: "Về sớm đưa con đi khám" },
+  { id: "TK009", teacherId: "USR001", date: "2025-03-20", checkInTime: "08:10", checkOutTime: "17:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "late" },
+  { id: "TK010", teacherId: "USR001", date: "2025-03-19", checkInTime: "07:55", checkOutTime: "16:00", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "early-leave" },
+  { id: "TK011", teacherId: "USR001", date: "2025-03-18", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.028511, lng: 105.804817, name: "Menglish Ba Đình" }, status: "on-time" },
+  { id: "TK012", teacherId: "USR001", date: "2025-03-17", checkInTime: "07:45", checkOutTime: "17:15", location: { lat: 21.328511, lng: 105.844817, name: "Menglish Quận 1" }, status: "on-time" },
 ];
 
 // ---- Accounting (Kế toán Thu Chi) ----

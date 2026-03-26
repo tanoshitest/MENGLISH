@@ -174,12 +174,13 @@ const TimekeepingPage = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-secondary/30 text-muted-foreground font-black uppercase text-[10px]">
+                  <thead className="bg-secondary/30 text-muted-foreground font-black uppercase text-[10px]">
                 <tr>
                   <th className="px-6 py-3 text-left">Ngày</th>
                   <th className="px-6 py-3 text-center">Giờ vào</th>
                   <th className="px-6 py-3 text-center">Giờ ra</th>
                   <th className="px-6 py-3 text-center">Số giờ</th>
+                  <th className="px-6 py-3 text-left">Vị trí</th>
                   <th className="px-6 py-3 text-center">Trạng thái</th>
                   <th className="px-6 py-3 text-left">Ghi chú</th>
                 </tr>
@@ -195,13 +196,19 @@ const TimekeepingPage = () => {
                     <td className="px-6 py-4 text-center font-bold">
                       {calculateDuration(r.checkInTime, r.checkOutTime).toFixed(1)}h
                     </td>
+                    <td className="px-6 py-4 text-left font-bold text-[10px] text-slate-500">
+                       {r.location?.name || "-"}
+                    </td>
                     <td className="px-6 py-4 text-center">
                        <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase border
                           ${r.status === 'on-time' ? 'bg-success/5 text-success border-success/20' : 
                             r.status === 'late' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
+                            r.status === 'early-leave' ? 'bg-purple-50 text-purple-600 border-purple-200' :
                             'bg-destructive/10 text-destructive border-destructive/20'}`}
                         >
-                          {r.status === 'on-time' ? 'Đúng giờ' : r.status === 'late' ? 'Đi muộn' : 'Vắng/Thiếu'}
+                          {r.status === 'on-time' ? 'Đúng giờ' : 
+                           r.status === 'late' ? 'Đi muộn' : 
+                           r.status === 'early-leave' ? 'Về sớm' : 'Vắng/Thiếu'}
                         </span>
                     </td>
                     <td className="px-6 py-4 text-left text-xs text-muted-foreground italic">{r.note || "-"}</td>
@@ -338,20 +345,33 @@ const TimekeepingPage = () => {
         <div className="w-full md:w-1/3 xl:w-1/4 space-y-6">
            <div className="bg-card rounded-3xl border shadow-xl p-8 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-primary/20 to-transparent" />
-              <div className="relative">
-                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">{currentTime.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                 <motion.h1 
-                    key={currentTime.getSeconds()}
-                    initial={{ opacity: 0.5, y: -2 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-6xl font-black mt-4 font-mono tracking-tighter"
-                 >
-                    {currentTime.toTimeString().slice(0, 5)}
-                 </motion.h1>
-                 <p className="text-xs font-bold text-primary mt-2 flex justify-center items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" /> GPS Location: Acquiring...
-                 </p>
+              <div className="relative pt-6 pb-2">
+                 <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] mb-1">{currentTime.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                 <div className="relative inline-block">
+                    <motion.div 
+                      key={currentTime.getSeconds()}
+                      initial={{ opacity: 0.8, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="text-7xl font-black font-mono tracking-tighter text-slate-800 drop-shadow-sm"
+                    >
+                       {currentTime.toTimeString().slice(0, 5)}
+                       <span className="text-3xl opacity-30 ml-1 font-bold">{currentTime.toTimeString().slice(6, 8)}</span>
+                    </motion.div>
+                    {isCheckingIn && (
+                      <motion.div 
+                        initial={{ scale: 0.8, opacity: 0.3 }}
+                        animate={{ scale: 2, opacity: 0 }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="absolute inset-0 bg-primary/20 rounded-full -z-10"
+                      />
+                    )}
+                 </div>
+                 <div className="flex items-center justify-center gap-2 mt-4">
+                    <div className={`w-2 h-2 rounded-full ${isCheckingIn ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`} />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                       {isCheckingIn ? "Đang xác thực GPS..." : "Vị trí: Menglish Ba Đình"}
+                    </span>
+                 </div>
               </div>
 
               <div className="mt-10 space-y-4">

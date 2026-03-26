@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useRole } from "@/contexts/RoleContext";
 import { mockGrades, timekeepingRecords, students, mockHomeworks, mockTuitions } from "@/data/mockData";
+import { ClassDetailContent } from "./ClassDetailPage";
+import { useSearchParams } from "react-router-dom";
 import { 
   GraduationCap, BookOpen, Clock, MessageCircle, 
   UploadCloud, CheckCircle, AlertCircle, Send, CheckSquare, FileText, ChevronRight, Wallet, Bell, Calendar
@@ -10,7 +12,8 @@ import { motion } from "framer-motion";
 
 const ParentDashboard = () => {
   const { isParent } = useRole();
-  const [activeTab, setActiveTab] = useState("info");
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "info"; 
   const [message, setMessage] = useState("");
   const [uploadingId, setUploadingId] = useState<string | null>(null);
 
@@ -42,273 +45,91 @@ const ParentDashboard = () => {
 
   const tabs = [
     { id: "info", label: "Thông tin học viên", icon: GraduationCap },
-    { id: "grades", label: "Điểm & Chuyên cần", icon: BookOpen },
-    { id: "homework", label: "Bài tập", icon: CheckSquare },
+    { id: "grades", label: "Lớp học & Kết quả", icon: BookOpen },
     { id: "finance", label: "Học phí & Lịch sử", icon: Wallet },
     { id: "news", label: "Tin tức & Sự kiện", icon: Bell },
     { id: "contact", label: "Liên hệ Trung tâm", icon: MessageCircle }
   ];
 
   return (
-    <div className="p-4 md:p-6 w-full mx-auto h-[calc(100vh-80px)] flex flex-col">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-6 shrink-0">
-        <div>
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <GraduationCap className="w-7 h-7" /> Cổng Thông Tin Phụ Huynh
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Chào mừng Phụ huynh của <strong className="text-foreground">{child.name}</strong> quay trở lại.</p>
-        </div>
-        <div className="flex items-center gap-3 bg-secondary/30 px-6 py-2 rounded-md border border-primary/20 bg-primary/5">
-          <div className="w-12 h-12 rounded bg-primary text-primary-foreground flex items-center justify-center font-bold text-xl shadow-sm">
-            {child.avatar}
+    <div className="w-full h-full flex flex-col overflow-hidden bg-slate-50/30">
+      <div className="flex-1 min-h-0 flex flex-col">
+        {/* Main Content Area - NOW FULL WIDTH */}
+        <div className="flex-1 bg-transparent overflow-hidden flex flex-col min-h-0">
+          {/* Dashboard Header Banner - PRO ANNOUNCEMENT */}
+          <div className="px-6 pt-4">
+             <div className="bg-gradient-to-r from-primary to-[#5cba9b] p-4 rounded-2xl shadow-lg shadow-primary/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                   <Bell className="w-20 h-20 text-white" />
+                </div>
+                <div className="relative z-10 flex items-center gap-4">
+                   <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+                      <Bell className="w-5 h-5 text-white" />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Thông báo mới</p>
+                      <p className="text-sm font-bold text-white tracking-tight">Cập nhật lịch thi giữa kỳ MOVERS Buổi 7 - Vui lòng xem tài liệu ôn tập!</p>
+                   </div>
+                   <button className="ml-auto px-4 py-1.5 bg-white text-primary text-[10px] font-black uppercase rounded-lg shadow-sm hover:scale-105 transition-all">Xem ngay</button>
+                </div>
+             </div>
           </div>
-          <div>
-            <p className="font-bold text-base">{child.name}</p>
-            <p className="text-xs text-muted-foreground">Mã số: {child.id} • Lớp: <span className="text-primary font-bold">{child.level}</span></p>
-          </div>
-        </div>
-      </div>
 
-      {/* Main Layout: Left Sidebar + Right Content */}
-      <div className="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
-        
-        {/* Left Vertical Menu */}
-        <div className="w-full md:w-64 flex flex-col gap-1 shrink-0 overflow-y-auto pr-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center justify-between px-4 py-3.5 rounded-md text-sm font-semibold transition-all ${
-                activeTab === tab.id 
-                  ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20"
-                  : "bg-transparent hover:bg-secondary text-muted-foreground hover:text-foreground border border-transparent"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? "text-primary-foreground" : "text-primary"}`} />
-                {tab.label}
-              </div>
-              {activeTab === tab.id && <ChevronRight className="w-4 h-4 opacity-70" />}
-            </button>
-          ))}
-          
-          <div className="mt-auto p-4 bg-primary/10 rounded-md border border-primary/20 text-[10px] text-primary space-y-2">
-            <p className="font-bold flex items-center gap-1"><Clock className="w-3 h-3" /> Hỗ trợ 24/7:</p>
-            <p>Email: support@menglish.edu.vn</p>
-            <p>Hotline: 1900 6789</p>
-          </div>
-        </div>
-
-        {/* Right Content Area */}
-        <div className="flex-1 bg-card border rounded-md shadow-sm overflow-hidden flex flex-col min-h-0">
-          <div className="p-8 overflow-y-auto flex-1 h-full">
+          <div className="overflow-y-auto flex-1 h-full no-scrollbar px-6 py-4">
             
             {/* CONTENT: INFO */}
             {activeTab === "info" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="font-bold text-xl flex items-center gap-2 mb-8 border-b pb-3">
-                  <GraduationCap className="w-6 h-6 text-primary" /> Thông tin hồ sơ học viên
+              <div className="p-6 md:p-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                <h2 className="font-bold text-lg flex items-center gap-2 mb-4 border-b pb-2">
+                  <GraduationCap className="w-5 h-5 text-primary" /> Thông tin hồ sơ học viên
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-16">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Họ và tên học viên</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">{child.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Mã định danh (ID)</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">{child.id}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Lớp đang theo học</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1 text-primary">{child.level}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Giáo viên phụ trách</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">Cô Sarah Miller</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Ngày nhập học</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">15/01/2025</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Ngày sinh</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">{child.dob}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Người giám hộ</p>
-                    <p className="font-bold text-lg border-b border-dashed pb-1">Nguyễn Văn Hùng</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Trạng thái tài chính</p>
-                    <div className="pt-1">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-success/20 text-success-foreground text-xs font-black uppercase rounded-sm border border-success/40 shadow-sm">
-                        <CheckCircle className="w-3.5 h-3.5" /> Đã hoàn tất học phí
-                      </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                  {[
+                    { label: "Họ và tên học viên", value: child.name, icon: "User" },
+                    { label: " Mã định danh (ID)", value: child.id, icon: "Fingerprint" },
+                    { label: "Lớp đang theo học", value: child.level, icon: "School", highlight: true },
+                    { label: "Giáo viên phụ trách", value: "Cô Sarah Miller", icon: "UserCheck" },
+                    { label: "Ngày nhập học", value: "15/01/2025", icon: "Calendar" },
+                    { label: "Ngày sinh", value: child.dob, icon: "Baby" },
+                    { label: "Người giám hộ", value: "Nguyễn Văn Hùng", icon: "Users" },
+                    { label: "Trạng thái tài chính", value: "Đã hoàn tất học phí", icon: "Wallet", badge: true },
+                  ].map((item, i) => (
+                    <div key={i} className="border-b border-dashed pb-2 hover:bg-primary/5 transition-colors rounded px-1">
+                      <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest mb-0.5">{item.label}</p>
+                      <div className="flex items-center justify-between">
+                        <p className={`font-black text-sm ${item.highlight ? 'text-primary' : ''}`}>{item.value}</p>
+                        {item.badge && (
+                          <span className="text-[8px] font-black bg-success/10 text-success px-2 py-0.5 rounded-full border border-success/20 uppercase">
+                            Đã hoàn tất học phí
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-
-                <div className="mt-12 p-6 bg-secondary/20 rounded-md border border-dashed border-primary/30">
-                  <h3 className="font-bold text-sm mb-3 text-primary uppercase">Ghi chú từ trung tâm:</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed italic">
+                
+                <div className="mt-6 bg-primary/5 border border-primary/10 p-4 rounded-md relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/40" />
+                  <p className="font-black text-[10px] text-primary uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                    <MessageCircle className="w-3 h-3" /> Ghi chú từ Trung tâm:
+                  </p>
+                  <p className="text-xs italic text-muted-foreground leading-relaxed">
                     "Học viên có tinh thần học tập tốt, rất tích cực trong các hoạt động ngoại khóa. Phụ huynh vui lòng theo dõi tab Bài tập để nhắc nhở bé hoàn thành bài đúng hạn."
                   </p>
                 </div>
               </div>
             )}
 
-            {/* CONTENT: GRADES */}
+            {/* CONTENT: GRADES & CLASS DETAIL */}
             {activeTab === "grades" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-10 focus:outline-none">
-                <div>
-                  <h2 className="font-bold text-xl flex items-center gap-2 mb-6 border-b pb-3">
-                    <BookOpen className="w-6 h-6 text-primary" /> Bảng điểm & Đánh giá
-                  </h2>
-                  <div className="overflow-x-auto rounded-md shadow-sm border">
-                    <table className="w-full text-sm border-collapse">
-                      <thead className="bg-secondary/40 text-muted-foreground border-b">
-                        <tr>
-                          <th className="px-5 py-4 text-left font-bold uppercase text-[10px] tracking-widest border-r">Môn học / Kỹ năng</th>
-                          <th className="px-5 py-4 text-center font-bold uppercase text-[10px] tracking-widest border-r w-28">Giữa kỳ</th>
-                          <th className="px-5 py-4 text-center font-bold uppercase text-[10px] tracking-widest border-r w-28">Cuối kỳ</th>
-                          <th className="px-5 py-4 text-left font-bold uppercase text-[10px] tracking-widest">Nhận xét chi tiết</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {mockGrades.map((grade, idx) => (
-                          <tr key={idx} className="hover:bg-primary/5 transition-colors">
-                            <td className="px-5 py-4 font-bold border-r text-base">{grade.subject}</td>
-                            <td className="px-5 py-4 text-center border-r">
-                                <span className="text-lg font-black text-primary">{grade.midterm}</span>
-                            </td>
-                            <td className="px-5 py-4 text-center border-r">
-                                <span className="text-lg font-black text-primary">{grade.final}</span>
-                            </td>
-                            <td className="px-5 py-4 text-muted-foreground leading-relaxed italic">{grade.comments}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div>
-                  <h2 className="font-bold text-xl flex items-center gap-2 mb-6 border-b pb-3">
-                    <Clock className="w-6 h-6 text-primary" /> Lịch sử chuyên cần (Gần nhất)
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[
-                      { date: "24/03/2026", status: "ok", label: "Có mặt", time: "17:30 - 19:30" },
-                      { date: "22/03/2026", status: "ok", label: "Có mặt", time: "17:30 - 19:30" },
-                      { date: "20/03/2026", status: "late", label: "Đi muộn (15p)", time: "17:45 - 19:30" }
-                    ].map((att, i) => (
-                      <div key={i} className="bg-secondary/10 border p-5 rounded-md flex items-center gap-5 shadow-sm hover:border-primary/50 transition-colors group">
-                        <div className={`p-3 rounded-full ${att.status === 'ok' ? 'bg-success/10 text-success' : 'bg-amber-100 text-amber-600'}`}>
-                          {att.status === "ok" ? (
-                            <CheckCircle className="w-8 h-8" />
-                          ) : (
-                            <AlertCircle className="w-8 h-8" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-muted-foreground uppercase mb-1">{att.date}</p>
-                          <p className={`font-black text-base ${att.status === 'ok' ? 'text-success' : 'text-amber-600'}`}>
-                            {att.label}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground/80 mt-1 font-medium">{att.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* CONTENT: HOMEWORK */}
-            {activeTab === "homework" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300 flex flex-col h-full focus:outline-none">
-                <div className="mb-6">
-                  <h2 className="font-bold text-xl flex items-center gap-2 border-b pb-3">
-                    <CheckSquare className="w-6 h-6 text-primary" /> Danh sách bài tập từ đầu khóa
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-3 leading-relaxed">Phụ huynh vui lòng nhắc nhở học viên hoàn thành bài tập trước ngày hết hạn để đảm bảo tiến độ học tập tốt nhất.</p>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto space-y-4 pr-3 pb-8">
-                  {mockHomeworks.map((hw) => {
-                    const isSubmittingThis = uploadingId === hw.id;
-                    
-                    return (
-                      <div key={hw.id} className={`p-6 rounded-md border flex flex-col lg:flex-row gap-6 lg:items-center justify-between transition-all ${hw.status === 'submitted' ? 'bg-success/5 border-success/30' : 'bg-background hover:shadow-lg hover:border-primary/40'}`}>
-                        <div className="flex items-start gap-5 flex-1">
-                          <div className={`p-3 rounded bg-secondary/50 ${hw.status === 'submitted' ? 'text-success' : 'text-muted-foreground'}`}>
-                            <FileText className="w-7 h-7 shrink-0" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-bold text-lg mb-1">{hw.title}</p>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                                <span className="flex items-center gap-1 font-medium"><Calendar className="w-3 h-3" /> Hạn nộp: <span className="text-foreground font-bold">{hw.dueDate}</span></span>
-                                <span className="bg-secondary px-2 py-0.5 rounded-sm">ID: {hw.id}</span>
-                            </div>
-                            {hw.comments && (
-                              <div className="mt-4 bg-background border border-primary/20 p-4 rounded-sm shadow-inner overflow-hidden relative">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
-                                <span className="font-bold text-xs block mb-1 text-primary uppercase">Nhận xét của Teacher Sarah:</span>
-                                <span className="text-sm italic text-muted-foreground leading-relaxed">"{hw.comments}"</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-start lg:items-center gap-4 shrink-0 lg:w-48 lg:border-l lg:pl-6 pt-6 lg:pt-0">
-                          {hw.status === 'submitted' ? (
-                            <>
-                              <div className="flex items-center gap-2 text-xs font-black text-success bg-white px-4 py-2 rounded-full border border-success/30 shadow-sm w-full lg:w-auto justify-center">
-                                <CheckCircle className="w-4 h-4" /> ĐÃ NỘP BÀI
-                              </div>
-                              {hw.score !== undefined && (
-                                <div className="text-center w-full mt-2">
-                                  <span className="text-xs text-muted-foreground block mb-1 font-bold">KẾT QUẢ:</span>
-                                  <div className="flex items-baseline justify-center gap-0.5">
-                                    <span className="text-3xl font-black text-primary">{hw.score}</span>
-                                    <span className="text-sm font-bold text-muted-foreground">/10</span>
-                                  </div>
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <div className="w-full">
-                              <button 
-                                onClick={() => handleUpload(hw.id)}
-                                disabled={isSubmittingThis}
-                                className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground text-sm font-black rounded-md shadow-md transition-all hover:bg-primary/95 active:scale-95 ${isSubmittingThis ? 'opacity-70 cursor-wait' : 'hover:-translate-y-0.5'}`}
-                              >
-                                {isSubmittingThis ? (
-                                  <>
-                                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                                    ĐANG TẢI LÊN...
-                                  </>
-                                ) : (
-                                  <>
-                                    <UploadCloud className="w-5 h-5" /> NỘP BÀI NGAY
-                                  </>
-                                )}
-                              </button>
-                              <p className="text-[10px] text-center text-muted-foreground mt-2 italic font-medium">Hỗ trợ PDF, Ảnh, Video (Max 50MB)</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+              <div className="animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col">
+                <ClassDetailContent id={child.classIds && child.classIds[0] ? child.classIds[0] : "CLS001"} backButton={false} />
               </div>
             )}
 
             {/* CONTENT: FINANCE (Học phí) */}
             {activeTab === "finance" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none">
+              <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none">
                 <h2 className="font-bold text-xl flex items-center gap-2 mb-8 border-b pb-3">
                   <Wallet className="w-6 h-6 text-primary" /> Lịch sử thanh toán học phí
                 </h2>
@@ -371,7 +192,7 @@ const ParentDashboard = () => {
 
             {/* CONTENT: NEWS (Tin tức) */}
             {activeTab === "news" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none h-full">
+              <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none h-full">
                 <h2 className="font-bold text-xl flex items-center gap-2 mb-8 border-b pb-3">
                   <Bell className="w-6 h-6 text-primary" /> Tin tức & Sự kiện nội bộ
                 </h2>
@@ -407,7 +228,7 @@ const ParentDashboard = () => {
 
             {/* CONTENT: CONTACT */}
             {activeTab === "contact" && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col focus:outline-none">
+              <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col focus:outline-none">
                 <h2 className="font-bold text-xl flex items-center gap-2 mb-6 border-b pb-3 shrink-0">
                   <MessageCircle className="w-6 h-6 text-primary" /> Hỗ trợ & Giải đáp thắc mắc
                 </h2>

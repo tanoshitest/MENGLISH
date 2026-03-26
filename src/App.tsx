@@ -11,14 +11,16 @@ import CoursesPage from "@/pages/CoursesPage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentDetailPage from "@/pages/StudentDetailPage";
 import UserManagementPage from "@/pages/UserManagementPage";
+import UserDetailPage from "@/pages/UserDetailPage";
+import ClassDetailPage from "@/pages/ClassDetailPage";
 import FinancialManagementPage from "@/pages/FinancialManagementPage";
 import TicketsPage from "@/pages/TicketsPage";
 import TasksPage from "@/pages/TasksPage";
 import SettingsPage from "@/pages/SettingsPage";
 import DocumentsPage from "@/pages/DocumentsPage";
 import SchedulePage from "@/pages/SchedulePage";
-import TeacherDetailPage from "@/pages/TeacherDetailPage";
 import TimekeepingPage from "@/pages/TimekeepingPage";
+import MyClassesPage from "@/pages/MyClassesPage";
 import ParentDashboard from "@/pages/ParentDashboard";
 import NotFound from "@/pages/NotFound";
 
@@ -40,14 +42,17 @@ const App = () => (
               <Route path="/students" element={<StudentsPage />} />
               <Route path="/students/:id" element={<StudentDetailPage />} />
               <Route path="/users" element={<UserManagementPage />} />
+              <Route path="/users/:id" element={<UserDetailPage />} />
+              <Route path="/classes/:id" element={<ClassDetailPage />} />
               <Route path="/financial" element={<FinancialManagementPage />} />
-              <Route path="/teachers/:id" element={<TeacherDetailPage />} />
+              <Route path="/teachers/:id" element={<UserDetailPage />} />
               <Route path="/tickets" element={<TicketsPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/timekeeping" element={<TimekeepingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/parent-portal" element={<ParentDashboard />} />
+              <Route path="/my-classes" element={<MyClassesPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
