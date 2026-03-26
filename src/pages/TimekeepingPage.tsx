@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRole } from "@/contexts/RoleContext";
-import { timekeepingRecords, teachers } from "@/data/mockData";
+import { timekeepingRecords, users, TimekeepingRecord } from "@/data/mockData";
 import { 
   Clock, Fingerprint, MapPin, CheckCircle, 
   XCircle, AlertCircle, Search, Filter,
-  CalendarDays, Download, User
+  CalendarDays, Download, User, ChevronLeft,
+  ChevronRight, ArrowLeft, BarChart3, Timer,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TimekeepingPage = () => {
   const { isAdmin } = useRole();
   const [records, setRecords] = useState(timekeepingRecords);
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string | null>(null);
+  const [reportDate, setReportDate] = useState(new Date(2025, 2, 1)); // March 2025
   
   // Teacher State
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -46,7 +50,7 @@ const TimekeepingPage = () => {
          if (type === "in") updatedRecords[existingRecordIndex].checkInTime = newTime;
          setRecords(updatedRecords);
       } else {
-         setRecords([{
+         const newRecord: TimekeepingRecord = {
            id: `TK_NEW_${Date.now()}`,
            teacherId: currentTeacherId,
            date: todayDate,
@@ -54,14 +58,176 @@ const TimekeepingPage = () => {
            checkOutTime: type === "out" ? newTime : null,
            location: { lat: 21.0285, lng: 105.8048, name: "Menglish Ba Đình" },
            status: "on-time"
-         }, ...records]);
+         };
+         setRecords([newRecord, ...records]);
       }
     }, 1500);
   };
 
-  const renderAdminView = () => (
+  // ---- HELPER FUNCTIONS FOR STATS ----
+  const calculateDuration = (inTime: string | null, outTime: string | null) => {
+    if (!inTime || !outTime) return 0;
+    const [inH, inM] = inTime.split(':').map(Number);
+    const [outH, outM] = outTime.split(':').map(Number);
+    const diff = (outH * 60 + outM) - (inH * 60 + inM);
+    return Math.max(0, diff / 60); // Hours
+  };
+
+  const calculateLateMinutes = (inTime: string | null) => {
+    if (!inTime) return 0;
+    const [h, m] = inTime.split(':').map(Number);
+    const scheduledMinutes = 8 * 60; // 08:00
+    const actualMinutes = h * 60 + m;
+    return Math.max(0, actualMinutes - scheduledMinutes);
+  };
+
+  const teachersList = users.filter(u => u.role === "teacher" || u.role === "admin");
+
+  // ---- RENDER REPORT VIEW ----
+  const renderMonthlyReport = (teacherId: string) => {
+    const teacher = users.find(u => u.id === teacherId);
+    const month = reportDate.getMonth();
+    const year = reportDate.getFullYear();
+    
+    const monthRecords = records.filter(r => {
+      const d = new Date(r.date);
+      return r.teacherId === teacherId && d.getMonth() === month && d.getFullYear() === year;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const totalHours = monthRecords.reduce((sum, r) => sum + calculateDuration(r.checkInTime, r.checkOutTime), 0);
+    const totalLateMin = monthRecords.reduce((sum, r) => sum + calculateLateMinutes(r.checkInTime), 0);
+    const onTimeCount = monthRecords.filter(r => r.status === 'on-time').length;
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="space-y-6"
+      >
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setSelectedTeacherId(null)}
+            className="p-2 hover:bg-secondary rounded-full transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              Báo cáo tháng: <span className="text-primary">{teacher?.name}</span>
+            </h2>
+            <p className="text-xs text-muted-foreground uppercase font-black tracking-widest">Mã nhân sự: {teacherId}</p>
+          </div>
+
+          <div className="ml-auto flex items-center gap-2 bg-secondary/30 px-3 py-1.5 rounded-xl border">
+            <button 
+              onClick={() => setReportDate(new Date(year, month - 1, 1))}
+              className="p-1 hover:bg-card rounded-md"
+            ><ChevronLeft className="w-4 h-4" /></button>
+            <span className="text-xs font-black min-w-[120px] text-center">Tháng {month + 1} / {year}</span>
+            <button 
+              onClick={() => setReportDate(new Date(year, month + 1, 1))}
+              className="p-1 hover:bg-card rounded-md"
+            ><ChevronRight className="w-4 h-4" /></button>
+          </div>
+        </div>
+
+        {/* Report Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-card p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <Timer className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-muted-foreground uppercase">Tổng giờ làm</p>
+              <p className="text-2xl font-black">{totalHours.toFixed(1)}h</p>
+            </div>
+          </div>
+          <div className="bg-card p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-muted-foreground uppercase">Số phút đi muộn</p>
+              <p className="text-2xl font-black text-amber-600">{totalLateMin}m</p>
+            </div>
+          </div>
+          <div className="bg-card p-5 rounded-2xl border shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-success">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-muted-foreground uppercase">Số buổi đúng giờ</p>
+              <p className="text-2xl font-black text-success">{onTimeCount}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Monthly Detail Table */}
+        <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
+          <div className="p-4 border-b bg-secondary/10 flex items-center justify-between">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" /> Chi tiết từng ngày
+            </h3>
+            <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white text-[10px] font-bold rounded-lg hover:opacity-90">
+              <Download className="w-3.5 h-3.5" /> Xuất Excel
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/30 text-muted-foreground font-black uppercase text-[10px]">
+                <tr>
+                  <th className="px-6 py-3 text-left">Ngày</th>
+                  <th className="px-6 py-3 text-center">Giờ vào</th>
+                  <th className="px-6 py-3 text-center">Giờ ra</th>
+                  <th className="px-6 py-3 text-center">Số giờ</th>
+                  <th className="px-6 py-3 text-center">Trạng thái</th>
+                  <th className="px-6 py-3 text-left">Ghi chú</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {monthRecords.map(r => (
+                  <tr key={r.id} className="hover:bg-primary/5 transition-colors">
+                    <td className="px-6 py-4 font-bold">{r.date}</td>
+                    <td className={`px-6 py-4 text-center font-mono font-bold ${calculateLateMinutes(r.checkInTime) > 0 ? "text-amber-600" : "text-primary"}`}>
+                      {r.checkInTime || "--:--"}
+                    </td>
+                    <td className="px-6 py-4 text-center font-mono font-bold">{r.checkOutTime || "--:--"}</td>
+                    <td className="px-6 py-4 text-center font-bold">
+                      {calculateDuration(r.checkInTime, r.checkOutTime).toFixed(1)}h
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                       <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase border
+                          ${r.status === 'on-time' ? 'bg-success/5 text-success border-success/20' : 
+                            r.status === 'late' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
+                            'bg-destructive/10 text-destructive border-destructive/20'}`}
+                        >
+                          {r.status === 'on-time' ? 'Đúng giờ' : r.status === 'late' ? 'Đi muộn' : 'Vắng/Thiếu'}
+                        </span>
+                    </td>
+                    <td className="px-6 py-4 text-left text-xs text-muted-foreground italic">{r.note || "-"}</td>
+                  </tr>
+                ))}
+                {monthRecords.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground italic">
+                      Không có dữ liệu chấm công cho tháng này.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const renderAdminView = () => {
+    if (selectedTeacherId) return renderMonthlyReport(selectedTeacherId);
+
+    return (
       <div className="space-y-6">
-        {/* Admin KPI Cards */}
+        {/* Admin KPI Cards - Realtime Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-card p-5 rounded-2xl border shadow-sm">
              <p className="text-[10px] uppercase font-black text-muted-foreground mb-1">Tổng lịch dạy hôm nay</p>
@@ -86,7 +252,9 @@ const TimekeepingPage = () => {
         {/* Data Table */}
         <div className="bg-card rounded-2xl border shadow-sm overflow-hidden">
           <div className="p-4 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 bg-secondary/10">
-            <h2 className="font-bold">Lịch sử chấm công</h2>
+            <h2 className="font-bold flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4 text-primary" /> Lịch sử chấm công realtime
+            </h2>
             <div className="flex gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -111,15 +279,18 @@ const TimekeepingPage = () => {
               </thead>
               <tbody className="divide-y">
                 {records.map(record => {
-                  const teacher = teachers.find(t => t.id === record.teacherId);
+                  const teacher = users.find(u => u.id === record.teacherId);
                   return (
-                    <tr key={record.id} className="hover:bg-primary/5 transition-colors">
+                    <tr key={record.id} className="hover:bg-primary/5 transition-colors group">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">{teacher?.avatar || 'GV'}</div>
+                        <div 
+                          className="flex items-center gap-3 cursor-pointer"
+                          onClick={() => setSelectedTeacherId(record.teacherId)}
+                        >
+                          <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs uppercase">{teacher?.name.charAt(0)}</div>
                           <div>
-                            <p className="font-bold">{teacher?.name || record.teacherId}</p>
-                            <p className="text-[10px] text-muted-foreground">{teacher?.phone || '...'}</p>
+                            <p className="font-bold group-hover:text-primary transition-colors">{teacher?.name || record.teacherId}</p>
+                            <p className="text-[10px] text-muted-foreground">Bấm để xem báo cáo tháng</p>
                           </div>
                         </div>
                       </td>
@@ -154,7 +325,8 @@ const TimekeepingPage = () => {
           </div>
         </div>
       </div>
-  );
+    );
+  };
 
   const renderTeacherView = () => {
     const todayDate = currentTime.toISOString().split('T')[0];
@@ -217,47 +389,9 @@ const TimekeepingPage = () => {
            </div>
         </div>
 
-        {/* Right Column: Personal History */}
+        {/* Right Column: Personal Monthly Report */}
         <div className="flex-1">
-           <div className="bg-card rounded-2xl border shadow-sm h-full">
-              <div className="p-5 border-b flex justify-between items-center bg-secondary/10">
-                 <h2 className="font-bold uppercase text-sm tracking-widest text-muted-foreground flex items-center gap-2">
-                    <CalendarDays className="w-4 h-4" /> Lịch sử của bạn
-                 </h2>
-              </div>
-              <div className="overflow-x-auto">
-                 <table className="w-full text-sm">
-                    <thead className="text-[10px] font-black uppercase text-muted-foreground bg-secondary/20">
-                       <tr>
-                          <th className="px-6 py-3 text-left">Ngày</th>
-                          <th className="px-6 py-3 text-center">Vị trí</th>
-                          <th className="px-6 py-3 text-center">Giờ Vào</th>
-                          <th className="px-6 py-3 text-center">Giờ Ra</th>
-                          <th className="px-6 py-3 text-center">Ghi chú</th>
-                       </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                       {records.filter(r => r.teacherId === currentTeacherId).map(record => (
-                         <tr key={record.id} className="hover:bg-primary/5">
-                            <td className="px-6 py-4 font-bold">{record.date}</td>
-                            <td className="px-6 py-4 text-center text-xs font-bold">{record.location?.name || '--'}</td>
-                            <td className="px-6 py-4 text-center font-mono text-primary font-bold">{record.checkInTime || "--:--"}</td>
-                            <td className="px-6 py-4 text-center font-mono font-bold">{record.checkOutTime || "--:--"}</td>
-                            <td className="px-6 py-4 text-center">
-                               {record.status === 'late' ? (
-                                  <span className="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded">ĐI MUỘN</span>
-                               ) : record.status === 'missing-checkout' ? (
-                                  <span className="text-[10px] font-black text-destructive bg-destructive/10 px-2 py-1 rounded">CHƯA CHECKOUT</span>
-                               ) : (
-                                  <span className="text-[10px] font-bold text-muted-foreground"><CheckCircle className="w-3 h-3 inline-block text-success mr-1"/>OK</span>
-                               )}
-                            </td>
-                         </tr>
-                       ))}
-                    </tbody>
-                 </table>
-              </div>
-           </div>
+           {renderMonthlyReport(currentTeacherId)}
         </div>
       </div>
     );
@@ -265,15 +399,19 @@ const TimekeepingPage = () => {
 
   return (
     <div className="p-4 md:p-6 h-full flex flex-col min-h-0 bg-background">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black">{isAdmin ? "Quản lý Chấm công" : "Chấm công Điện tử"}</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {isAdmin ? "Báo cáo giờ vào/ra và thống kê chuyên cần của giảng viên." : "Ghi nhận giờ làm việc tự động với hệ thống nhận diện vị trí GPS."}
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black">{isAdmin ? "Quản lý Chấm công" : "Chấm công Điện tử"}</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {isAdmin ? "Báo cáo giờ vào/ra và thống kê chuyên cần của giảng viên." : "Ghi nhận giờ làm việc tự động với hệ thống nhận diện vị trí GPS."}
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
-         {isAdmin ? renderAdminView() : renderTeacherView()}
+          <AnimatePresence mode="wait">
+            {isAdmin ? renderAdminView() : renderTeacherView()}
+          </AnimatePresence>
       </div>
     </div>
   );
