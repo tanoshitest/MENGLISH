@@ -28,7 +28,6 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
   { label: "Quản lý khóa học", path: "/courses", icon: BookOpen },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
