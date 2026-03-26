@@ -3,12 +3,11 @@ import {
   Search, Filter, Download, Plus, Users, 
   Check, X, ChevronLeft, ChevronRight, 
   GraduationCap, ClipboardCheck, ArrowUpRight,
-  MoreVertical, Calendar, Info, AlertCircle
+  MoreVertical, Calendar, Info, AlertCircle, History
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { students, classes, attendanceRecords } from "@/data/mockData";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,8 +30,11 @@ const SESSIONS = [
   { id: "S10", label: "Buổi 302", day: "T5, 12/02", time: "18:00-19:30" },
 ];
 
-const AttendancePage = () => {
-  const navigate = useNavigate();
+interface AttendanceSectionProps {
+  onGoToMakeUp: () => void;
+}
+
+const AttendanceSection: React.FC<AttendanceSectionProps> = ({ onGoToMakeUp }) => {
   const [showOnlyAbsent, setShowOnlyAbsent] = useState(false);
   const [selectedClass, setSelectedClass] = useState("CLS001");
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,10 +42,7 @@ const AttendancePage = () => {
   const currentClass = classes.find(c => c.id === selectedClass);
   const classStudents = students.filter(s => s.classIds.includes(selectedClass));
 
-  // Determine attendance for each student and session
-  // For demo, we'll randomize or use partial mock data
   const getAttendanceStatus = (studentId: string, sessionId: string) => {
-    // Deterministic demo status
     if (studentId === "STU001" && (sessionId === "S2" || sessionId === "S5")) return "absent";
     if (studentId === "STU004" && sessionId === "S1") return "absent";
     if (studentId === "STU009" && (sessionId === "S3" || sessionId === "S8")) return "absent";
@@ -53,7 +52,6 @@ const AttendancePage = () => {
   const filteredStudents = classStudents.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase());
     if (showOnlyAbsent) {
-      // Check if student has any absent in active sessions
       const hasAbsent = SESSIONS.some(sess => getAttendanceStatus(s.id, sess.id) === "absent");
       return matchesSearch && hasAbsent;
     }
@@ -62,42 +60,16 @@ const AttendancePage = () => {
 
   const handleAddToMakeUp = (studentName: string) => {
     toast.success(`Đã thêm ${studentName} vào danh sách học bù`, {
-      description: "Học sinh sẽ xuất hiện trong tab 'Chưa xếp lịch'.",
+      description: "Học sinh sẽ xuất hiện trong tab 'Danh sách học bù'.",
       action: {
         label: "Xem học bù",
-        onClick: () => navigate("/make-up")
+        onClick: onGoToMakeUp
       }
     });
   };
 
   return (
-    <div className="p-6 bg-[#f8fafc] min-h-full space-y-6">
-      {/* Header Area */}
-      <div className="bg-white border rounded-2xl p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <ClipboardCheck className="w-5 h-5 text-primary" />
-              <h1 className="text-2xl font-black text-foreground">Điểm danh - {currentClass?.name || "CAM10 (PRE7)"}</h1>
-            </div>
-            <p className="text-sm text-muted-foreground font-medium">Theo dõi chuyên cần và quản lý học bù hệ thống.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/make-up")}
-              className="rounded-xl border-primary/20 text-primary hover:bg-primary/5 font-bold"
-            >
-              Quản lý học bù <ArrowUpRight className="ml-2 w-4 h-4" />
-            </Button>
-            <Button className="rounded-xl font-bold bg-primary shadow-lg shadow-primary/20">
-              <Plus className="mr-2 w-4 h-4" /> Điểm danh buổi mới
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters Bar */}
+    <div className="space-y-6">
       <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[240px] relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -134,7 +106,6 @@ const AttendancePage = () => {
         </div>
       </div>
 
-      {/* Matrix Table */}
       <div className="bg-white border rounded-2xl shadow-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
@@ -222,7 +193,6 @@ const AttendancePage = () => {
         </div>
       </div>
 
-      {/* Footer Controls */}
       <div className="flex items-center justify-between bg-white border rounded-2xl p-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Button variant="outline" className="rounded-xl shadow-sm border-slate-200">
@@ -230,9 +200,6 @@ const AttendancePage = () => {
           </Button>
           <Button variant="outline" className="rounded-xl shadow-sm border-slate-200">
             <Download className="mr-2 w-4 h-4" /> Download
-          </Button>
-          <Button variant="outline" className="rounded-xl shadow-sm border-slate-200" onClick={() => navigate("/students")}>
-            Quản lý học viên
           </Button>
         </div>
         <div className="flex items-center gap-2">
@@ -255,4 +222,4 @@ const AttendancePage = () => {
   );
 };
 
-export default AttendancePage;
+export default AttendanceSection;

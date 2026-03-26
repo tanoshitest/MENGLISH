@@ -38,8 +38,6 @@ const navItems: NavItem[] = [
   { label: "Phân công công việc", path: "/tasks", icon: ClipboardList },
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
-  { label: "Điểm danh học sinh", path: "/attendance", icon: ClipboardCheck, adminOnly: true },
-  { label: "Danh sách học bù", path: "/make-up", icon: History, adminOnly: true },
   { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint },
   // Parent Items
   { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
@@ -86,10 +84,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                 : item.path === "/timekeeping"
                 ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
-                : item.path === "/attendance"
-                ? "Điểm danh học sinh"
-                : item.path === "/make-up"
-                ? "Danh sách học bù"
                 : item.label;
             return (
               <button
@@ -175,16 +169,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
                       : item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
-                      : item.path === "/timekeeping"
-                        ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                       : item.path === "/documents"
                         ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
                       : item.path === "/users"
                         ? "Quản lý User"
-                      : item.path === "/attendance"
-                        ? "Điểm danh học sinh"
-                      : item.path === "/make-up"
-                        ? "Danh sách học bù"
                       : item.label;
                   return (
                     <button
