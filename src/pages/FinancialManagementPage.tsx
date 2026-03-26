@@ -4,14 +4,16 @@ import {
   financeRecords, 
   transactions as mockTransactions, 
   FinanceRecord, 
-  Transaction 
+  Transaction,
+  branches,
+  classes
 } from "@/data/mockData";
 import { 
   DollarSign, Wallet, Search, Filter, CreditCard, 
   Calendar, AlertCircle, CheckCircle2, Clock, 
   TrendingUp, TrendingDown, Plus, Download, 
   ArrowUpRight, ArrowDownRight, FileText, X,
-  ChevronRight
+  ChevronRight, School, Laptop
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,6 +27,8 @@ const FinancialManagementPage = () => {
   // States for Tuition
   const [tuitionSearch, setTuitionSearch] = useState("");
   const [tuitionStatusFilter, setTuitionStatusFilter] = useState<"all" | FinanceRecord["status"]>("all");
+  const [tuitionBranchFilter, setTuitionBranchFilter] = useState<string>("all");
+  const [tuitionClassFilter, setTuitionClassFilter] = useState<string>("all");
   
   // States for Accounting
   const [accountingTransactions, setAccountingTransactions] = useState<Transaction[]>(mockTransactions);
@@ -44,14 +48,18 @@ const FinancialManagementPage = () => {
   const tuitionRecords = financeRecords.filter(
     (r) => r.type === "income" && r.category === "Học phí"
   );
+  
   const filteredTuition = tuitionRecords.filter((r) => {
     const matchSearch = r.description.toLowerCase().includes(tuitionSearch.toLowerCase());
     const matchStatus = tuitionStatusFilter === "all" || r.status === tuitionStatusFilter;
-    return matchSearch && matchStatus;
+    const matchBranch = tuitionBranchFilter === "all" || r.branchId === tuitionBranchFilter;
+    const matchClass = tuitionClassFilter === "all" || r.classId === tuitionClassFilter;
+    return matchSearch && matchStatus && matchBranch && matchClass;
   });
-  const totalTuitionCollected = tuitionRecords.filter((r) => r.status === "paid").reduce((s, r) => s + r.amount, 0);
-  const totalTuitionPending = tuitionRecords.filter((r) => r.status === "pending").reduce((s, r) => s + r.amount, 0);
-  const totalTuitionOverdue = tuitionRecords.filter((r) => r.status === "overdue").reduce((s, r) => s + r.amount, 0);
+  
+  const totalTuitionCollected = filteredTuition.filter((r) => r.status === "paid").reduce((s, r) => s + r.amount, 0);
+  const totalTuitionPending = filteredTuition.filter((r) => r.status === "pending").reduce((s, r) => s + r.amount, 0);
+  const totalTuitionOverdue = filteredTuition.filter((r) => r.status === "overdue").reduce((s, r) => s + r.amount, 0);
 
   // ---- ACCOUNTING LOGIC ----
   const totalAccIncome = accountingTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
@@ -130,7 +138,7 @@ const FinancialManagementPage = () => {
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
                     <h1 className="text-xl font-bold text-foreground">Quản lý Học phí</h1>
-                    <p className="text-sm text-muted-foreground">Theo dõi tình trạng đóng học phí của học sinh toàn bộ hệ thống.</p>
+                    <p className="text-sm text-muted-foreground">Theo dõi tình trạng đóng học phí của học sinh theo chi nhánh và lớp học.</p>
                   </div>
                 </div>
 
@@ -150,47 +158,89 @@ const FinancialManagementPage = () => {
                   </div>
                 </div>
 
-                {/* Tuition Table Section */}
-                <div className="space-y-4">
+                {/* Tuition Filter Section */}
+                <div className="bg-card border rounded-lg p-5 shadow-sm space-y-4">
                   <div className="flex items-center gap-4 flex-wrap">
-                    <div className="relative flex-1 max-w-sm">
+                    <div className="relative flex-1 min-w-[200px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input 
                         type="text" placeholder="Tìm theo tên học sinh..." 
                         value={tuitionSearch} onChange={(e) => setTuitionSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-card border rounded-md text-sm focus:ring-1 focus:ring-primary outline-none"
+                        className="w-full pl-9 pr-4 py-2 bg-background border rounded-md text-sm focus:ring-1 focus:ring-primary outline-none"
                       />
                     </div>
-                    <div className="flex border rounded-md overflow-hidden bg-card">
+                    
+                    <select 
+                      value={tuitionBranchFilter}
+                      onChange={(e) => setTuitionBranchFilter(e.target.value)}
+                      className="h-10 px-3 bg-background border rounded-md text-sm font-medium focus:ring-1 focus:ring-primary outline-none min-w-[160px]"
+                    >
+                      <option value="all">Tất cả chi nhánh</option>
+                      {branches.map(b => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+
+                    <select 
+                      value={tuitionClassFilter}
+                      onChange={(e) => setTuitionClassFilter(e.target.value)}
+                      className="h-10 px-3 bg-background border rounded-md text-sm font-medium focus:ring-1 focus:ring-primary outline-none min-w-[160px]"
+                    >
+                      <option value="all">Tất cả lớp học</option>
+                      {classes.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+
+                    <div className="flex border rounded-md overflow-hidden bg-background ml-auto">
                       {(["all", "paid", "pending", "overdue"] as const).map(s => (
                         <button 
                           key={s} onClick={() => setTuitionStatusFilter(s)}
-                          className={`px-4 py-2 text-[10px] font-bold uppercase transition-colors border-r last:border-0 ${
+                          className={`px-3 py-2 text-[10px] font-bold uppercase transition-colors border-r last:border-0 ${
                             tuitionStatusFilter === s ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"
                           }`}
                         >
-                          {s === "all" ? "Tất cả" : s === "paid" ? "Đã nộp" : s === "pending" ? "Chờ nộp" : "Quá hạn"}
+                          {s === "all" ? "Tất cả" : s === "paid" ? "Đã nộp" : s === "pending" ? "Chờ" : "Quá hạn"}
                         </button>
                       ))}
                     </div>
                   </div>
+                </div>
 
-                  <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="bg-secondary/5 border-b text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                        <tr>
-                          <th className="px-6 py-4 text-left font-bold">Mã phiếu / Nội dung</th>
-                          <th className="px-6 py-4 text-center font-bold">Ngày lập</th>
-                          <th className="px-6 py-4 text-center font-bold">Trạng thái</th>
-                          <th className="px-6 py-4 text-right font-bold">Học phí</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {filteredTuition.map(r => (
+                {/* Tuition Table Section */}
+                <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-secondary/5 border-b text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <tr>
+                        <th className="px-6 py-4 text-left font-bold">Thông tin học sinh / Nội dung</th>
+                        <th className="px-6 py-4 text-left font-bold">Chi nhánh / Lớp</th>
+                        <th className="px-6 py-4 text-center font-bold">Ngày lập</th>
+                        <th className="px-6 py-4 text-center font-bold">Trạng thái</th>
+                        <th className="px-6 py-4 text-right font-bold">Học phí</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filteredTuition.map(r => {
+                        const branch = branches.find(b => b.id === r.branchId);
+                        const cls = classes.find(c => c.id === r.classId);
+                        return (
                           <tr key={r.id} className="hover:bg-secondary/10 transition-colors">
                             <td className="px-6 py-4">
                               <p className="font-semibold text-foreground">{r.description}</p>
                               <p className="text-[10px] font-mono text-muted-foreground">{r.id}</p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                                  {branch?.name === "MENGLISH - Online" ? <Laptop className="w-3 h-3 text-blue-500" /> : <School className="w-3 h-3 text-primary" />}
+                                  {branch?.name.replace("MENGLISH - ", "")}
+                                </div>
+                                {cls && (
+                                  <div className="text-[10px] text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded w-fit">
+                                    {cls.name}
+                                  </div>
+                                )}
+                              </div>
                             </td>
                             <td className="px-6 py-4 text-center text-xs text-muted-foreground">{r.date}</td>
                             <td className="px-6 py-4 text-center">
@@ -206,10 +256,17 @@ const FinancialManagementPage = () => {
                               r.status === "paid" ? "text-success" : "text-destructive"
                             }`}>{formatVND(r.amount)}</td>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        );
+                      })}
+                      {filteredTuition.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground italic">
+                            Không tìm thấy dữ liệu học phí phù hợp với bộ lọc.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </>
             ) : (
