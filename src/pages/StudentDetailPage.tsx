@@ -258,6 +258,7 @@ const StudentDetailPage = () => {
                       <th className="text-left py-3 px-2">Khoản thu (Tháng)</th>
                       <th className="text-center py-3">Hạn thanh toán</th>
                       <th className="text-right py-3">Số tiền</th>
+                      <th className="text-right py-3">Đã đóng</th>
                       <th className="text-center py-3">Trạng thái</th>
                       <th className="text-right py-3 px-2">Hành động</th>
                     </tr>
@@ -268,6 +269,9 @@ const StudentDetailPage = () => {
                         <td className="py-4 px-2 font-bold">{t.month}</td>
                         <td className="py-4 text-center text-muted-foreground">{t.dueDate}</td>
                         <td className="py-4 text-right font-mono font-bold">{formatVND(t.amount)}</td>
+                        <td className="py-4 text-right font-mono font-bold text-success">
+                          {t.status === "paid" ? formatVND(t.amount) : "0đ"}
+                        </td>
                         <td className="py-4 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                             t.status === "paid" ? "bg-success/10 text-success border-success/20" : "bg-destructive/10 text-destructive border-destructive/20"
