@@ -572,3 +572,20 @@ export const mockTuitions: TuitionRecord[] = [
   { id: "BILL004", studentId: "STU001", month: "Tháng 04/2025", amount: 15000000, dueDate: "2025-04-20", status: "unpaid" },
   { id: "BILL005", studentId: "STU002", month: "Tháng 03/2025", amount: 8000000, dueDate: "2025-03-25", status: "unpaid" },
 ];
+
+// ---- Student Make-up Classes (Danh sách học bù) ----
+export interface MakeUpRecord {
+  id: string;
+  studentId: string;
+  absentDate: string;
+  makeUpDate?: string;
+  learnWith?: string; // Class name or Teacher
+  note?: string;
+  status: "pending" | "scheduled" | "completed";
+}
+
+export const mockMakeUpRecords: MakeUpRecord[] = [
+  { id: "MUP001", studentId: "STU001", absentDate: "2025-03-18", status: "completed", makeUpDate: "2025-03-20", learnWith: "CLS001", note: "Bù buổi T3" },
+  { id: "MUP002", studentId: "STU002", absentDate: "2025-03-24", status: "pending", note: "Kẹt xe nghỉ có phép" },
+  { id: "MUP003", studentId: "STU004", absentDate: "2025-03-24", status: "scheduled", makeUpDate: "2025-03-26", learnWith: "CLS002", note: "Học bù cùng lớp 4CLC" },
+];
