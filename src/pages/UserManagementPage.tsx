@@ -1,19 +1,73 @@
-import { useState } from "react";
-import { users, branches, AppUserRole } from "@/data/mockData";
+import React, { useState } from "react";
+import { users as initialUsers, branches, AppUserRole } from "@/data/mockData";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Mail, Phone, MoreVertical, MapPin, Shield, CheckCircle2, XCircle } from "lucide-react";
+import { Search, Filter, Mail, Phone, MoreVertical, MapPin, Shield, CheckCircle2, XCircle, Plus, Loader2 } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const UserManagementPage = () => {
+  const navigate = useNavigate();
+  const [items, setItems] = useState([...initialUsers]);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<AppUserRole | "all">("all");
   const [branchFilter, setBranchFilter] = useState<string | "all">("all");
-  const navigate = useNavigate();
+
+  // Interactive Demo State
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState<AppUserRole>("teacher");
+  const [newBranch, setNewBranch] = useState(branches[0].id);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName || !newEmail) return;
+    
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const newUser = {
+      id: `USR${100 + items.length}`,
+      name: newName,
+      avatar: newName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2),
+      role: newRole,
+      branchId: newBranch,
+      email: newEmail,
+      phone: "0900 000 000",
+      status: "active" as const,
+      contractInfo: { type: "Thử việc", baseSalary: 10000000, startDate: new Date().toISOString().split('T')[0], endDate: null }
+    };
+
+    setItems(prev => [newUser, ...prev]);
+    setIsSubmitting(false);
+    setIsOpen(false);
+    
+    setNewName("");
+    setNewEmail("");
+    
+    toast.success("Khởi tạo tài khoản User thành công!", {
+      description: `Nhân sự ${newName} đã được thêm vào danh sách hệ thống.`,
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    });
+  };
 
   const getRoleLabel = (role: AppUserRole) => {
     switch (role) {
@@ -30,7 +84,7 @@ const UserManagementPage = () => {
     return branches.find(b => b.id === branchId)?.name || "N/A";
   };
 
-  const filtered = users.filter((u) => {
+  const filtered = items.filter((u) => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
                          u.email.toLowerCase().includes(search.toLowerCase()) ||
                          u.id.toLowerCase().includes(search.toLowerCase());
@@ -47,9 +101,87 @@ const UserManagementPage = () => {
           <h1 className="text-2xl font-bold tracking-tight">Quản lý User</h1>
           <p className="text-sm text-muted-foreground mt-1">Danh sách nhân sự, giảng viên và cộng tác viên trên toàn hệ thống.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md font-bold hover:opacity-90 transition shadow-sm active:scale-95">
-          + Thêm User mới
-        </button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <button className="px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2">
+              <Plus className="w-4 h-4" /> User mới
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black">Thêm User mới</DialogTitle>
+              <p className="text-sm text-muted-foreground italic">Cấp quyền truy cập hệ thống cho nhân sự mới.</p>
+            </DialogHeader>
+            <form onSubmit={handleCreateUser} className="space-y-6 pt-4">
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="userName" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Họ và tên *</Label>
+                  <Input 
+                    id="userName" 
+                    placeholder="Nguyễn Văn A" 
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="rounded-xl border-slate-200 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="userEmail" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Email *</Label>
+                  <Input 
+                    id="userEmail" 
+                    type="email"
+                    placeholder="email@menglish.edu.vn" 
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    className="rounded-xl border-slate-200 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Vai trò</Label>
+                    <select 
+                      className="w-full h-10 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                      value={newRole}
+                      onChange={(e) => setNewRole(e.target.value as AppUserRole)}
+                    >
+                      <option value="teacher">Giáo viên</option>
+                      <option value="ta">Trợ giảng</option>
+                      <option value="ops">Vận hành</option>
+                      <option value="accounting">Kế toán</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Chi nhánh</Label>
+                    <select 
+                      className="w-full h-10 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                      value={newBranch}
+                      onChange={(e) => setNewBranch(e.target.value)}
+                    >
+                      {branches.map(b => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Đang thiết lập...
+                    </>
+                  ) : "Lưu nhân sự"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -104,10 +236,15 @@ const UserManagementPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filtered.map((u) => {
-                const roleInfo = getRoleLabel(u.role);
-                return (
-                  <tr
+              <AnimatePresence mode="popLayout">
+                {filtered.map((u) => {
+                  const roleInfo = getRoleLabel(u.role);
+                  return (
+                    <motion.tr
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
                     key={u.id}
                     className="hover:bg-primary/5 transition-colors group cursor-pointer"
                     onClick={() => navigate(`/users/${u.id}`)}
@@ -163,9 +300,10 @@ const UserManagementPage = () => {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
-                  </tr>
-                );
-              })}
+                    </motion.tr>
+                  );
+                })}
+              </AnimatePresence>
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-20 text-center">

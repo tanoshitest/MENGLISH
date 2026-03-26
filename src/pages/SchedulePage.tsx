@@ -5,9 +5,22 @@ import { teacherSchedule, classes, users } from "@/data/mockData";
 import { 
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, 
   MapPin, Clock, Users, School, Info, Plus,
-  Filter, Search, LayoutGrid, List, ChevronDown, Monitor
+  Filter, Search, LayoutGrid, List, ChevronDown, Monitor,
+  Loader2, CheckCircle2, X, Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const DAYS_OF_WEEK = [
   { label: "Thứ 2", date: "16/03" },
@@ -44,17 +57,64 @@ const SchedulePage = () => {
   const [filterTeacher, setFilterTeacher] = useState("all");
   const [filterClass, setFilterClass] = useState("all");
   const [viewType, setViewType] = useState<"detail" | "overview">("detail");
+  const [events, setEvents] = useState([...teacherSchedule]);
+
+  // Interactive Demo State
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [pendingCell, setPendingCell] = useState<{clsId: string, day: string, periodId: string} | null>(null);
+  const [selectedTeacherId, setSelectedTeacherId] = useState("TCH001");
+  const [selectedRoom, setSelectedRoom] = useState("Room A1");
 
   const teachers = users.filter(u => u.role === "teacher");
 
-  // Helper to find event for a specific cell
-  const getEvent = (classId: string, dayLabel: string, periodId: string) => {
-    // In real app, we would map date and period. For demo, we'll randomize or match some.
-    // Let's match by classId and day for demo purposes.
-    return teacherSchedule.find(s => {
+  const handleCreateSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pendingCell) return;
+    
+    setIsAdding(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const cls = classes.find(c => c.id === pendingCell.clsId);
+    const day = DAYS_OF_WEEK.find(d => d.label === pendingCell.day);
+    const periodGroup = Object.values(PERIODS).flat().find(p => p.id === pendingCell.periodId);
+
+    const newEvent = {
+      id: `EVT${100 + events.length}`,
+      title: `${cls?.course || "Lớp hóc"} - ${pendingCell.day}`,
+      classId: pendingCell.clsId,
+      room: selectedRoom,
+      date: `2025-03-${day?.date.split('/')[0]}`,
+      startTime: periodGroup?.time.split(' - ')[0] || "08:00",
+      endTime: periodGroup?.time.split(' - ')[1] || "09:30",
+      type: "class" as const
+    };
+
+    setEvents(prev => [...prev, newEvent]);
+    setIsAdding(false);
+    setIsAddOpen(false);
+    
+    toast.success("Đã xếp lịch dạy mới!", {
+      description: `Lớp ${cls?.name} đã được xếp vào ${pendingCell.day}, ${periodGroup?.name} tại ${selectedRoom}.`,
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    });
+  };
+
+  const getCellEvent = (classId: string, dayLabel: string, periodId: string) => {
+    return events.find(s => {
       const cls = classes.find(c => c.id === s.classId);
-      return (filterClass === "all" || s.classId === filterClass) &&
-             (filterTeacher === "all" || cls?.teacherId === filterTeacher);
+      const day = DAYS_OF_WEEK.find(d => `2025-03-${d.date.split('/')[0]}` === s.date);
+      
+      // Simplify logic for demo purposes: match classId and day label
+      // In real app, we would match YYYY-MM-DD and time blocks
+      const isCorrectClass = s.classId === classId;
+      const isCorrectDay = day?.label === dayLabel;
+      
+      // More deterministic for the demo: 
+      // check if the event matches the class and day
+      return isCorrectClass && isCorrectDay && (
+        filterTeacher === "all" || cls?.teacherId === filterTeacher
+      );
     });
   };
 
@@ -189,11 +249,7 @@ const SchedulePage = () => {
 
                         {/* Day Columns */}
                         {DAYS_OF_WEEK.map((day) => {
-                          // Deterministic demo mapping
-                          const hasEvent = (cls.id === "CLS001" && day.label !== "Thứ 3" && day.label !== "Thứ 5" && (period.id === "M1" || period.id === "M2")) ||
-                                           (cls.id === "CLS003" && day.label === "Thứ 5" && period.id === "M1");
-                          
-                          const event = hasEvent ? teacherSchedule[clsIdx % teacherSchedule.length] : null;
+                          const event = getCellEvent(cls.id, day.label, period.id);
 
                           return (
                             <td key={day.label} className="p-2 border-r border-b last:border-r-0 relative group/cell min-h-[80px]">
@@ -203,8 +259,8 @@ const SchedulePage = () => {
                                   animate={{ opacity: 1, scale: 1 }}
                                   onClick={() => navigate(`/classes/${cls.id}`)}
                                   className={`p-3 rounded-xl border shadow-sm relative overflow-hidden h-full flex flex-col justify-center min-h-[60px] cursor-pointer hover:shadow-md transition-all ${
-                                    event.id === "EVT001" ? "bg-blue-50 border-blue-200 text-blue-700" :
-                                    event.id === "EVT002" ? "bg-purple-50 border-purple-200 text-purple-700" :
+                                    event.id.includes("EVT001") ? "bg-blue-50 border-blue-200 text-blue-700" :
+                                    event.id.includes("EVT002") ? "bg-purple-50 border-purple-200 text-purple-700" :
                                     "bg-amber-50 border-amber-200 text-amber-700"
                                   }`}
                                 >
@@ -224,9 +280,19 @@ const SchedulePage = () => {
                                 </motion.div>
                               ) : (
                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity">
-                                  <button className="p-2 bg-primary/10 text-primary rounded-full hover:bg-primary hover:text-white transition-all transform hover:scale-110 active:scale-90">
-                                    <Plus className="w-4 h-4" />
-                                  </button>
+                                  {isAdmin ? (
+                                    <button 
+                                      onClick={() => {
+                                        setPendingCell({ clsId: cls.id, day: day.label, periodId: period.id });
+                                        setIsAddOpen(true);
+                                      }}
+                                      className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-all transform hover:scale-110 active:scale-90 shadow-lg shadow-primary/20"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                    </button>
+                                  ) : (
+                                    <span className="text-[10px] text-muted-foreground/30 font-bold uppercase">Trống</span>
+                                  )}
                                 </div>
                               )}
                             </td>
@@ -289,6 +355,74 @@ const SchedulePage = () => {
           </button>
         </div>
       </div>
+
+      {/* Add Schedule Modal */}
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black">Xếp lịch dạy mới</DialogTitle>
+            <p className="text-sm text-muted-foreground italic tracking-tight">Cấu hình thời gian và phòng học cho tiết học.</p>
+          </DialogHeader>
+          
+          {pendingCell && (
+            <div className="bg-secondary/20 p-4 rounded-2xl border border-dashed text-sm space-y-2 mb-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground font-bold">Lớp học:</span>
+                <span className="font-black text-primary">{classes.find(c => c.id === pendingCell.clsId)?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground font-bold">Thời gian:</span>
+                <span className="font-black">{pendingCell.day}, {Object.values(PERIODS).flat().find(p => p.id === pendingCell.periodId)?.name}</span>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleCreateSchedule} className="space-y-6 pt-2">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Giảng viên đảm nhận</Label>
+                <select 
+                  className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                  value={selectedTeacherId}
+                  onChange={(e) => setSelectedTeacherId(e.target.value)}
+                >
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Phòng học</Label>
+                <select 
+                  className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                  value={selectedRoom}
+                  onChange={(e) => setSelectedRoom(e.target.value)}
+                >
+                  <option value="Room A1">Phòng A1 (Ba Đình)</option>
+                  <option value="Room B2">Phòng B2 (Quận 1)</option>
+                  <option value="Room C1">Phòng C1 (Online)</option>
+                  <option value="Phòng họp 1">Phòng họp 1</option>
+                </select>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="submit" 
+                disabled={isAdding}
+                className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
+              >
+                {isAdding ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Đang lưu lịch...
+                  </>
+                ) : "Xác nhận xếp lịch"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

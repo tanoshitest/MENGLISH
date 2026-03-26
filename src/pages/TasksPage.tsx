@@ -1,13 +1,24 @@
-import { useState } from "react";
-import { tasks, type Task } from "@/data/mockData";
+import React, { useState } from "react";
+import { tasks as initialTasks, type Task } from "@/data/mockData";
 import { useRole } from "@/contexts/RoleContext";
 import { 
   ClipboardList, CheckCircle2, Clock, AlertCircle, 
   Search, Filter, Plus, MoreVertical, Calendar,
-  LayoutGrid, List as ListIcon, User
+  LayoutGrid, List as ListIcon, User, Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Stage = Task["stage"];
 
@@ -26,9 +37,43 @@ const priorityConfig = {
 const stages: Stage[] = ["todo", "in_progress", "done"];
 
 const TasksPage = () => {
-  const { isTeacher } = useRole();
+  const { isTeacher, isAdmin } = useRole();
   const [searchQuery, setSearchQuery] = useState("");
-  const [taskList, setTaskList] = useState(tasks);
+  const [taskList, setTaskList] = useState([...initialTasks]);
+
+  // Interactive Demo State
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newAssignee, setNewAssignee] = useState("Admin");
+  const [newPriority, setNewPriority] = useState<Task["priority"]>("medium");
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle) return;
+    
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const newTask: Task = {
+      id: `TSK${100 + taskList.length}`,
+      title: newTitle,
+      assignee: newAssignee,
+      priority: newPriority,
+      dueDate: new Date().toISOString().split('T')[0],
+      stage: "todo"
+    };
+
+    setTaskList(prev => [newTask, ...prev]);
+    setIsSubmitting(false);
+    setIsOpen(false);
+    setNewTitle("");
+    
+    toast.success("Nhiệm vụ mới đã được phân công!", {
+      description: `Task "${newTitle}" đã được thêm vào cột Cần làm.`,
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    });
+  };
 
   const handleUpdateStage = (taskId: string, newStage: Stage) => {
     setTaskList(prev => prev.map(t => 
@@ -78,6 +123,78 @@ const TasksPage = () => {
                 className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-64 shadow-sm"
               />
            </div>
+
+           {isAdmin && (
+             <Dialog open={isOpen} onOpenChange={setIsOpen}>
+               <DialogTrigger asChild>
+                 <button className="px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2">
+                   <Plus className="w-4 h-4" /> Nhiệm vụ
+                 </button>
+               </DialogTrigger>
+               <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
+                 <DialogHeader>
+                   <DialogTitle className="text-2xl font-black text-foreground">Tạo nhiệm vụ mới</DialogTitle>
+                   <p className="text-sm text-muted-foreground italic tracking-tight">Phân công công việc cho nhân sự trên hệ thống.</p>
+                 </DialogHeader>
+                 <form onSubmit={handleCreateTask} className="space-y-6 pt-4">
+                   <div className="space-y-4">
+                     <div className="space-y-1.5">
+                       <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Tiêu đề công việc *</Label>
+                       <Input 
+                         id="title" 
+                         placeholder="Ví dụ: Chuẩn bị tài liệu ôn tập lớp CLC" 
+                         value={newTitle}
+                         onChange={(e) => setNewTitle(e.target.value)}
+                         className="rounded-xl border-slate-200 focus:ring-primary/20 h-11"
+                         required
+                       />
+                     </div>
+                     <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-1.5">
+                         <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Người thực hiện</Label>
+                         <select 
+                           className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                           value={newAssignee}
+                           onChange={(e) => setNewAssignee(e.target.value)}
+                         >
+                           <option value="Admin">Admin</option>
+                           <option value="Sarah Johnson">Sarah Johnson</option>
+                           <option value="Nguyễn Thị Phượng">Nguyễn Thị Phượng</option>
+                           <option value="Lê Hoàng Nam">Lê Hoàng Nam</option>
+                         </select>
+                       </div>
+                       <div className="space-y-1.5">
+                         <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Mức độ ưu tiên</Label>
+                         <select 
+                           className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                           value={newPriority}
+                           onChange={(e) => setNewPriority(e.target.value as any)}
+                         >
+                           <option value="low">Thấp</option>
+                           <option value="medium">Trung bình</option>
+                           <option value="high">Cao</option>
+                         </select>
+                       </div>
+                     </div>
+                   </div>
+                   <DialogFooter>
+                     <Button 
+                       type="submit" 
+                       disabled={isSubmitting}
+                       className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
+                     >
+                       {isSubmitting ? (
+                         <>
+                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                           Đang phân công...
+                         </>
+                       ) : "Giao việc ngay"}
+                     </Button>
+                   </DialogFooter>
+                 </form>
+               </DialogContent>
+             </Dialog>
+           )}
         </div>
       </div>
 

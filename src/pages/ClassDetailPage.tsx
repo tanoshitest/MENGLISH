@@ -44,6 +44,23 @@ export const ClassDetailContent: React.FC<ClassDetailContentProps> = ({ id: prop
   // High-fidelity Parent Demo: Interactive Homework Submission
   const [submittingIds, setSubmittingIds] = useState<Record<number, boolean>>({});
   const [demoSubmittedIds, setDemoSubmittedIds] = useState<Record<number, boolean>>({});
+  
+  // High-fidelity Teacher Demo: Interactive Attendance
+  const [attendanceOverrides, setAttendanceOverrides] = useState<Record<string, string>>({});
+
+  const handleToggleStatus = (idKey: string, studentName: string) => {
+    if (isParent) return;
+    
+    const statuses = ["Đúng giờ", "Đi muộn", "Vắng mặt"];
+    const current = attendanceOverrides[idKey] || "Đúng giờ";
+    const next = statuses[(statuses.indexOf(current) + 1) % statuses.length];
+    
+    setAttendanceOverrides(prev => ({ ...prev, [idKey]: next }));
+    toast.success(`Cập nhật trạng thái cho ${studentName}: ${next}`, {
+      description: "Dữ liệu đã được đồng bộ với sổ cái học điểm.",
+      icon: <CalendarCheck className="w-5 h-5 text-emerald-500" />
+    });
+  };
 
   const handleParentUpload = (sId: number) => {
     setSubmittingIds(prev => ({ ...prev, [sId]: true }));
@@ -300,7 +317,9 @@ export const ClassDetailContent: React.FC<ClassDetailContentProps> = ({ id: prop
                         const seed = (sId + sIdx) % 10;
                         
                         // Derive Status
-                        const status = seed === 0 ? "Vắng mặt" : seed === 5 ? "Đi muộn" : "Đúng giờ";
+                        const initialStatus = seed === 0 ? "Vắng mặt" : seed === 5 ? "Đi muộn" : "Đúng giờ";
+                        const idKey = isParent ? `session-${sId}` : `student-${studentId}-b${sId}`;
+                        const status = attendanceOverrides[idKey] || initialStatus;
                         
                         // Derive Homework
                         const hw_tfl = seed % 2 === 0;
@@ -336,11 +355,17 @@ export const ClassDetailContent: React.FC<ClassDetailContentProps> = ({ id: prop
                             </td>
 
                             <td className="px-6 py-4 border-r text-center">
-                               <span className={`px-2.5 py-1 rounded-full font-black uppercase text-[8px] border italic tracking-tighter ${
-                                 status === 'Vắng mặt' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
-                                 status === 'Đi muộn' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
-                                 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                               }`}>{status}</span>
+                               <button 
+                                 onClick={() => handleToggleStatus(idKey, student.name)}
+                                 disabled={isParent}
+                                 className={`px-2.5 py-1 rounded-full font-black uppercase text-[8px] border italic tracking-tighter transition-all hover:scale-110 active:scale-95 ${
+                                   status === 'Vắng mặt' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
+                                   status === 'Đi muộn' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
+                                   'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                 } ${!isParent ? 'cursor-pointer' : 'cursor-default'}`}
+                               >
+                                 {status}
+                               </button>
                             </td>
 
                             <td className="px-3 py-4 border-r text-center bg-emerald-50/5">

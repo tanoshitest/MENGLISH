@@ -3,16 +3,69 @@ import { useRole } from "@/contexts/RoleContext";
 import { documents, classes, teachers } from "@/data/mockData";
 import { 
   FileText, Download, Eye, Trash2, Search, Filter, Plus, 
-  ShieldCheck, X, Check, Users, School, Globe 
+  ShieldCheck, X, Check, Users, School, Globe, Loader2, CheckCircle2 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const DocumentsPage = () => {
   const { isAdmin, isTeacher } = useRole();
   const activeTeacherId = "TCH001"; 
+  const [items, setItems] = useState([...documents]);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+
+  // Interactive Demo State
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState("");
+  const [uploadType, setUploadType] = useState<"pdf" | "docx" | "xlsx" | "pptx">("pdf");
+  const [uploadClass, setUploadClass] = useState("all");
+
+  const handleUploadDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadTitle) return;
+    
+    setIsUploading(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const newDoc = {
+      id: `DOC${100 + items.length}`,
+      title: uploadTitle,
+      type: uploadType,
+      size: `${(Math.random() * 5 + 1).toFixed(1)} MB`,
+      uploadDate: new Date().toISOString().split('T')[0],
+      addedBy: "Admin",
+      classId: uploadClass,
+      url: "#"
+    };
+
+    setItems(prev => [newDoc, ...prev]);
+    setDocPermissions(prev => ({
+      ...prev,
+      [newDoc.id]: { classId: uploadClass, allowedTeachers: ["all"] }
+    }));
+    
+    setIsUploading(false);
+    setIsUploadOpen(false);
+    setUploadTitle("");
+    
+    toast.success("Tài liệu đã được tải lên thành công!", {
+      description: `Tệp "${uploadTitle}.${uploadType}" đã sẵn sàng để sử dụng.`,
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    });
+  };
 
   // Mock permission state for the demo
   const [docPermissions, setDocPermissions] = useState<Record<string, { classId: string, allowedTeachers: string[] }>>(() => {
@@ -30,7 +83,7 @@ const DocumentsPage = () => {
     .filter((cls) => cls.teacherId === activeTeacherId)
     .map((cls) => cls.id);
 
-  const filteredDocuments = documents.filter((doc) => {
+  const filteredDocuments = items.filter((doc) => {
     if (isAdmin) return true;
     if (isTeacher) {
       const perms = docPermissions[doc.id];
@@ -78,10 +131,85 @@ const DocumentsPage = () => {
           </p>
         </div>
         {isAdmin && (
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md font-medium hover:opacity-90 transition-all shadow-md active:scale-95">
-            <Plus className="w-4 h-4" />
-            Tải tài liệu lên
-          </button>
+          <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+            <DialogTrigger asChild>
+              <button className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-primary/20">
+                <Plus className="w-4 h-4" />
+                Tải tài liệu lên
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black">Tải tài liệu mới</DialogTitle>
+                <p className="text-sm text-muted-foreground italic">Tải lên học liệu, bài tập hoặc đề thi cho hệ thống.</p>
+              </DialogHeader>
+              <form onSubmit={handleUploadDocument} className="space-y-6 pt-4">
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="docTitle" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Tiêu đề tài liệu *</Label>
+                    <Input 
+                      id="docTitle" 
+                      placeholder="Ví dụ: Đề thi thử cuối kỳ B1" 
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
+                      className="rounded-xl border-slate-200 focus:ring-primary/20 h-11"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Định dạng</Label>
+                      <select 
+                        className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                        value={uploadType}
+                        onChange={(e) => setUploadType(e.target.value as any)}
+                      >
+                        <option value="pdf">PDF Document</option>
+                        <option value="docx">Word File</option>
+                        <option value="xlsx">Excel Sheet</option>
+                        <option value="pptx">PowerPoint</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Phạm vi lớp</Label>
+                      <select 
+                        className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
+                        value={uploadClass}
+                        onChange={(e) => setUploadClass(e.target.value)}
+                      >
+                        <option value="all">Tất cả lớp</option>
+                        {classes.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    type="submit" 
+                    disabled={isUploading}
+                    className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 relative overflow-hidden"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Đang tải lên...
+                      </>
+                    ) : "Bắt đầu tải tệp"}
+                    {isUploading && (
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 1.5 }}
+                        className="absolute bottom-0 left-0 h-1 bg-white/30"
+                      />
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
 
@@ -113,9 +241,17 @@ const DocumentsPage = () => {
                     <th className="text-right px-4 py-4 text-muted-foreground">Thao tác</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
-                  {filteredDocuments.map((doc) => (
-                    <tr key={doc.id} className="hover:bg-primary/5 transition-colors group">
+                <tbody className="divide-y relative">
+                  <AnimatePresence mode="popLayout">
+                    {filteredDocuments.map((doc) => (
+                      <motion.tr 
+                        key={doc.id}
+                        layout
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="hover:bg-primary/5 transition-colors group"
+                      >
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`p-2.5 rounded-lg bg-secondary/30 ${getIconColor(doc.type)} shadow-sm`}>
@@ -165,8 +301,9 @@ const DocumentsPage = () => {
                           )}
                         </div>
                       </td>
-                    </tr>
-                  ))}
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
                 </tbody>
               </table>
             </div>
