@@ -8,7 +8,6 @@ import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import CRMPage from "@/pages/CRMPage";
 import CoursesPage from "@/pages/CoursesPage";
-import ClassesPage from "@/pages/ClassesPage";
 import StudentsPage from "@/pages/StudentsPage";
 import StudentDetailPage from "@/pages/StudentDetailPage";
 import TeachersPage from "@/pages/TeachersPage";
@@ -17,7 +16,6 @@ import FinancePage from "@/pages/FinancePage";
 import TasksPage from "@/pages/TasksPage";
 import SettingsPage from "@/pages/SettingsPage";
 import DocumentsPage from "@/pages/DocumentsPage";
-import ClassDetailPage from "@/pages/ClassDetailPage";
 import SchedulePage from "@/pages/SchedulePage";
 import TeacherDetailPage from "@/pages/TeacherDetailPage";
 import TimekeepingPage from "@/pages/TimekeepingPage";
@@ -39,8 +37,6 @@ const App = () => (
               <Route path="/" element={<Dashboard />} />
               <Route path="/crm" element={<CRMPage />} />
               <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/classes" element={<ClassesPage />} />
-              <Route path="/classes/:id" element={<ClassDetailPage />} />
               <Route path="/schedule" element={<SchedulePage />} />
               <Route path="/students" element={<StudentsPage />} />
               <Route path="/students/:id" element={<StudentDetailPage />} />

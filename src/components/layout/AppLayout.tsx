@@ -31,7 +31,6 @@ const navItems: NavItem[] = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
   { label: "Quản lý khóa học", path: "/courses", icon: BookOpen },
-  { label: "Lớp học", path: "/classes", icon: School },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap },
   { label: "Quản lý giáo viên", path: "/teachers", icon: UserCog },
   { label: "Học phí", path: "/finance", icon: DollarSign, adminOnly: true },
@@ -159,9 +158,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
                 {filteredNav.map((item) => {
                   const active = location.pathname === item.path;
-                      const label = item.path === "/classes" 
-                        ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
-                      : item.path === "/schedule"
+                      const label = item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : item.path === "/timekeeping"
                         ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
@@ -235,9 +232,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <>
                   <currentPage.icon className="w-4 h-4" />
                   <span className="font-medium text-foreground">
-                    {currentPage.path === "/classes" 
-                      ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
-                      : currentPage.path === "/schedule"
+                    {currentPage.path === "/schedule"
                       ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : currentPage.path === "/timekeeping"
                       ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
