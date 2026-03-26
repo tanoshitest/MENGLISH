@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { students, classes, attendanceRecords } from "@/data/mockData";
-import { ArrowLeft, BookOpen, CalendarCheck, DollarSign, MessageSquare, User } from "lucide-react";
+import { students, classes, attendanceRecords, mockTuitions } from "@/data/mockData";
+import { ArrowLeft, BookOpen, CalendarCheck, DollarSign, MessageSquare, User, BellRing, Receipt, CheckCircle2, Clock } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const formatVND = (n: number) =>
   new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(n) + "đ";
@@ -28,6 +29,7 @@ const StudentDetailPage = () => {
     { key: "history", label: "Lịch sử học" },
     { key: "attendance", label: "Điểm danh" },
     { key: "exams", label: "Kết quả thi" },
+    { key: "tuition", label: "Học phí" },
   ];
 
   return (
@@ -212,6 +214,85 @@ const StudentDetailPage = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {activeTab === "tuition" && (
+            <div className="space-y-6">
+              {/* Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-secondary/30 rounded-xl border border-dashed flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <Receipt className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase">Tổng học phí</p>
+                    <p className="text-sm font-bold">{formatVND(student.totalFee)}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-success/5 rounded-xl border border-success/20 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase">Đã thanh toán</p>
+                    <p className="text-sm font-bold text-success">{formatVND(student.paidFee)}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-destructive/5 rounded-xl border border-destructive/20 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase">Còn nợ (Công nợ)</p>
+                    <p className="text-sm font-bold text-destructive">{formatVND(student.totalFee - student.paidFee)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* History Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground text-[10px] uppercase font-black">
+                      <th className="text-left py-3 px-2">Khoản thu (Tháng)</th>
+                      <th className="text-center py-3">Hạn thanh toán</th>
+                      <th className="text-right py-3">Số tiền</th>
+                      <th className="text-center py-3">Trạng thái</th>
+                      <th className="text-right py-3 px-2">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {mockTuitions.filter(t => t.studentId === student.id).map(t => (
+                      <tr key={t.id} className="hover:bg-secondary/20 transition-colors">
+                        <td className="py-4 px-2 font-bold">{t.month}</td>
+                        <td className="py-4 text-center text-muted-foreground">{t.dueDate}</td>
+                        <td className="py-4 text-right font-mono font-bold">{formatVND(t.amount)}</td>
+                        <td className="py-4 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${
+                            t.status === "paid" ? "bg-success/10 text-success border-success/20" : "bg-destructive/10 text-destructive border-destructive/20"
+                          }`}>
+                            {t.status === "paid" ? "Đã đóng" : "Chưa đóng"}
+                          </span>
+                        </td>
+                        <td className="py-4 text-right px-2">
+                          {t.status === "unpaid" && (
+                            <button 
+                              onClick={() => toast.success(`Đã gửi yêu cầu nhắc thanh toán đến phụ huynh ${student.parentName}`)}
+                              className="flex items-center gap-1.5 ml-auto px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase rounded-lg hover:opacity-90 shadow-sm shadow-primary/20 active:scale-95 transition-all"
+                            >
+                              <BellRing className="w-3.5 h-3.5" /> Nhắc thanh toán
+                            </button>
+                          )}
+                          {t.status === "paid" && (
+                            <span className="text-[10px] text-muted-foreground font-medium italic">Ngày đóng: {t.paymentDate}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
