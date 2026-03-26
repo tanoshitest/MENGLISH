@@ -68,17 +68,21 @@ const DocumentsPage = () => {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold italic underline decoration-primary/20 underline-offset-8">Quản lý tài liệu</h1>
+          <h1 className="text-xl font-bold italic underline decoration-primary/20 underline-offset-8">
+            {isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi"}
+          </h1>
           <p className="text-[10px] text-muted-foreground mt-2 uppercase font-bold tracking-wider">
             {isAdmin 
               ? "Hệ thống quản lý tài liệu tập trung" 
               : `Tài liệu lớp: ${teacherClassIds.join(", ")}`}
           </p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md font-medium hover:opacity-90 transition-all shadow-md active:scale-95">
-          <Plus className="w-4 h-4" />
-          Tải tài liệu lên
-        </button>
+        {isAdmin && (
+          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md font-medium hover:opacity-90 transition-all shadow-md active:scale-95">
+            <Plus className="w-4 h-4" />
+            Tải tài liệu lên
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

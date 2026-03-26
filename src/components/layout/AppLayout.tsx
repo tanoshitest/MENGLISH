@@ -161,11 +161,13 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   const active = location.pathname === item.path;
                       const label = item.path === "/classes" 
                         ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
-                        : item.path === "/schedule"
+                      : item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
-                        : item.path === "/timekeeping"
+                      : item.path === "/timekeeping"
                         ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
-                        : item.label;
+                      : item.path === "/documents"
+                        ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
+                      : item.label;
                   return (
                     <button
                       key={item.path}
@@ -239,6 +241,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
                       : currentPage.path === "/timekeeping"
                       ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
+                      : currentPage.path === "/documents"
+                      ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
                       : currentPage.label}
                   </span>
                 </>
