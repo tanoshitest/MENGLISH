@@ -6,7 +6,10 @@ import {
   LayoutDashboard, Users, GraduationCap, BookOpen, UserCog,
   Headphones, DollarSign, ClipboardList, Settings, Menu, X,
   ChevronRight, School, FileText, Bell, Calendar, Option,
-  Fingerprint, Wallet, MessageCircle, ClipboardCheck, History
+  Fingerprint, Wallet, MessageCircle, ClipboardCheck, History,
+  PieChart, MessageSquareX, BarChart3, Repeat, GraduationCap as StudentIcon,
+  CircleDollarSign, Layers, CalendarClock, TrendingUp, HandCoins, Building2,
+  Users2, Clock, BellRing, UserMinus, ShieldAlert, LineChart
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import {
@@ -39,12 +42,27 @@ const navItems: NavItem[] = [
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
   { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint },
-  // Parent Items
-  { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
-  { label: "Lớp học & Kết quả", path: "/parent-portal?tab=grades", icon: BookOpen, parentOnly: true },
-  { label: "Học phí & Lịch sử", path: "/parent-portal?tab=finance", icon: Wallet, parentOnly: true },
-  { label: "Tin tức & Sự kiện", path: "/parent-portal?tab=news", icon: Bell, parentOnly: true },
-  { label: "Liên hệ Trung tâm", path: "/parent-portal?tab=contact", icon: MessageCircle, parentOnly: true },
+];
+
+const reportItems = [
+  { label: "Tin chưa gửi được", path: "/reports/failed-sms", icon: MessageSquareX },
+  { label: "Biểu đồ học viên", path: "/reports/student-charts", icon: BarChart3 },
+  { label: "Báo cáo chuyển lớp", path: "/reports/transfers", icon: Repeat },
+  { label: "Báo cáo học thử", path: "/reports/trials", icon: Layers },
+  { label: "Báo cáo âm học phí", path: "/reports/negative-tuition", icon: ShieldAlert },
+  { label: "Báo cáo tổng lớp", path: "/reports/class-summary", icon: School },
+  { label: "Phân bổ học phí tháng", path: "/reports/monthly-allocation", icon: CalendarClock },
+  { label: "Báo cáo điểm danh", path: "/reports/attendance-report", icon: ClipboardCheck },
+  { label: "Kết quả học tập", path: "/reports/academic-results", icon: GraduationCap },
+  { label: "Bảng chấm công", path: "/reports/timesheets", icon: Fingerprint },
+  { label: "Lương", path: "/reports/payroll", icon: CircleDollarSign },
+  { label: "Báo cáo phòng", path: "/reports/room-usage", icon: Building2 },
+  { label: "Lớp, học viên", path: "/reports/class-students", icon: Users2 },
+  { label: "Học viên trong ngày", path: "/reports/daily-students", icon: Clock },
+  { label: "Nhắc hạn học phí", path: "/reports/tuition-reminder", icon: BellRing },
+  { label: "Nợ học phí", path: "/reports/tuition-debt", icon: HandCoins },
+  { label: "Nợ đặt cọc", path: "/reports/deposit-debt", icon: UserMinus },
+  { label: "Lợi nhuận", path: "/reports/profit", icon: TrendingUp },
 ];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -53,6 +71,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [reportsOpen, setReportsOpen] = useState(false);
 
   const filteredNav = navItems.filter((item) => {
     if (isParent) return item.parentOnly;
@@ -74,8 +93,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <span className="font-bold text-sidebar-primary text-sm">MENGLISH PROTOTYPE</span>
         </div>
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
-          {filteredNav.map((item) => {
-            const active = location.pathname === item.path;
+            {filteredNav.map((item) => {
+              const active = location.pathname === item.path;
               const label = item.path === "/tasks"
                 ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
                 : item.path === "/classes" 
@@ -85,21 +104,60 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 : item.path === "/timekeeping"
                 ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
                 : item.label;
-            return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                }`}
-              >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                {label}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4 flex-shrink-0" />
+                  {label}
+                </button>
+              );
+            })}
+
+            {/* Reports Collapsible */}
+            {isAdmin && (
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => setReportsOpen(!reportsOpen)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground ${reportsOpen ? "font-bold" : ""}`}
+                >
+                  <PieChart className="w-4 h-4 flex-shrink-0" />
+                  Báo cáo
+                  <ChevronRight className={`w-3 h-3 ml-auto transition-transform duration-200 ${reportsOpen ? "rotate-90" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {reportsOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden bg-sidebar-accent/20 rounded-lg ml-2"
+                    >
+                      {reportItems.map((item) => (
+                        <button
+                          key={item.path}
+                          onClick={() => navigate(item.path)}
+                          className={`w-full flex items-center gap-3 px-4 py-1.5 text-[11px] font-medium transition-colors ${
+                            location.pathname === item.path
+                              ? "text-primary bg-primary/5"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent/30"
+                          }`}
+                        >
+                          <item.icon className="w-3 h-3 opacity-60" />
+                          {item.label}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
         </nav>
         <div className="p-3 border-t border-sidebar-border relative">
           <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>

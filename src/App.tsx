@@ -22,6 +22,7 @@ import SchedulePage from "@/pages/SchedulePage";
 import TimekeepingPage from "@/pages/TimekeepingPage";
 import MyClassesPage from "@/pages/MyClassesPage";
 import ParentDashboard from "@/pages/ParentDashboard";
+import ReportsPage from "@/pages/ReportsPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,8 @@ const App = () => (
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/timekeeping" element={<TimekeepingPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/reports/:type" element={<ReportsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/parent-portal" element={<ParentDashboard />} />
               <Route path="/my-classes" element={<MyClassesPage />} />
