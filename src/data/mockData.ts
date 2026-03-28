@@ -197,6 +197,7 @@ export const classes: ClassItem[] = [
   { id: "CLS004", name: "Starter A1 - Sáng T7/CN", course: "English Starter", teacherId: "USR003", schedule: "T7, CN | 9:00-11:00", room: "Room C1", studentCount: 6, maxStudents: 10, startDate: "2025-01-11", endDate: "2025-07-11", status: "active", levelId: "LVL_S_1" },
   { id: "CLS005", name: "Business 1 - Tối T2/T4/T6", course: "Business English 1", teacherId: "USR002", schedule: "T2, T4, T6 | 19:30-21:00", room: "Room B1", studentCount: 15, maxStudents: 15, startDate: "2025-02-01", endDate: "2025-05-01", status: "active", levelId: "LVL_B_1" },
   { id: "CLS006", name: "Tiền Tiểu Học 1 (T7/CN)", course: "Kids Pre-School", teacherId: "USR002", schedule: "T7, CN | 14:00-16:00", room: "Room C2", studentCount: 12, maxStudents: 15, startDate: "2025-03-01", endDate: "2025-09-01", status: "active", levelId: "LVL_K_1" },
+  { id: "CLS_TRIAL", name: "Lớp học thử 01", course: "Trial English", teacherId: "USR001", schedule: "Linh hoạt", room: "Room A1", studentCount: 5, maxStudents: 20, startDate: "2025-03-28", endDate: "2025-03-31", status: "active", levelId: "LVL_TRIAL" },
 ];
 
 // ---- CRM Leads ----
@@ -528,7 +529,7 @@ export const courseCategories: CourseCategory[] = [
   { id: "CAT_S", name: "Sơ cấp", description: "Dành cho người mất gốc hoặc bắt đầu từ con số 0.", color: "bg-blue-500" },
   { id: "CAT_T", name: "Trung cấp", description: "Củng cố ngữ pháp, giao tiếp căn bản hàng ngày.", color: "bg-green-500" },
   { id: "CAT_K", name: "Sắp vào lớp 1 (Tiền Tiểu học)", description: "Chương trình làm quen Tiếng Anh cho trẻ em 5-6 tuổi.", color: "bg-amber-500" },
-  { id: "CAT_I", name: "Luyện thi IELTS", description: "Chuyên sâu luyện thi chứng chỉ IELTS.", color: "bg-rose-500" },
+  { id: "CAT_TRIAL", name: "Học viên học thử", description: "Lớp dành riêng cho học viên trải nghiệm trước khi nhập học chính thức.", color: "bg-slate-500" },
 ];
 
 export const courseLevels: CourseLevel[] = [
@@ -542,9 +543,8 @@ export const courseLevels: CourseLevel[] = [
   // Tiền tiểu học
   { id: "LVL_K_1", categoryId: "CAT_K", name: "Tiền tiểu học 1", durationInMonths: 6, fee: 5000000 },
   { id: "LVL_K_2", categoryId: "CAT_K", name: "Tiền tiểu học 2", durationInMonths: 6, fee: 5500000 },
-  // IELTS
-  { id: "LVL_I_1", categoryId: "CAT_I", name: "IELTS Foundation (4.5)", durationInMonths: 3, fee: 6000000 },
-  { id: "LVL_I_2", categoryId: "CAT_I", name: "IELTS Intensive (6.5)", durationInMonths: 4, fee: 8000000 },
+  // Học thử
+  { id: "LVL_TRIAL", categoryId: "CAT_TRIAL", name: "Lớp học thử", durationInMonths: 0, fee: 0 },
   // Lạc rớt lại cho code có thể tham chiếu
   { id: "LVL_G_1", categoryId: "CAT_S", name: "General 1", durationInMonths: 2, fee: 2000000 },
   { id: "LVL_G_2", categoryId: "CAT_S", name: "General 2", durationInMonths: 2, fee: 2500000 },

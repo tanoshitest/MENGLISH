@@ -15,7 +15,7 @@ const MyClassesPage = () => {
   
   // In a real app we'd get the current user ID from auth. 
   // For demo, we'll assume the "Teacher" role corresponds to a specific teacher ID (e.g., "USR002")
-  const myClasses = classes.filter(c => c.id === "CLS001");
+  const myClasses = classes.filter(c => c.id === "CLS001" || c.id === "CLS002"); 
 
   return (
     <div className="p-4 md:p-8 space-y-8 bg-slate-50/30 min-h-full">
@@ -29,88 +29,79 @@ const MyClassesPage = () => {
           </h1>
           <p className="text-muted-foreground font-bold mt-2 ml-15">Danh sách các lớp học bạn đang trực tiếp giảng dạy và quản lý.</p>
         </div>
-        
-        <div className="flex items-center gap-2 bg-card p-1 rounded-2xl border shadow-sm self-start">
-           <button className="p-2 bg-secondary rounded-xl text-primary transition-all"><LayoutGrid className="w-4 h-4" /></button>
-           <button className="p-2 text-muted-foreground hover:bg-secondary rounded-xl transition-all"><List className="w-4 h-4" /></button>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-slate-50/80 border-b border-slate-100">
+                <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Thông tin lớp học</th>
+                <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Lịch học & Phòng</th>
+                <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">Sĩ số</th>
+                <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">Trạng thái</th>
+                <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {myClasses.map((cls) => (
+                <tr 
+                  key={cls.id} 
+                  className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                  onClick={() => navigate(`/classes/${cls.id}`)}
+                >
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs shrink-0">
+                        {cls.id.slice(-3)}
+                      </div>
+                      <div>
+                        <p className="font-black text-slate-800 uppercase tracking-tight group-hover:text-primary transition-colors">{cls.name}</p>
+                        <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{cls.id}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2 text-xs font-black text-slate-600">
+                        <Clock className="w-3.5 h-3.5 text-slate-300" /> {cls.schedule}
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <MapPin className="w-3.5 h-3.5 text-slate-300" /> {cls.room}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                       <span className="text-sm font-black text-slate-700">{cls.studentCount} / {cls.maxStudents}</span>
+                       <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${(cls.studentCount / cls.maxStudents) * 100}%` }}></div>
+                       </div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 text-center">
+                    <span className="inline-flex px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black rounded-lg border border-emerald-100 uppercase tracking-widest shadow-sm">
+                      Đang diễn ra
+                    </span>
+                  </td>
+                  <td className="px-8 py-6 text-right">
+                    <button className="p-2.5 bg-slate-50 rounded-xl text-slate-400 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {myClasses.map((cls, idx) => (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            key={cls.id}
-            onClick={() => navigate(`/classes/${cls.id}`)}
-            className="group bg-card rounded-[2.5rem] border border-slate-200 hover:border-primary/50 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all p-1 cursor-pointer"
-          >
-            <div className="bg-white rounded-[2.2rem] p-6 h-full flex flex-col">
-              <div className="flex items-start justify-between mb-6">
-                 <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">{cls.id}</span>
-                    <h3 className="text-xl font-black group-hover:text-primary transition-colors leading-tight">{cls.name}</h3>
-                 </div>
-                 <div className="w-10 h-10 rounded-2xl bg-[#5cba9b]/10 text-[#5cba9b] flex items-center justify-center font-black text-xs border border-[#5cba9b]/20">
-                    <Users className="w-5 h-5" />
-                 </div>
-              </div>
-
-              <div className="space-y-4 flex-1">
-                 <div className="flex items-center gap-3 text-slate-500">
-                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                       <Clock className="w-4 h-4" />
-                    </div>
-                    <div>
-                       <p className="text-[9px] uppercase font-black opacity-50 tracking-tighter">Lịch học</p>
-                       <p className="text-xs font-black text-slate-700">{cls.schedule}</p>
-                    </div>
-                 </div>
-
-                 <div className="flex items-center gap-3 text-slate-500">
-                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                       <MapPin className="w-4 h-4" />
-                    </div>
-                    <div>
-                       <p className="text-[9px] uppercase font-black opacity-50 tracking-tighter">Phòng học</p>
-                       <p className="text-xs font-black text-slate-700">{cls.room}</p>
-                    </div>
-                 </div>
-
-                 <div className="flex items-center gap-3 text-slate-500">
-                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                       <GraduationCap className="w-4 h-4" />
-                    </div>
-                    <div>
-                       <p className="text-[9px] uppercase font-black opacity-50 tracking-tighter">Sĩ số</p>
-                       <p className="text-xs font-black text-slate-700">{cls.studentCount} / {cls.maxStudents} Học viên</p>
-                    </div>
-                 </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                 <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map(i => (
-                       <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[8px] font-black">{i}</div>
-                    ))}
-                    <div className="w-7 h-7 rounded-full border-2 border-white bg-primary text-white flex items-center justify-center text-[8px] font-black">+{cls.studentCount - 4}</div>
-                 </div>
-                 <div className="flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest group-hover:translate-x-1 transition-transform">
-                    Vào lớp <ArrowRight className="w-4 h-4" />
-                 </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-
-        {myClasses.length === 0 && (
-          <div className="col-span-full p-20 text-center bg-card rounded-3xl border border-dashed">
-             <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-             <p className="text-lg font-bold text-muted-foreground italic">Bạn hiện chưa được phân công lớp học nào.</p>
-          </div>
-        )}
-      </div>
+      {myClasses.length === 0 && (
+        <div className="p-20 text-center bg-card rounded-3xl border border-dashed">
+           <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+           <p className="text-lg font-bold text-muted-foreground italic">Bạn hiện chưa được phân công lớp học nào.</p>
+        </div>
+      )}
     </div>
   );
 };

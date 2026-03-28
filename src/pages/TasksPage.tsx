@@ -4,7 +4,8 @@ import { useRole } from "@/contexts/RoleContext";
 import { 
   ClipboardList, CheckCircle2, Clock, AlertCircle, 
   Search, Filter, Plus, MoreVertical, Calendar,
-  LayoutGrid, List as ListIcon, User, Loader2
+  LayoutGrid, List as ListIcon, User, Loader2,
+  Building2, Tag, Clock3, AlignLeft, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -47,6 +48,11 @@ const TasksPage = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newAssignee, setNewAssignee] = useState("Admin");
   const [newPriority, setNewPriority] = useState<Task["priority"]>("medium");
+  const [newDept, setNewDept] = useState("Vận hành");
+  const [newTaskType, setNewTaskType] = useState("Hành chính");
+  const [newStartDate, setNewStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newEndDate, setNewEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newDesc, setNewDesc] = useState("");
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +74,9 @@ const TasksPage = () => {
     setIsSubmitting(false);
     setIsOpen(false);
     setNewTitle("");
+    setNewDesc("");
+    setNewDept("Vận hành");
+    setNewTaskType("Hành chính");
     
     toast.success("Nhiệm vụ mới đã được phân công!", {
       description: `Task "${newTitle}" đã được thêm vào cột Cần làm.`,
@@ -131,68 +140,153 @@ const TasksPage = () => {
                    <Plus className="w-4 h-4" /> Nhiệm vụ
                  </button>
                </DialogTrigger>
-               <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
-                 <DialogHeader>
-                   <DialogTitle className="text-2xl font-black text-foreground">Tạo nhiệm vụ mới</DialogTitle>
-                   <p className="text-sm text-muted-foreground italic tracking-tight">Phân công công việc cho nhân sự trên hệ thống.</p>
-                 </DialogHeader>
-                 <form onSubmit={handleCreateTask} className="space-y-6 pt-4">
-                   <div className="space-y-4">
-                     <div className="space-y-1.5">
-                       <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Tiêu đề công việc *</Label>
-                       <Input 
-                         id="title" 
-                         placeholder="Ví dụ: Chuẩn bị tài liệu ôn tập lớp CLC" 
-                         value={newTitle}
-                         onChange={(e) => setNewTitle(e.target.value)}
-                         className="rounded-xl border-slate-200 focus:ring-primary/20 h-11"
-                         required
-                       />
-                     </div>
-                     <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-1.5">
-                         <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Người thực hiện</Label>
-                         <select 
-                           className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
-                           value={newAssignee}
-                           onChange={(e) => setNewAssignee(e.target.value)}
-                         >
-                           <option value="Admin">Admin</option>
-                           <option value="Sarah Johnson">Sarah Johnson</option>
-                           <option value="Nguyễn Thị Phượng">Nguyễn Thị Phượng</option>
-                           <option value="Lê Hoàng Nam">Lê Hoàng Nam</option>
-                         </select>
-                       </div>
-                       <div className="space-y-1.5">
-                         <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Mức độ ưu tiên</Label>
-                         <select 
-                           className="w-full h-11 px-3 py-2 border rounded-xl text-sm bg-card outline-none focus:ring-2 focus:ring-primary/20"
-                           value={newPriority}
-                           onChange={(e) => setNewPriority(e.target.value as any)}
-                         >
-                           <option value="low">Thấp</option>
-                           <option value="medium">Trung bình</option>
-                           <option value="high">Cao</option>
-                         </select>
-                       </div>
-                     </div>
-                   </div>
-                   <DialogFooter>
-                     <Button 
-                       type="submit" 
-                       disabled={isSubmitting}
-                       className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
-                     >
-                       {isSubmitting ? (
-                         <>
-                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                           Đang phân công...
-                         </>
-                       ) : "Giao việc ngay"}
-                     </Button>
-                   </DialogFooter>
-                 </form>
-               </DialogContent>
+               <DialogContent className="sm:max-w-[700px] rounded-[2.5rem] border-none shadow-2xl overflow-hidden p-0 bg-white">
+                  <div className="bg-primary/5 p-8 border-b border-primary/10">
+                    <DialogHeader>
+                      <DialogTitle className="text-3xl font-black text-slate-800 tracking-tight">Tạo nhiệm vụ mới</DialogTitle>
+                      <p className="text-sm text-slate-500 font-bold italic tracking-tight mt-1">Phân công công việc chi tiết cho nhân sự trên hệ thống.</p>
+                    </DialogHeader>
+                  </div>
+
+                  <form onSubmit={handleCreateTask} className="p-8 space-y-8">
+                    <div className="space-y-6">
+                      {/* Full Width Field */}
+                      <div className="space-y-2">
+                        <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                          <Info className="w-3.5 h-3.5" /> Tiêu đề công việc *
+                        </Label>
+                        <Input 
+                          id="title" 
+                          placeholder="Ví dụ: Chuẩn bị tài liệu ôn tập lớp CLC..." 
+                          value={newTitle}
+                          onChange={(e) => setNewTitle(e.target.value)}
+                          className="rounded-2xl border-slate-200 focus:ring-primary/20 h-14 text-base font-bold shadow-sm"
+                          required
+                        />
+                      </div>
+
+                      {/* 2-Column Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <User className="w-3.5 h-3.5" /> Người thực hiện
+                          </Label>
+                          <select 
+                            className="w-full h-12 px-4 py-2 border border-slate-200 rounded-2xl text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                            value={newAssignee}
+                            onChange={(e) => setNewAssignee(e.target.value)}
+                          >
+                            <option value="Admin">Admin</option>
+                            <option value="Sarah Johnson">Sarah Johnson</option>
+                            <option value="Nguyễn Thị Phượng">Nguyễn Thị Phượng</option>
+                            <option value="Lê Hoàng Nam">Lê Hoàng Nam</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <Building2 className="w-3.5 h-3.5" /> Phòng ban
+                          </Label>
+                          <select 
+                            className="w-full h-12 px-4 py-2 border border-slate-200 rounded-2xl text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                            value={newDept}
+                            onChange={(e) => setNewDept(e.target.value)}
+                          >
+                            <option value="Đào tạo">Phòng Đào tạo</option>
+                            <option value="Kinh doanh">Phòng Tuyển sinh</option>
+                            <option value="Vận hành">Phòng Vận hành</option>
+                            <option value="Kế toán">Phòng Kế toán</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <Tag className="w-3.5 h-3.5" /> Loại công việc
+                          </Label>
+                          <select 
+                            className="w-full h-12 px-4 py-2 border border-slate-200 rounded-2xl text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                            value={newTaskType}
+                            onChange={(e) => setNewTaskType(e.target.value)}
+                          >
+                            <option value="Hành chính">Công việc Hành chính</option>
+                            <option value="Chuyên môn">Chuyên môn giảng dạy</option>
+                            <option value="Tài chính">Tài chính / Học phí</option>
+                            <option value="Họp">Họp / Event</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <AlertCircle className="w-3.5 h-3.5" /> Ưu tiên
+                          </Label>
+                          <select 
+                            className="w-full h-12 px-4 py-2 border border-slate-200 rounded-2xl text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                            value={newPriority}
+                            onChange={(e) => setNewPriority(e.target.value as any)}
+                          >
+                            <option value="low">Thấp</option>
+                            <option value="medium">Trung bình</option>
+                            <option value="high">Cao</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <Clock3 className="w-3.5 h-3.5" /> Ngày bắt đầu
+                          </Label>
+                          <Input 
+                            type="date"
+                            value={newStartDate}
+                            onChange={(e) => setNewStartDate(e.target.value)}
+                            className="rounded-2xl border-slate-200 focus:ring-primary/20 h-12 font-bold bg-slate-50"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                             <Clock3 className="w-3.5 h-3.5" /> Hạn chót
+                          </Label>
+                          <Input 
+                            type="date"
+                            value={newEndDate}
+                            onChange={(e) => setNewEndDate(e.target.value)}
+                            className="rounded-2xl border-slate-200 focus:ring-primary/20 h-12 font-bold bg-slate-50"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Textarea Description */}
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 px-1">
+                           <AlignLeft className="w-3.5 h-3.5" /> Chi tiết công việc
+                        </Label>
+                        <textarea 
+                          className="w-full min-h-[100px] p-4 border border-slate-200 rounded-3xl text-sm bg-slate-50 font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          placeholder="Mô tả cụ thể các đầu việc cần làm..."
+                          value={newDesc}
+                          onChange={(e) => setNewDesc(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <DialogFooter className="pt-4">
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className="w-full h-16 rounded-[1.5rem] font-black text-base uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 bg-primary overflow-hidden relative"
+                      >
+                        {isSubmitting ? (
+                          <div className="flex items-center gap-3">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Đang phân công...
+                          </div>
+                        ) : (
+                          "Giao việc ngay"
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
              </Dialog>
            )}
         </div>

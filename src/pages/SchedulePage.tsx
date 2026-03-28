@@ -22,47 +22,88 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const DAYS_OF_WEEK = [
-  { label: "Thứ 2", date: "16/03" },
-  { label: "Thứ 3", date: "17/03" },
-  { label: "Thứ 4", date: "18/03" },
-  { label: "Thứ 5", date: "19/03" },
-  { label: "Thứ 6", date: "20/03" },
-  { label: "Thứ 7", date: "21/03" },
+const FULL_DAYS = [
+  { label: "Thứ 2", date: "16/03", fullDate: "2026-03-16" },
+  { label: "Thứ 3", date: "17/03", fullDate: "2026-03-17" },
+  { label: "Thứ 4", date: "18/03", fullDate: "2026-03-18" },
+  { label: "Thứ 5", date: "19/03", fullDate: "2026-03-19" },
+  { label: "Thứ 6", date: "20/03", fullDate: "2026-03-20" },
+  { label: "Thứ 7", date: "21/03", fullDate: "2026-03-21" },
+  { label: "Chủ Nhật", date: "22/03", fullDate: "2026-03-22" },
 ];
 
-const PERIODS = {
-  morning: [
-    { id: "M1", name: "Tiết 1", time: "08:00 - 09:00" },
-    { id: "M2", name: "Tiết 2", time: "09:00 - 10:00" },
-    { id: "M3", name: "Tiết 3", time: "10:30 - 11:30" },
-    { id: "M1A", name: "Tiết 1A", time: "09:30 - 10:30" },
-    { id: "M2A", name: "Tiết 2A", time: "10:30 - 11:30" },
-  ],
-  afternoon: [
-    { id: "A4", name: "Tiết 4", time: "13:00 - 14:00" },
-    { id: "A5", name: "Tiết 5", time: "14:00 - 15:00" },
-    { id: "A6", name: "Tiết 6", time: "15:00 - 16:00" },
-    { id: "A7", name: "Tiết 7", time: "16:30 - 17:30" },
-  ],
-  evening: [
-    { id: "E8", name: "Tiết 8", time: "18:30 - 20:00" },
-    { id: "E9", name: "Tiết 9", time: "20:00 - 21:30" },
-  ]
-};
+const COMPACT_SLOTS = [
+  { id: "M1", label: "Sáng 1", time: "08:00 - 09:30", session: "Morning" },
+  { id: "M2", label: "Sáng 2", time: "10:00 - 11:30", session: "Morning" },
+  { id: "A1", label: "Chiều 1", time: "14:00 - 15:30", session: "Afternoon" },
+  { id: "A2", label: "Chiều 2", time: "16:00 - 17:30", session: "Afternoon" },
+  { id: "E1", label: "Tối 1", time: "18:00 - 19:30", session: "Evening" },
+  { id: "E2", label: "Tối 2", time: "20:00 - 21:30", session: "Evening" },
+];
 
 const SchedulePage = () => {
   const { isAdmin } = useRole();
   const navigate = useNavigate();
   const [filterTeacher, setFilterTeacher] = useState("all");
   const [filterClass, setFilterClass] = useState("all");
-  const [viewType, setViewType] = useState<"detail" | "overview">("detail");
-  const [events, setEvents] = useState([...teacherSchedule]);
+  
+  // Generating Demo Data (80% coverage)
+  const initialDemoEvents = [
+    // Monday
+    { id: "DEMO1", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-16", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO2", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-16", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO3", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-16", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO4", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-16", startTime: "18:00", endTime: "19:30", type: "class" },
+    { id: "DEMO5", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-16", startTime: "20:00", endTime: "21:30", type: "class" },
+    
+    // Tuesday
+    { id: "DEMO6", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-17", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO7", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-17", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO8", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-17", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO9", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-17", startTime: "16:00", endTime: "17:30", type: "class" },
+    { id: "DEMO10", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-17", startTime: "18:00", endTime: "19:30", type: "class" },
+
+    // Wednesday
+    { id: "DEMO11", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-18", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO12", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-18", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO13", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-18", startTime: "16:00", endTime: "17:30", type: "class" },
+    { id: "DEMO14", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-18", startTime: "18:00", endTime: "19:30", type: "class" },
+    { id: "DEMO15", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-18", startTime: "20:00", endTime: "21:30", type: "class" },
+
+    // Thursday
+    { id: "DEMO16", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-19", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO17", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-19", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO18", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-19", startTime: "16:00", endTime: "17:30", type: "class" },
+    { id: "DEMO19", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-19", startTime: "18:00", endTime: "19:30", type: "class" },
+    { id: "DEMO20", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-19", startTime: "20:00", endTime: "21:30", type: "class" },
+
+    // Friday
+    { id: "DEMO21", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-20", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO22", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-20", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO23", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-20", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO24", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-20", startTime: "16:00", endTime: "17:30", type: "class" },
+    { id: "DEMO25", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-20", startTime: "18:00", endTime: "19:30", type: "class" },
+
+    // Saturday
+    { id: "DEMO26", title: "Lớp 4CLC", classId: "CLS001", room: "A1", date: "2026-03-21", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO27", title: "Lớp 5STAR", classId: "CLS002", room: "B2", date: "2026-03-21", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO28", title: "Lớp 3A", classId: "CLS003", room: "C1", date: "2026-03-21", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO29", title: "Lớp 2B", classId: "CLS004", room: "Online", date: "2026-03-21", startTime: "18:00", endTime: "19:30", type: "class" },
+    { id: "DEMO30", title: "Lớp 6C", classId: "CLS005", room: "A1", date: "2026-03-21", startTime: "20:00", endTime: "21:30", type: "class" },
+
+    // Sunday
+    { id: "DEMO31", title: "Lớp 7A", classId: "CLS001", room: "A1", date: "2026-03-22", startTime: "08:00", endTime: "09:30", type: "class" },
+    { id: "DEMO32", title: "Lớp 8B", classId: "CLS002", room: "B2", date: "2026-03-22", startTime: "10:00", endTime: "11:30", type: "class" },
+    { id: "DEMO33", title: "Lớp 9C", classId: "CLS003", room: "C1", date: "2026-03-22", startTime: "14:00", endTime: "15:30", type: "class" },
+    { id: "DEMO34", title: "Lớp 10D", classId: "CLS004", room: "Online", date: "2026-03-22", startTime: "18:00", endTime: "19:30", type: "class" },
+  ];
+
+  const [events, setEvents] = useState(initialDemoEvents);
 
   // Interactive Demo State
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [pendingCell, setPendingCell] = useState<{clsId: string, day: string, periodId: string} | null>(null);
+  const [pendingCell, setPendingCell] = useState<{clsId: string, day: string, slotId: string} | null>(null);
   const [selectedTeacherId, setSelectedTeacherId] = useState("TCH001");
   const [selectedRoom, setSelectedRoom] = useState("Room A1");
 
@@ -73,20 +114,19 @@ const SchedulePage = () => {
     if (!pendingCell) return;
     
     setIsAdding(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    const cls = classes.find(c => c.id === pendingCell.clsId);
-    const day = DAYS_OF_WEEK.find(d => d.label === pendingCell.day);
-    const periodGroup = Object.values(PERIODS).flat().find(p => p.id === pendingCell.periodId);
+    const day = FULL_DAYS.find(d => d.label === pendingCell.day);
+    const slot = COMPACT_SLOTS.find(s => s.id === pendingCell.slotId);
 
     const newEvent = {
       id: `EVT${100 + events.length}`,
-      title: `${cls?.course || "Lớp hóc"} - ${pendingCell.day}`,
-      classId: pendingCell.clsId,
+      title: `Lớp học mới - ${pendingCell.day}`,
+      classId: filterClass !== "all" ? filterClass : "CLS001",
       room: selectedRoom,
-      date: `2025-03-${day?.date.split('/')[0]}`,
-      startTime: periodGroup?.time.split(' - ')[0] || "08:00",
-      endTime: periodGroup?.time.split(' - ')[1] || "09:30",
+      date: day?.fullDate || "2026-03-16",
+      startTime: slot?.time.split(' - ')[0] || "08:00",
+      endTime: slot?.time.split(' - ')[1] || "09:30",
       type: "class" as const
     };
 
@@ -95,264 +135,174 @@ const SchedulePage = () => {
     setIsAddOpen(false);
     
     toast.success("Đã xếp lịch dạy mới!", {
-      description: `Lớp ${cls?.name} đã được xếp vào ${pendingCell.day}, ${periodGroup?.name} tại ${selectedRoom}.`,
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+      description: `${pendingCell.day}, ${slot?.label} tại ${selectedRoom}`,
+      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />
     });
   };
 
-  const getCellEvent = (classId: string, dayLabel: string, periodId: string) => {
-    return events.find(s => {
+  const getEventsForSlot = (fullDate: string, slotId: string) => {
+    const slot = COMPACT_SLOTS.find(s => s.id === slotId);
+    if (!slot) return [];
+
+    return events.filter(s => {
       const cls = classes.find(c => c.id === s.classId);
-      const day = DAYS_OF_WEEK.find(d => `2025-03-${d.date.split('/')[0]}` === s.date);
+      const isCorrectDate = s.date === fullDate;
       
-      // Simplify logic for demo purposes: match classId and day label
-      // In real app, we would match YYYY-MM-DD and time blocks
-      const isCorrectClass = s.classId === classId;
-      const isCorrectDay = day?.label === dayLabel;
+      // Basic time matching logic for the slots
+      const startHour = parseInt(s.startTime.split(":")[0]);
+      const slotStartHour = parseInt(slot.time.split(":")[0]);
       
-      // More deterministic for the demo: 
-      // check if the event matches the class and day
-      return isCorrectClass && isCorrectDay && (
-        filterTeacher === "all" || cls?.teacherId === filterTeacher
-      );
+      const teacherMatch = filterTeacher === "all" || cls?.teacherId === filterTeacher;
+      const classMatch = filterClass === "all" || s.classId === filterClass;
+      
+      return isCorrectDate && (startHour === slotStartHour) && teacherMatch && classMatch;
     });
   };
 
   return (
-    <div className="p-6 bg-background min-h-full space-y-6">
-      {/* Header & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-card border rounded-2xl p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-black text-foreground">Xếp lịch dạy</h1>
-          <p className="text-sm text-muted-foreground">Quản lý lịch dạy và điều phối phòng học toàn hệ thống.</p>
+    <div className="p-4 bg-background h-full flex flex-col gap-4 overflow-hidden">
+      {/* Centralized Filters & Navigation Bar - More Compact */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white border rounded-3xl p-4 shadow-sm border-slate-200/60 flex-shrink-0">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-100 shadow-sm">
+            <button className="p-1 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400 hover:text-primary"><ChevronLeft className="w-4 h-4" /></button>
+            <div className="flex flex-col items-center min-w-[130px]">
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">Tháng 3 / 2026</span>
+              <span className="text-sm font-black text-slate-800 leading-tight">Tuần 4 (16/3 - 22/3)</span>
+            </div>
+            <button className="p-1 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400 hover:text-primary"><ChevronRight className="w-4 h-4" /></button>
+          </div>
+
+          <div className="h-10 w-[1px] bg-slate-100 mx-1 hidden lg:block" />
+
+          <div className="flex items-center gap-2">
+            <div className="relative group">
+              <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <select 
+                value={filterTeacher}
+                onChange={(e) => setFilterTeacher(e.target.value)}
+                className="pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-black uppercase tracking-tight appearance-none outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/50 transition-all cursor-pointer min-w-[160px]"
+              >
+                <option value="all">Tất cả Giáo viên</option>
+                {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+
+            <div className="relative group">
+              <School className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <select 
+                value={filterClass}
+                onChange={(e) => setFilterClass(e.target.value)}
+                className="pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-[11px] font-black uppercase tracking-tight appearance-none outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/50 transition-all cursor-pointer min-w-[160px]"
+              >
+                <option value="all">Tất cả Lớp học</option>
+                {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-          <button 
-            onClick={() => setViewType("detail")}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${viewType === "detail" ? "bg-primary text-white shadow-md shadow-primary/20" : "hover:bg-secondary text-muted-foreground"}`}
-          >
-            <List className="w-4 h-4" /> Chi tiết
-          </button>
-          <button 
-            onClick={() => setViewType("overview")}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-all ${viewType === "overview" ? "bg-primary text-white shadow-md shadow-primary/20" : "hover:bg-secondary text-muted-foreground"}`}
-          >
-            <LayoutGrid className="w-4 h-4" /> Tổng quan
-          </button>
+          <Button variant="outline" className="rounded-2xl border-slate-200 font-black text-[10px] uppercase tracking-widest h-10 px-6 hover:bg-slate-50">Hôm nay</Button>
+          <Button className="rounded-2xl font-black text-[10px] uppercase tracking-widest h-10 px-6 shadow-lg shadow-primary/20">+ Xếp lịch mới</Button>
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="flex items-center gap-4 flex-wrap bg-card border rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 bg-secondary/30 px-3 py-1.5 rounded-xl border border-transparent">
-          <button className="p-1 hover:bg-card rounded-md"><ChevronLeft className="w-4 h-4" /></button>
-          <span className="text-xs font-black min-w-[140px] text-center">Tuần 4 - Tháng 3/2026</span>
-          <button className="p-1 hover:bg-card rounded-md"><ChevronRight className="w-4 h-4" /></button>
-        </div>
-
-        <div className="h-8 w-[1px] bg-border mx-2" />
-
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select 
-              value={filterTeacher}
-              onChange={(e) => setFilterTeacher(e.target.value)}
-              className="pl-9 pr-8 py-2 bg-secondary/10 border-none rounded-xl text-xs font-bold appearance-none outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="all">Tất cả GV</option>
-              {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
-          </div>
-
-          <div className="relative">
-            <School className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select 
-              value={filterClass}
-              onChange={(e) => setFilterClass(e.target.value)}
-              className="pl-9 pr-8 py-2 bg-secondary/10 border-none rounded-xl text-xs font-bold appearance-none outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="all">Tất cả lớp</option>
-              {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
-          </div>
-
-          <select className="px-4 py-2 bg-secondary/10 border-none rounded-xl text-xs font-bold outline-none">
-            <option>Tháng 3</option>
-            <option>Tháng 4</option>
-          </select>
-
-          <select className="px-4 py-2 bg-secondary/10 border-none rounded-xl text-xs font-bold outline-none">
-            <option>2026</option>
-            <option>2025</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Main Table Content */}
-      <div className="bg-card rounded-2xl border shadow-xl overflow-x-auto relative min-h-[600px]">
-        <table className="w-full border-collapse table-fixed min-w-[1200px]">
-          <thead>
-            <tr className="bg-secondary/20">
-              <th className="w-24 p-4 text-[10px] font-black uppercase text-muted-foreground border-b border-r sticky left-0 z-20 bg-secondary/20">Lớp</th>
-              <th className="w-20 p-4 text-[10px] font-black uppercase text-muted-foreground border-b border-r sticky left-24 z-20 bg-secondary/20">Buổi</th>
-              <th className="w-32 p-4 text-[10px] font-black uppercase text-muted-foreground border-b border-r sticky left-[11rem] z-20 bg-secondary/20">Tiết</th>
-              {DAYS_OF_WEEK.map((day) => (
-                <th key={day.label} className="p-4 border-b border-r last:border-r-0">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">{day.label}</span>
-                    <span className="text-sm font-black">{day.date}</span>
-                  </div>
-                </th>
+      {/* Google Calendar Style Grid Optimized for Height */}
+      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden relative border-separate flex-1">
+        <div className="h-full flex flex-col">
+            {/* Calendar Header */}
+            <div className="grid grid-cols-[80px_repeat(7,1fr)] bg-slate-50/50 border-b border-slate-100 flex-shrink-0">
+              <div className="p-3 border-r border-slate-100 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-slate-300" />
+              </div>
+              {FULL_DAYS.map((day) => (
+                <div key={day.label} className="p-3 border-r border-slate-100 last:border-r-0 text-center">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">{day.label}</span>
+                  <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-black ${day.date.startsWith("16") ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-800"}`}>
+                    {day.date.split('/')[0]}
+                  </span>
+                </div>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {classes.filter(c => filterClass === "all" || c.id === filterClass).map((cls, clsIdx) => (
-              <React.Fragment key={cls.id}>
-                {/* Morning Session */}
-                {Object.entries(PERIODS).map(([sessionKey, sessionPeriods], sessIdx) => (
-                  <React.Fragment key={sessionKey}>
-                    {sessionPeriods.map((period, pIdx) => (
-                      <tr key={period.id} className="group hover:bg-primary/5 transition-colors">
-                        {/* Class Column - spans all periods for this class */}
-                        {sessIdx === 0 && pIdx === 0 && (
-                          <td 
-                            rowSpan={PERIODS.morning.length + PERIODS.afternoon.length + PERIODS.evening.length} 
-                            className="p-4 border-r border-b text-center sticky left-0 z-10 bg-card group-hover:bg-primary/5 transition-colors border-l-4 border-l-primary cursor-pointer"
-                            onClick={() => navigate(`/classes/${cls.id}`)}
-                          >
-                            <span className="text-lg font-black text-primary">{cls.name.split(" ")[0]}</span>
-                          </td>
-                        )}
-                        
-                        {/* Session Column - spans morning/afternoon periods */}
-                        {pIdx === 0 && (
-                          <td 
-                            rowSpan={sessionPeriods.length} 
-                            className="p-4 border-r border-b text-center text-[10px] font-black uppercase text-muted-foreground sticky left-24 z-10 bg-card group-hover:bg-primary/5 transition-colors"
-                          >
-                            {sessionKey === 'morning' ? 'Sáng' : sessionKey === 'afternoon' ? 'Chiều' : 'Tối'}
-                          </td>
-                        )}
+            </div>
 
-                        {/* Period Column */}
-                        <td className="p-3 border-r border-b sticky left-[11rem] z-10 bg-card group-hover:bg-primary/5 transition-colors">
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-black whitespace-nowrap">{period.name}</span>
-                            <span className="text-[9px] text-muted-foreground font-medium opacity-60">({period.time})</span>
-                          </div>
-                        </td>
+            {/* Calendar Body - Using Flex-1 to fill space evenly */}
+            <div className="flex-1 overflow-auto">
+              <div className="min-w-[1000px] h-full flex flex-col">
+              {COMPACT_SLOTS.map((slot) => (
+                <div key={slot.id} className="grid grid-cols-[80px_repeat(7,1fr)] group border-b border-slate-50/80 last:border-b-0 flex-1 min-h-[85px]">
+                  {/* Slot Label */}
+                  <div className={`p-2 border-r border-slate-100 text-center flex flex-col justify-center items-center gap-0.5 ${slot.session === 'Morning' ? 'bg-amber-50/20' : slot.session === 'Afternoon' ? 'bg-blue-50/20' : 'bg-indigo-50/20'}`}>
+                    <span className="text-[11px] font-black text-slate-800">{slot.label}</span>
+                    <span className="text-[9px] font-bold text-slate-400 tracking-tighter whitespace-nowrap">{slot.time}</span>
+                  </div>
 
-                        {/* Day Columns */}
-                        {DAYS_OF_WEEK.map((day) => {
-                          const event = getCellEvent(cls.id, day.label, period.id);
-
-                          return (
-                            <td key={day.label} className="p-2 border-r border-b last:border-r-0 relative group/cell min-h-[80px]">
-                              {event ? (
-                                <motion.div 
-                                  initial={{ opacity: 0, scale: 0.95 }}
+                  {/* Day Slots */}
+                  {FULL_DAYS.map((day) => {
+                    const slotEvents = getEventsForSlot(day.fullDate, slot.id);
+                    
+                    return (
+                      <div 
+                        key={day.label} 
+                        className="p-1 border-r border-slate-100/50 last:border-r-0 relative group/slot transition-colors hover:bg-slate-50/30 overflow-hidden"
+                      >
+                        {slotEvents.length > 0 ? (
+                          <div className="flex flex-col gap-1 h-full h-full overflow-hidden">
+                            {slotEvents.map((event) => {
+                              const cls = classes.find(c => c.id === event.classId);
+                              const teacher = users.find(u => u.id === cls?.teacherId);
+                              
+                              return (
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.98 }}
                                   animate={{ opacity: 1, scale: 1 }}
-                                  onClick={() => navigate(`/classes/${cls.id}`)}
-                                  className={`p-3 rounded-xl border shadow-sm relative overflow-hidden h-full flex flex-col justify-center min-h-[60px] cursor-pointer hover:shadow-md transition-all ${
-                                    event.id.includes("EVT001") ? "bg-blue-50 border-blue-200 text-blue-700" :
-                                    event.id.includes("EVT002") ? "bg-purple-50 border-purple-200 text-purple-700" :
-                                    "bg-amber-50 border-amber-200 text-amber-700"
+                                  key={event.id}
+                                  onClick={() => navigate(`/classes/${event.classId}`)}
+                                  className={`p-2 rounded-2xl border shadow-sm cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between h-full min-h-0 ${
+                                    slot.session === 'Morning' ? "bg-amber-50 border-amber-100 text-amber-800" :
+                                    slot.session === 'Afternoon' ? "bg-blue-50 border-blue-100 text-blue-800" :
+                                    "bg-indigo-50 border-indigo-100 text-indigo-800"
                                   }`}
                                 >
-                                  {/* Label "OFF" in image */}
-                                  <span className="absolute top-1 left-1 bg-muted-foreground/20 text-[6px] px-1 rounded uppercase font-bold text-muted-foreground">OFF</span>
-                                  
-                                  <p className="text-[11px] font-black leading-tight mb-1">
-                                    {(() => {
-                                      const cls = classes.find(c => c.id === event.classId);
-                                      return users.find(u => u.id === cls?.teacherId)?.name || "Giảng viên";
-                                    })()}
-                                  </p>
-                                  <div className="flex items-center gap-1 opacity-60">
-                                    <MapPin className="w-2.5 h-2.5" />
-                                    <span className="text-[9px] font-bold uppercase">{event.room}</span>
+                                  <div>
+                                    <p className="text-[11px] font-black leading-tight uppercase group-hover/slot:text-primary transition-colors truncate">{cls?.name}</p>
+                                  </div>
+                                  <div className="flex items-center justify-between mt-auto">
+                                    <div className="flex items-center gap-1">
+                                      <Users className="w-3 h-3 opacity-60" />
+                                      <span className="text-[9px] font-black opacity-80">{teacher?.name.split(" ").pop()}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 opacity-60 ring-white/50">
+                                      <MapPin className="w-2.5 h-2.5" />
+                                      <span className="text-[9px] font-bold uppercase tracking-tighter">{event.room.replace("Room ", "")}</span>
+                                    </div>
                                   </div>
                                 </motion.div>
-                              ) : (
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity">
-                                  {isAdmin ? (
-                                    <button 
-                                      onClick={() => {
-                                        setPendingCell({ clsId: cls.id, day: day.label, periodId: period.id });
-                                        setIsAddOpen(true);
-                                      }}
-                                      className="p-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-all transform hover:scale-110 active:scale-90 shadow-lg shadow-primary/20"
-                                    >
-                                      <Plus className="w-4 h-4" />
-                                    </button>
-                                  ) : (
-                                    <span className="text-[10px] text-muted-foreground/30 font-bold uppercase">Trống</span>
-                                  )}
-                                </div>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Legend & Tips */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-card border rounded-2xl p-6 shadow-sm">
-          <h3 className="text-xs font-black uppercase text-muted-foreground mb-4 tracking-widest">Hướng dẫn thao tác</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex gap-4 p-4 bg-secondary/10 rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Plus className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-bold">Thêm lịch mới</p>
-                <p className="text-[11px] text-muted-foreground">Di chuột vào ô trống bất kỳ và nhấn biểu tượng dấu (+) để xếp lịch.</p>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          isAdmin && (
+                            <button 
+                              onClick={() => {
+                                setPendingCell({ clsId: filterClass !== "all" ? filterClass : "CLS001", day: day.label, slotId: slot.id });
+                                setIsAddOpen(true);
+                              }}
+                              className="w-full h-full rounded-xl flex items-center justify-center opacity-0 group-hover/slot:opacity-100 transition-all hover:bg-slate-100/30"
+                            >
+                               <Plus className="w-4 h-4 text-primary" />
+                            </button>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
               </div>
             </div>
-            <div className="flex gap-4 p-4 bg-secondary/10 rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
-                <Monitor className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm font-bold">Xung đột lịch</p>
-                <p className="text-[11px] text-muted-foreground">Các tiết học bị trùng phòng hoặc trùng giảng viên sẽ được đánh dấu cảnh báo đỏ.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-card border rounded-2xl p-6 shadow-sm">
-          <h3 className="text-xs font-black uppercase text-muted-foreground mb-4 tracking-widest">Trạng thái phòng</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium">Phòng A1 (Ba Đình)</span>
-              <span className="px-2 py-0.5 bg-success/10 text-success text-[10px] font-bold rounded-full">Trống: 4/12</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium">Phòng B2 (Quận 1)</span>
-              <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-[10px] font-bold rounded-full">Kín lịch</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium">Bản thảo chưa lưu</span>
-              <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 text-[10px] font-bold rounded-full">3 lịch</span>
-            </div>
-          </div>
-          <button className="w-full mt-6 py-2.5 bg-primary text-white text-xs font-black rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
-            XÁC NHẬN LƯU LỊCH
-          </button>
         </div>
       </div>
 
@@ -372,7 +322,7 @@ const SchedulePage = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground font-bold">Thời gian:</span>
-                <span className="font-black">{pendingCell.day}, {Object.values(PERIODS).flat().find(p => p.id === pendingCell.periodId)?.name}</span>
+                <span className="font-black">{pendingCell.day}, {COMPACT_SLOTS.find(s => s.id === pendingCell.slotId)?.label}</span>
               </div>
             </div>
           )}

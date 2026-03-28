@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { 
   courseCategories as initialCategories, 
-  courseLevels, 
-  classes, 
+  courseLevels as initialLevels, 
+  classes as initialClasses, 
+  users,
   CourseCategory, 
   CourseLevel, 
   ClassItem 
@@ -10,7 +11,8 @@ import {
 import { 
   BookOpen, ChevronDown, ChevronRight, 
   Users, Layers, GraduationCap, ArrowRight, Clock,
-  Plus, Loader2, CheckCircle2
+  Plus, Loader2, CheckCircle2, Calendar, MapPin,
+  ClipboardList, User, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +27,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 const formatVND = (n: number) =>
@@ -34,41 +42,77 @@ const formatVND = (n: number) =>
 const CoursesPage = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<CourseCategory[]>([...initialCategories]);
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    "CAT_S": true // Expand first one by default
-  });
+  const [currentClasses, setCurrentClasses] = useState<ClassItem[]>([...initialClasses]);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedLevels, setExpandedLevels] = useState<Record<string, boolean>>({});
   
-  // Interactive Demo State
+  // Interactive Demo State for Add Class
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newDesc, setNewDesc] = useState("");
+  
+  // Form State
+  const [formCategoryId, setFormCategoryId] = useState("");
+  const [formLevelId, setFormLevelId] = useState("");
+  const [formClassName, setFormClassName] = useState("");
+  const [formTeacherId, setFormTeacherId] = useState("");
+  const [formSchedule, setFormSchedule] = useState("");
+  const [formRoom, setFormRoom] = useState("");
+  const [formMaxStudents, setFormMaxStudents] = useState("15");
+  const [formStartDate, setFormStartDate] = useState("");
+  const [formEndDate, setFormEndDate] = useState("");
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const teachers = users.filter(u => u.role === "teacher");
+
+  const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName) return;
+    if (!formClassName || !formLevelId) {
+      toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc.");
+      return;
+    }
     
     setIsSubmitting(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const newCat: CourseCategory = {
-      id: `CAT_${Date.now()}`,
-      name: newName,
-      description: newDesc || "Khối chương trình đào tạo mới.",
-      color: "bg-indigo-500"
+    const selectedLevel = initialLevels.find(l => l.id === formLevelId);
+    
+    const newClass: ClassItem = {
+      id: `CLS_${Date.now()}`,
+      name: formClassName,
+      course: selectedLevel?.name || "Khóa học mới",
+      teacherId: formTeacherId,
+      schedule: formSchedule || "Chưa xếp lịch",
+      room: formRoom || "Chưa xếp phòng",
+      studentCount: 0,
+      maxStudents: parseInt(formMaxStudents),
+      startDate: formStartDate || "2024-03-28",
+      endDate: formEndDate || "2024-09-28",
+      status: "active",
+      levelId: formLevelId
     };
 
-    setCategories(prev => [newCat, ...prev]);
+    setCurrentClasses(prev => [...prev, newClass]);
     setIsSubmitting(false);
     setIsOpen(false);
-    setExpandedCategories(prev => ({ ...prev, [newCat.id]: true }));
     
-    setNewName("");
-    setNewDesc("");
+    // Auto-expand the newly created class parent
+    if (formCategoryId) {
+      setExpandedCategories(prev => ({ ...prev, [formCategoryId]: true }));
+    }
+    setExpandedLevels(prev => ({ ...prev, [formLevelId]: true }));
     
-    toast.success("Khởi tạo hệ khóa học thành công!", {
-      description: `Hệ thống ${newName} đã được thêm vào sơ đồ đào tạo.`,
+    // Reset Form
+    setFormCategoryId("");
+    setFormLevelId("");
+    setFormClassName("");
+    setFormTeacherId("");
+    setFormSchedule("");
+    setFormRoom("");
+    setFormMaxStudents("15");
+    setFormStartDate("");
+    setFormEndDate("");
+    
+    toast.success("Khởi tạo lớp học mới thành công!", {
+      description: `Lớp ${formClassName} đã được thêm vào hệ thống.`,
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
     });
   };
@@ -83,69 +127,199 @@ const CoursesPage = () => {
   };
 
   const getLevelsForCategory = (categoryId: string) => {
-    return courseLevels.filter(l => l.categoryId === categoryId);
+    return initialLevels.filter(l => l.categoryId === categoryId);
   };
 
   const getClassesForLevel = (levelId: string) => {
-    return classes.filter(c => c.levelId === levelId);
+    return currentClasses.filter(c => c.levelId === levelId);
   };
 
+  const availableLevels = formCategoryId 
+    ? initialLevels.filter(l => l.categoryId === formCategoryId)
+    : [];
+
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-primary" /> Quản lý Khóa học
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Quản lý sơ đồ đào tạo theo các cấp bậc hiển thị lồng nhau.</p>
+    <div className="p-4 md:p-6 flex flex-col h-full bg-[#f8f9fa]">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6 bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black uppercase tracking-tight text-slate-800">Quản lý lớp học</h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5 ">Sơ đồ đào tạo & Lộ trình học viên</p>
+          </div>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <button className="px-5 py-2.5 bg-primary text-primary-foreground text-sm rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Hệ Khóa học
-            </button>
+            <Button className="bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-wider text-[10px] h-8 px-4 shadow-lg shadow-primary/20">
+              <Plus className="w-3.5 h-3.5 mr-2" />
+              Thêm lớp học
+            </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-none shadow-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black">Thêm Hệ Khóa học mới</DialogTitle>
-              <p className="text-sm text-muted-foreground italic">Phân cấp lớn nhất trong sơ đồ đào tạo (Ví dụ: Tiếng Anh Trẻ Em, IELTS...)</p>
-            </DialogHeader>
-            <form onSubmit={handleCreateCategory} className="space-y-6 pt-4">
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="catName" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Tên hệ khóa học *</Label>
-                  <Input 
-                    id="catName" 
-                    placeholder="Ví dụ: Luyện thi Cambridge" 
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="rounded-xl border-slate-200 focus:ring-primary/20"
-                    required
-                  />
+          <DialogContent className="sm:max-w-[800px] rounded-2xl border-none shadow-2xl p-0 overflow-hidden">
+            <DialogHeader className="p-6 bg-white border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <Plus className="w-6 h-6" />
                 </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="catDesc" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Mô tả tóm tắt</Label>
-                  <Textarea 
-                    id="catDesc" 
-                    placeholder="Nhập mô tả về định hướng và mục tiêu của hệ khóa học này..." 
-                    value={newDesc}
-                    onChange={(e) => setNewDesc(e.target.value)}
-                    className="rounded-xl border-slate-200 focus:ring-primary/20 min-h-[100px]"
-                  />
+                <div>
+                  <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-800">Thêm lớp học mới</DialogTitle>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Khởi tạo lớp học theo danh mục chương trình</p>
                 </div>
               </div>
-              <DialogFooter>
+            </DialogHeader>
+
+            <form onSubmit={handleCreateClass} className="bg-slate-50/50">
+              <div className="p-6 grid grid-cols-2 gap-x-8 gap-y-5">
+                {/* Section 1: Hierarchy */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary mb-1">
+                    <Layers className="w-3.5 h-3.5" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-primary">Phân loại lớp học</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Hệ chương trình (*)</Label>
+                    <Select value={formCategoryId} onValueChange={setFormCategoryId}>
+                      <SelectTrigger className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs uppercase cursor-pointer">
+                        <SelectValue placeholder="Chọn hệ đào tạo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id} className="font-bold text-xs uppercase cursor-pointer">
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Cấp độ / Trình độ (*)</Label>
+                    <Select value={formLevelId} onValueChange={setFormLevelId} disabled={!formCategoryId}>
+                      <SelectTrigger className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs uppercase cursor-pointer">
+                        <SelectValue placeholder={formCategoryId ? "Chọn cấp độ" : "Vui lòng chọn hệ trước"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableLevels.map(lvl => (
+                          <SelectItem key={lvl.id} value={lvl.id} className="font-bold text-xs uppercase cursor-pointer">
+                            {lvl.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Tên lớp học (*)</Label>
+                    <Input 
+                      placeholder="Ví dụ: Starter A1 - Sáng T7/CN" 
+                      value={formClassName}
+                      onChange={(e) => setFormClassName(e.target.value)}
+                      className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Giảng viên</Label>
+                    <Select value={formTeacherId} onValueChange={setFormTeacherId}>
+                      <SelectTrigger className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs cursor-pointer">
+                        <SelectValue placeholder="Chọn giảng viên" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teachers.map(t => (
+                          <SelectItem key={t.id} value={t.id} className="font-bold text-xs cursor-pointer">
+                            {t.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Section 2: Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary mb-1">
+                    <ClipboardList className="w-3.5 h-3.5" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-primary">Thông tin vận hành</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Lịch học</Label>
+                    <Input 
+                      placeholder="Ví dụ: T2, T4, T6 | 18:30-20:00" 
+                      value={formSchedule}
+                      onChange={(e) => setFormSchedule(e.target.value)}
+                      className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phòng học</Label>
+                      <Input 
+                        placeholder="Room A1" 
+                        value={formRoom}
+                        onChange={(e) => setFormRoom(e.target.value)}
+                        className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Sĩ số tối đa</Label>
+                      <Input 
+                        type="number"
+                        value={formMaxStudents}
+                        onChange={(e) => setFormMaxStudents(e.target.value)}
+                        className="h-10 bg-white border-slate-200 rounded-xl font-bold text-xs text-center"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Ngày bắt đầu</Label>
+                      <Input 
+                        type="date"
+                        value={formStartDate}
+                        onChange={(e) => setFormStartDate(e.target.value)}
+                        className="h-10 bg-white border-slate-200 rounded-xl font-bold text-[10px] uppercase"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Ngày kết thúc</Label>
+                      <Input 
+                        type="date"
+                        value={formEndDate}
+                        onChange={(e) => setFormEndDate(e.target.value)}
+                        className="h-10 bg-white border-slate-200 rounded-xl font-bold text-[10px] uppercase"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="p-6 bg-white border-t border-slate-100">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsOpen(false)}
+                  className="text-[10px] font-black uppercase tracking-widest text-slate-400 rounded-xl px-6"
+                >
+                  Hủy bỏ
+                </Button>
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full h-12 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20"
+                  className="h-11 rounded-xl font-black text-xs uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 px-10"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Đang khởi tạo...
+                      Đang xử lý...
                     </>
-                  ) : "Lưu hệ khóa học"}
+                  ) : "Khởi tạo lớp học"}
                 </Button>
               </DialogFooter>
             </form>
@@ -153,159 +327,183 @@ const CoursesPage = () => {
         </Dialog>
       </div>
 
-      <div className="space-y-4">
+      {/* Categories List */}
+      <div className="flex-1 space-y-4 overflow-auto pb-6">
         <AnimatePresence mode="popLayout">
           {categories.map((category) => {
             const catLevels = getLevelsForCategory(category.id);
             const isCatExpanded = expandedCategories[category.id];
           
-          // Calculate stats for category
-          const totalClassesInCat = catLevels.reduce((sum, lvl) => sum + getClassesForLevel(lvl.id).length, 0);
-          const totalStudentsInCat = catLevels.reduce((sum, lvl) => {
-            return sum + getClassesForLevel(lvl.id).reduce((s, c) => s + c.studentCount, 0);
-          }, 0);
+            const totalClassesInCat = catLevels.reduce((sum, lvl) => sum + getClassesForLevel(lvl.id).length, 0);
+            const totalStudentsInCat = catLevels.reduce((sum, lvl) => {
+              return sum + getClassesForLevel(lvl.id).reduce((s, c) => s + c.studentCount, 0);
+            }, 0);
 
-          return (
-            <motion.div 
-              key={category.id} 
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-2xl border shadow-sm overflow-hidden"
-            >
-              {/* Category Header (Level 1) */}
-              <div 
-                onClick={() => toggleCategory(category.id)}
-                className={`p-5 flex items-center justify-between cursor-pointer transition-colors ${
-                  isCatExpanded ? 'bg-secondary/10 border-b' : 'hover:bg-secondary/20'
-                }`}
+            return (
+              <motion.div 
+                key={category.id} 
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white ${category.color} shadow-inner`}>
-                    <Layers className="w-6 h-6" />
+                {/* Level 1 Header: Category */}
+                <div 
+                  onClick={() => toggleCategory(category.id)}
+                  className={`p-4 flex items-center justify-between cursor-pointer transition-all ${
+                    isCatExpanded ? 'bg-slate-50 border-b border-slate-100 shadow-inner' : 'hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white ${category.color.replace('500', '600')} shadow-sm`}>
+                      <Layers className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">{category.name}</h2>
+                      <p className="text-[10px] font-bold text-slate-400  font-mono">{category.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-black">{category.name}</h2>
-                    <p className="text-sm text-muted-foreground">{category.description}</p>
+                  <div className="flex items-center gap-8">
+                    <div className="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-100"><BookOpen className="w-3 h-3 text-primary" /> {totalClassesInCat} Lớp</span>
+                      <span className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-100"><Users className="w-3 h-3 text-emerald-500" /> {totalStudentsInCat} HS</span>
+                    </div>
+                    <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300 ${isCatExpanded ? 'bg-primary text-white rotate-180' : 'bg-slate-100 text-slate-400'}`}>
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
-                  <div className="hidden md:flex gap-6 text-sm font-bold text-muted-foreground">
-                    <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4" /> {totalClassesInCat} Lớp</span>
-                    <span className="flex items-center gap-1.5"><Users className="w-4 h-4" /> {totalStudentsInCat} HS</span>
-                  </div>
-                  <div className={`p-2 rounded-full transition-transform duration-300 ${isCatExpanded ? 'bg-primary text-white rotate-180' : 'bg-secondary text-muted-foreground'}`}>
-                    <ChevronDown className="w-5 h-5" />
-                  </div>
-                </div>
-              </div>
 
-              {/* Levels Container (Level 2) */}
-              <AnimatePresence>
-                {isCatExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="p-4 bg-muted/30 space-y-3">
-                      {catLevels.map(level => {
-                        const levelClasses = getClassesForLevel(level.id);
-                        const isLevelExpanded = expandedLevels[level.id];
-                        const totalStudentsInLevel = levelClasses.reduce((s, c) => s + c.studentCount, 0);
+                {/* Level 2: Sub-Levels */}
+                <AnimatePresence>
+                  {isCatExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden bg-white mt-[-1px]"
+                    >
+                      <div className="p-3 bg-slate-50/30 space-y-3">
+                        {catLevels.map(level => {
+                          const levelClasses = getClassesForLevel(level.id);
+                          const isLevelExpanded = expandedLevels[level.id];
+                          const totalStudentsInLevel = levelClasses.reduce((s, c) => s + c.studentCount, 0);
 
-                        return (
-                          <div key={level.id} className="bg-background rounded-xl border shadow-sm overflow-hidden">
-                            {/* Level Header */}
-                            <div 
-                              onClick={(e) => toggleLevel(level.id, e)}
-                              className={`p-4 flex items-center justify-between cursor-pointer hover:bg-secondary/20 transition-colors ${
-                                isLevelExpanded ? 'border-b bg-secondary/10' : ''
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`p-1.5 rounded-md transition-transform duration-200 ${isLevelExpanded ? 'rotate-90 text-primary' : 'text-muted-foreground'}`}>
-                                  <ChevronRight className="w-5 h-5" />
+                          return (
+                            <div key={level.id} className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+                              {/* Level Section Header */}
+                              <div 
+                                onClick={(e) => toggleLevel(level.id, e)}
+                                className={`p-3 flex items-center justify-between cursor-pointer transition-colors ${
+                                  isLevelExpanded ? 'bg-[#f1f3f5] border-b' : 'hover:bg-slate-50'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`transition-transform duration-200 ${isLevelExpanded ? 'rotate-90 text-primary' : 'text-slate-400'}`}>
+                                    <ChevronRight className="w-4 h-4" />
+                                  </div>
+                                  <h3 className="text-xs font-black text-slate-700 uppercase tracking-tight">{level.name}</h3>
+                                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-black uppercase rounded border border-blue-100 tracking-tighter ml-1">
+                                    {level.durationInMonths} Tháng
+                                  </span>
                                 </div>
-                                <h3 className="font-bold text-foreground text-base tracking-tight">{level.name}</h3>
-                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-black uppercase rounded-full tracking-widest ml-2">
-                                  {level.durationInMonths} Tháng
-                                </span>
-                              </div>
-                              <div className="flex flex-col md:flex-row md:items-center gap-4 text-right">
-                                <div className="text-xs font-bold text-muted-foreground border-r pr-4 hidden md:block">
-                                  Học phí: <span className="text-foreground">{formatVND(level.fee)}</span>/Khóa
-                                </div>
-                                <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground">
-                                  <span>{levelClasses.length} Lớp học</span>
-                                  <span>{totalStudentsInLevel} HS</span>
+                                <div className="flex items-center gap-6">
+                                  <div className="text-[10px] font-black uppercase text-slate-400 border-r border-slate-200 pr-5 hidden md:block ">
+                                    Học phí: <span className="text-slate-800 font-mono tracking-tighter">{formatVND(level.fee)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-4 text-[10px] font-black uppercase text-slate-400">
+                                    <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {levelClasses.length} Lớp</span>
+                                    <span className="flex items-center gap-1.5"><GraduationCap className="w-3 h-3" /> {totalStudentsInLevel} HS</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            {/* Classes Container (Level 3) */}
-                            <AnimatePresence>
-                              {isLevelExpanded && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                >
-                                  <div className="p-3 bg-secondary/5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {levelClasses.map(cls => (
-                                      <div 
-                                        key={cls.id} 
-                                        onClick={() => navigate(`/classes/${cls.id}`)}
-                                        className="bg-card p-4 rounded-lg border shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden"
-                                      >
-                                        <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                                        <div className="pl-2">
-                                          <div className="flex items-start justify-between">
-                                            <h4 className="font-black text-sm text-foreground group-hover:text-primary transition-colors">{cls.name}</h4>
-                                            <span className="text-[10px] font-black text-white bg-success px-1.5 py-0.5 rounded shadow-sm">
-                                              Hoạt động
-                                            </span>
-                                          </div>
-                                          <div className="mt-3 space-y-2 text-xs font-medium text-muted-foreground">
-                                            <div className="flex items-center gap-2">
-                                              <Clock className="w-3.5 h-3.5 opacity-70" /> {cls.schedule}
+                              {/* Level 3: Class Grid */}
+                              <AnimatePresence>
+                                {isLevelExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="bg-slate-50/50"
+                                  >
+                                    <div className="p-3 space-y-2">
+                                      {levelClasses.map(cls => (
+                                        <div 
+                                          key={cls.id} 
+                                          onClick={() => navigate(`/classes/${cls.id}`)}
+                                          className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm hover:border-primary/40 hover:shadow-md transition-all cursor-pointer group flex items-center justify-between"
+                                        >
+                                          <div className="flex items-center gap-6 flex-1">
+                                            <div className="w-1.5 h-8 bg-slate-100 rounded-full group-hover:bg-primary transition-colors" />
+                                            
+                                            <div className="min-w-[200px]">
+                                              <h4 className="text-xs font-black text-slate-800 uppercase group-hover:text-primary transition-colors tracking-tight">
+                                                {cls.name}
+                                              </h4>
+                                              <div className="flex items-center gap-2 mt-1">
+                                                <div className="px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase rounded border border-emerald-100 tracking-tighter">
+                                                  Hoạt động
+                                                </div>
+                                              </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                              <GraduationCap className="w-3.5 h-3.5 opacity-70" /> {cls.studentCount} / {cls.maxStudents} Học viên
+
+                                            <div className="hidden lg:grid grid-cols-3 gap-x-12 gap-y-1 flex-1 max-w-2xl px-8">
+                                              <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="font-black text-slate-400 uppercase tracking-widest min-w-[70px]">Lịch học:</span>
+                                                <span className="font-bold text-slate-600 truncate">{cls.schedule}</span>
+                                              </div>
+                                              <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="font-black text-slate-400 uppercase tracking-widest min-w-[70px]">Bắt đầu:</span>
+                                                <span className="font-bold text-slate-600 truncate">{cls.startDate}</span>
+                                              </div>
+                                              <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="font-black text-slate-400 uppercase tracking-widest min-w-[70px]">Sĩ số:</span>
+                                                <span className="font-bold text-slate-800">{cls.studentCount} / {cls.maxStudents}</span>
+                                              </div>
+                                              <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="font-black text-slate-400 uppercase tracking-widest min-w-[70px]">Trạng thái:</span>
+                                                <div className="px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase rounded border border-emerald-100 tracking-tighter">
+                                                  Hoạt động
+                                                </div>
+                                              </div>
+                                              <div className="flex items-center gap-2 text-[10px]">
+                                                <span className="font-black text-slate-400 uppercase tracking-widest min-w-[70px]">Kết thúc:</span>
+                                                <span className="font-bold text-slate-600 truncate">{cls.endDate}</span>
+                                              </div>
                                             </div>
                                           </div>
-                                          <div className="mt-4 pt-3 border-t flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Vào lớp học</span>
-                                            <ArrowRight className="w-4 h-4 text-primary" />
+                                          
+                                          <div className="flex items-center gap-4 pl-4 border-l border-slate-50">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-300 group-hover:text-primary transition-colors hidden sm:block">Chi tiết</span>
+                                            <ArrowRight className="w-3.5 h-3.5 text-slate-200 group-hover:text-primary transition-all group-hover:translate-x-1" />
                                           </div>
                                         </div>
-                                      </div>
-                                    ))}
-                                    {levelClasses.length === 0 && (
-                                      <div className="col-span-full py-6 text-center text-sm text-muted-foreground italic h-full bg-card rounded-lg border border-dashed">
-                                        Chưa có lớp học nào thuộc cấp độ này.
-                                      </div>
-                                    )}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                                      ))}
+                                      {levelClasses.length === 0 && (
+                                        <div className="py-8 text-center text-[10px] font-black uppercase text-slate-400 border border-dashed border-slate-200 rounded-xl bg-white/50 ">
+                                          Chưa có lớp học nào được khởi tạo
+                                        </div>
+                                      )}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        })}
+                        {catLevels.length === 0 && (
+                          <div className="text-center py-8 text-[10px] font-black uppercase text-slate-400 border border-dashed border-slate-200 rounded-xl bg-white/50 italic">
+                            Hệ thống chưa thiết lập cấp độ đào tạo
                           </div>
-                        );
-                      })}
-                      {catLevels.length === 0 && (
-                        <div className="text-center py-6 text-sm text-muted-foreground italic bg-background rounded-xl border border-dashed">
-                          Chưa có cấp độ nào được thiết lập.
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
     </div>

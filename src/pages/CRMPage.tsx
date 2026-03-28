@@ -5,7 +5,7 @@ import {
   Phone, Mail, Calendar, DollarSign, Plus, Loader2, CheckCircle2, 
   UserPlus, Undo2, MousePointer2, Briefcase, LayoutGrid, List,
   LineChart, Download, Search, Filter, RotateCcw, MessageSquareText,
-  RefreshCw, User, ClipboardList, Clock, ChevronDown, X
+  RefreshCw, User, ClipboardList, Clock, ChevronDown, X, BookOpen
 } from "lucide-react";
 import { 
   Dialog, 
@@ -773,178 +773,131 @@ const CRMPage = () => {
       </div>
 
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="sm:max-w-[600px] gap-0 p-0 overflow-hidden border-none shadow-2xl rounded-2xl">
+        <DialogContent className="sm:max-w-[700px] gap-0 p-0 overflow-hidden border-none shadow-2xl rounded-2xl bg-[#f8f9fa]">
           {selectedLead && (
             <div className="flex flex-col">
-              {/* Header section with gradient */}
-              <div className="bg-gradient-to-r from-primary to-blue-600 p-6 text-white relative">
-                <button
-                  onClick={() => setIsDetailOpen(false)}
-                  className="absolute top-4 right-4 p-1 hover:bg-white/20 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              {/* Header section - Clean White */}
+              <div className="bg-white p-6 border-b border-slate-100 relative">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl font-black shadow-lg">
-                    {selectedLead.name.split(" ").pop()?.charAt(0)}
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                    <ClipboardList className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black uppercase tracking-tight">
+                    <h2 className="text-xl font-black uppercase tracking-tight text-slate-800">
                       {selectedLead.name}
                     </h2>
-                    <div className="flex items-center gap-2 mt-1 opacity-90">
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic ${
-                          stageConfig[selectedLead.stage].colorClass
-                        } bg-white transition-all`}
-                      >
-                        {stageConfig[selectedLead.stage].label}
-                      </span>
-                      <span className="text-xs font-bold">
-                        #{selectedLead.stt}
-                      </span>
-                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">
+                      Hồ sơ khách hàng tiềm năng <span className="text-primary ml-1">#{selectedLead.stt}</span>
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 grid grid-cols-2 gap-6 bg-slate-50/50">
-                <div className="space-y-6">
-                  <div className="animate-fade-in shadow-sm bg-white p-4 rounded-xl border border-slate-100">
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">
-                      Thông tin liên hệ
-                    </Label>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
-                          <Phone className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                            Số điện thoại
-                          </p>
-                          <p className="text-sm font-black text-slate-700">
-                            {selectedLead.phone}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500">
-                          <Calendar className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                            Ngày sinh
-                          </p>
-                          <p className="text-sm font-black text-slate-700">
-                            {selectedLead.dob}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className="animate-fade-in shadow-sm bg-white p-4 rounded-xl border border-slate-100"
-                    style={{ animationDelay: "100ms" }}
-                  >
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">
-                      Chương trình học
-                    </Label>
-                    <div className="space-y-2">
-                      <p className="text-base font-black text-primary italic uppercase tracking-tighter">
-                        {selectedLead.program.name}
-                      </p>
-                      <div className="grid grid-cols-2 gap-4 mt-2 pt-2 border-t border-slate-50">
-                        <div>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                            Số buổi
-                          </p>
-                          <p className="text-sm font-black text-slate-700">
-                            {selectedLead.program.sessions || "---"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                            Học phí
-                          </p>
-                          <p className="text-sm font-black text-blue-600">
-                            {formatVND(selectedLead.program.fee || 0)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              {/* Metrics Overview Bar */}
+              <div className="bg-white px-6 py-4 border-b border-slate-100 grid grid-cols-4 gap-4">
+                <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Nguồn khách</p>
+                  <span className="text-[10px] font-black text-blue-600 uppercase">{selectedLead.source}</span>
                 </div>
+                <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Cấp độ nhóm</p>
+                  <span className="text-[10px] font-black text-emerald-600 uppercase">{selectedLead.customerGroup.split(' ').pop()}</span>
+                </div>
+                <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Trạng thái</p>
+                  <span className="text-[10px] font-black text-amber-600 uppercase">{stageConfig[selectedLead.stage].label}</span>
+                </div>
+                <div className="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Nhân viên CS</p>
+                  <span className="text-[10px] font-black text-slate-700 uppercase">{selectedLead.assignee.split(' ').pop()}</span>
+                </div>
+              </div>
 
-                <div className="space-y-6">
-                  <div
-                    className="animate-fade-in shadow-sm bg-white p-4 rounded-xl border border-slate-100"
-                    style={{ animationDelay: "200ms" }}
-                  >
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">
-                      Phụ trách & Nguồn
-                    </Label>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                          Nhân viên CS
+              {/* Main Content Areas */}
+              <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto thin-scrollbar">
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Left Column: Contact & Program */}
+                  <div className="space-y-6">
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-primary">
+                        <Phone className="w-4 h-4" />
+                        <h3 className="text-[10px] font-black uppercase tracking-widest">Thông tin liên hệ</h3>
+                      </div>
+                      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Số điện thoại</span>
+                          <span className="text-xs font-bold text-slate-700">{selectedLead.phone}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ngày sinh</span>
+                          <span className="text-xs font-bold text-slate-700">{selectedLead.dob}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Giới tính</span>
+                          <span className="text-xs font-bold text-slate-700">Nam</span>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="space-y-3">
+                      <div className="flex items-center gap-2 text-primary">
+                        <BookOpen className="w-4 h-4" />
+                        <h3 className="text-[10px] font-black uppercase tracking-widest">Chương trình học</h3>
+                      </div>
+                      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hệ đào tạo</span>
+                          <span className="text-xs font-black text-primary uppercase">{selectedLead.program.name}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Số buổi dự kiến</span>
+                          <span className="text-xs font-bold text-slate-700">{selectedLead.program.sessions}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Mức phí</span>
+                          <span className="text-xs font-black text-emerald-600">{formatVND(selectedLead.program.fee || 3500000)}</span>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  {/* Right Column: History & Staff */}
+                  <div className="space-y-6">
+                    <section className="space-y-3 h-full flex flex-col">
+                      <div className="flex items-center gap-2 text-primary">
+                        <MessageSquareText className="w-4 h-4" />
+                        <h3 className="text-[10px] font-black uppercase tracking-widest">Lịch sử chăm sóc</h3>
+                      </div>
+                      <div className="flex-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 relative group min-h-[150px]">
+                        <div className="absolute -left-1 top-4 w-2 h-2 bg-blue-50 rotate-45 border-l border-b border-blue-100" />
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Cập nhật lúc 26/12 15:00</span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                          "Khách hàng quan tâm đến lộ trình học tiểu học cho bé lớp 2. Cần thêm tư vấn về lịch học cuối tuần. Tiếp tục chăm sóc vào thứ 2 tới."
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400">
-                            {selectedLead.assignee
-                              .split(" ")
-                              .pop()
-                              ?.charAt(0)}
+                        <div className="mt-3 flex items-center gap-2 pt-3 border-t border-blue-100/50">
+                          <div className="w-5 h-5 rounded-full bg-blue-200 flex items-center justify-center text-[9px] font-black text-blue-600">
+                            {selectedLead.assignee.split(' ').pop()?.charAt(0)}
                           </div>
-                          <p className="text-sm font-bold text-slate-700 uppercase tracking-tight">
-                            {selectedLead.assignee}
-                          </p>
+                          <span className="text-[10px] font-black text-blue-600 uppercase">{selectedLead.assignee}</span>
                         </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase italic">
-                          Nguồn khách
-                        </p>
-                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded uppercase tracking-tighter border border-blue-100">
-                          {selectedLead.source}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className="animate-fade-in shadow-sm bg-white p-4 rounded-xl border border-slate-100"
-                    style={{ animationDelay: "300ms" }}
-                  >
-                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">
-                      Lịch sử chăm sóc
-                    </Label>
-                    <div className="p-3 bg-slate-50 rounded-lg">
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed italic border-l-2 border-primary/20 pl-3">
-                        {selectedLead.followUpHistory} <br />
-                        <span className="text-[10px] text-slate-400 mt-1 block">
-                          Khách hàng quan tâm đến lộ trình học tiểu học...
-                        </span>
-                      </p>
-                    </div>
+                    </section>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 bg-white border-t border-slate-100 flex items-center justify-between">
-                <button className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-destructive transition-colors text-xs font-black uppercase tracking-widest">
-                  <RotateCcw className="w-4 h-4" /> Xóa lead
+              {/* Action Footer */}
+              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between">
+                <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 px-3 py-2 rounded-lg transition-colors">
+                  <RotateCcw className="w-3.5 h-3.5" /> Xóa Lead
                 </button>
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDetailOpen(false)}
-                    className="rounded-xl border-slate-200 text-xs font-black uppercase h-10 px-6"
-                  >
+                <div className="flex gap-3">
+                  <Button variant="ghost" onClick={() => setIsDetailOpen(false)} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 h-10 px-6">
                     Đóng
                   </Button>
-                  <Button className="rounded-xl bg-primary text-white text-xs font-black uppercase h-10 px-8 shadow-lg shadow-primary/20">
+                  <Button className="rounded-xl bg-primary text-white font-black uppercase tracking-widest text-[10px] h-10 px-8 shadow-lg shadow-primary/20">
                     Chăm sóc
                   </Button>
                 </div>

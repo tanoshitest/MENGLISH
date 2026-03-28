@@ -4,14 +4,18 @@ import { users, classes, tasks, timekeepingRecords } from "@/data/mockData";
 import { 
   ChevronLeft, ChevronRight, Mail, Phone, BookOpen, Star, Clock, 
   Calendar as CalendarIcon, MapPin, Info, ArrowRight, Fingerprint, CheckCircle,
-  FileText, Download, Briefcase, User as UserIcon
+  FileText, Download, Briefcase, User as UserIcon, DollarSign, X, CircleDollarSign
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const formatVND = (n: number) =>
+  new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(n) + "đ";
 
 const UserDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("info");
+  const [selectedMonthPayroll, setSelectedMonthPayroll] = useState<any>(null);
 
   const user = users.find((u) => u.id === id);
   const userClasses = classes.filter((c) => c.teacherId === id);
@@ -107,6 +111,7 @@ const UserDetailPage = () => {
               { id: "info", label: "Thông tin & Hợp đồng", icon: Info },
               { id: "assignments", label: user.role === "teacher" ? "Lớp học phụ trách" : "Công việc phụ trách", icon: user.role === "teacher" ? BookOpen : Briefcase },
               { id: "timekeeping", label: "Chấm công hàng ngày", icon: Fingerprint },
+              { id: "payroll", label: "Bảng lương", icon: DollarSign },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -314,9 +319,194 @@ const UserDetailPage = () => {
                  </div>
               </div>
             )}
+
+            {activeTab === "payroll" && (
+              <div className="bg-card rounded-xl border shadow-sm h-full overflow-hidden">
+                 <div className="p-5 border-b flex justify-between items-center bg-secondary/10">
+                    <h2 className="font-bold uppercase text-sm tracking-widest text-muted-foreground flex items-center gap-2">
+                       <DollarSign className="w-4 h-4" /> Lịch sử nhận lương (Payroll)
+                    </h2>
+                    <div className="flex bg-secondary/30 p-1 rounded-lg">
+                       <button className="px-3 py-1 text-[10px] font-bold bg-white rounded shadow-sm text-primary uppercase">Cá nhân</button>
+                    </div>
+                 </div>
+                 <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                       <thead className="text-[10px] font-black uppercase text-muted-foreground bg-secondary/20">
+                          <tr>
+                             <th className="px-6 py-3 text-left">Phiếu lương</th>
+                             <th className="px-6 py-3 text-right">Lương cơ bản</th>
+                             <th className="px-6 py-3 text-right">Phụ cấp/Thưởng</th>
+                             <th className="px-6 py-3 text-right">Khấu trừ</th>
+                             <th className="px-6 py-3 text-right text-primary">Thực nhận (Net)</th>
+                             <th className="px-6 py-3 text-center w-24">File</th>
+                          </tr>
+                       </thead>
+                       <tbody className="divide-y divide-slate-100">
+                          {[
+                            { month: "03/2025", base: 15000000, extra: 2500000, minus: 1200000, net: 16300000 },
+                            { month: "02/2025", base: 15000000, extra: 1800000, minus: 1200000, net: 15600000 },
+                            { month: "01/2025", base: 15000000, extra: 800000, minus: 1100000, net: 14700000 },
+                          ].map((pay, i) => (
+                            <tr 
+                                key={i} 
+                                onClick={() => setSelectedMonthPayroll(pay)}
+                                className="hover:bg-primary/5 transition-colors cursor-pointer group"
+                            >
+                               <td className="px-6 py-5">
+                                  <div className="flex items-center gap-3">
+                                     <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <FileText className="w-5 h-5" />
+                                     </div>
+                                     <div>
+                                        <p className="font-black text-slate-700">Tháng {pay.month}</p>
+                                        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Đã thanh toán</p>
+                                     </div>
+                                  </div>
+                               </td>
+                               <td className="px-6 py-4 text-right font-medium text-slate-500">
+                                  {formatVND(pay.base)}
+                               </td>
+                               <td className="px-6 py-4 text-right font-bold text-emerald-600">
+                                  + {formatVND(pay.extra)}
+                               </td>
+                               <td className="px-6 py-4 text-right font-bold text-rose-500">
+                                  - {formatVND(pay.minus)}
+                               </td>
+                               <td className="px-6 py-4 text-right font-black text-primary text-base">
+                                  {formatVND(pay.net)}
+                               </td>
+                               <td className="px-6 py-4 text-center">
+                                  <button className="p-2 hover:bg-primary/10 rounded-full text-primary transition-colors">
+                                     <Download className="w-4 h-4" />
+                                  </button>
+                               </td>
+                            </tr>
+                          ))}
+                       </tbody>
+                    </table>
+                 </div>
+                 <div className="p-4 bg-slate-50/50 border-t text-[10px] font-bold text-muted-foreground uppercase text-center tracking-widest">
+                    Mọi thắc mắc về bảng lương vui lòng liên hệ phòng kế toán để được hỗ trợ.
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Payroll Month Detail Modal - Replicated for Consistency */}
+      <AnimatePresence>
+        {selectedMonthPayroll && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setSelectedMonthPayroll(null)}
+               className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"
+             />
+             <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100"
+             >
+                <div className="bg-primary/5 p-8 border-b border-slate-50 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
+                            <CircleDollarSign className="w-6 h-6" />
+                        </div>
+                        <div>
+                           <h4 className="text-xl font-black text-slate-800 italic">Phiếu lương Chi tiết</h4>
+                           <p className="text-[10px] font-black text-primary uppercase tracking-widest">THÁNG {selectedMonthPayroll.month}</p>
+                        </div>
+                    </div>
+                    <button onClick={() => setSelectedMonthPayroll(null)} className="p-3 hover:bg-white rounded-2xl transition-colors text-slate-400">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="p-8 space-y-8">
+                    {/* Income Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100 italic">
+                            THU NHẬP (+)
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Lương cơ bản</span>
+                                <span className="font-black text-slate-700">{formatVND(selectedMonthPayroll.base)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Thưởng giảng dạy (42h)</span>
+                                <span className="font-black text-slate-700">{formatVND(1200000)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Thưởng KPI / Doanh số</span>
+                                <span className="font-black text-slate-700">{formatVND(800000)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Phụ cấp (Xăng xe, Ăn)</span>
+                                <span className="font-black text-slate-700">{formatVND(selectedMonthPayroll.extra - 2000000)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Deduction Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-600 bg-rose-50 w-fit px-3 py-1 rounded-full border border-rose-100 italic">
+                            KHẤU TRỪ (-)
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Bảo hiểm Xã hội (BHXH)</span>
+                                <span className="font-black text-rose-500 italic">-{formatVND(800000)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-slate-500">Thuế TNCN</span>
+                                <span className="font-black text-rose-500 italic">-{formatVND(400000)}</span>
+                            </div>
+                            {selectedMonthPayroll.minus > 1200000 && (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="font-bold text-slate-500">Phạt đi muộn / Về sớm</span>
+                                    <span className="font-black text-rose-500 italic">-{formatVND(selectedMonthPayroll.minus - 1200000)}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Total Section */}
+                    <div className="pt-8 border-t border-slate-100">
+                        <div className="bg-slate-50 p-6 rounded-[2rem] flex items-center justify-between border border-slate-100 relative overflow-hidden group">
+                            <div className="absolute right-[-10px] top-[-10px] w-24 h-24 bg-primary/5 rounded-full rotate-12 group-hover:scale-110 transition-transform" />
+                            <div>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">TÌNH TRẠNG: <span className="text-emerald-500">ĐÃ CHI TRẢ</span></p>
+                                <p className="text-sm font-bold text-slate-600">THỰC NHẬN (NET)</p>
+                            </div>
+                            <div className="text-right relative z-10">
+                                <p className="text-3xl font-black text-primary tracking-tighter">{formatVND(selectedMonthPayroll.net)}</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Payment id: #PAY_03_2026</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                        <button className="flex-1 bg-primary text-white rounded-2xl h-12 font-black text-xs shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                            <Download className="w-4 h-4" /> XUẤT PHIẾU LƯƠNG PDF
+                        </button>
+                        <button 
+                          onClick={() => setSelectedMonthPayroll(null)}
+                          className="flex-1 bg-white border border-slate-200 rounded-2xl h-12 font-black text-xs hover:bg-slate-50 transition-colors"
+                        >
+                            ĐÓNG
+                        </button>
+                    </div>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

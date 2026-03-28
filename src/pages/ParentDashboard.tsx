@@ -50,7 +50,6 @@ const ParentDashboard = () => {
     { id: "grades", label: "Lớp học & Kết quả", icon: BookOpen },
     { id: "finance", label: "Học phí & Lịch sử", icon: Wallet },
     { id: "reports", label: "Báo cáo định kỳ", icon: ClipboardList },
-    { id: "news", label: "Tin tức & Sự kiện", icon: Bell },
     { id: "contact", label: "Liên hệ Trung tâm", icon: MessageCircle }
   ];
 
@@ -59,24 +58,6 @@ const ParentDashboard = () => {
       <div className="flex-1 min-h-0 flex flex-col">
         {/* Main Content Area - NOW FULL WIDTH */}
         <div className="flex-1 bg-transparent overflow-hidden flex flex-col min-h-0">
-          {/* Dashboard Header Banner - PRO ANNOUNCEMENT */}
-          <div className="px-6 pt-4">
-             <div className="bg-gradient-to-r from-primary to-[#5cba9b] p-4 rounded-2xl shadow-lg shadow-primary/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                   <Bell className="w-20 h-20 text-white" />
-                </div>
-                <div className="relative z-10 flex items-center gap-4">
-                   <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-                      <Bell className="w-5 h-5 text-white" />
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-0.5">Thông báo mới</p>
-                      <p className="text-sm font-bold text-white tracking-tight">Cập nhật lịch thi giữa kỳ MOVERS Buổi 7 - Vui lòng xem tài liệu ôn tập!</p>
-                   </div>
-                   <button className="ml-auto px-4 py-1.5 bg-white text-primary text-[10px] font-black uppercase rounded-lg shadow-sm hover:scale-105 transition-all">Xem ngay</button>
-                </div>
-             </div>
-          </div>
 
           <div className="overflow-y-auto flex-1 h-full no-scrollbar px-6 py-4">
             
@@ -262,7 +243,6 @@ const ParentDashboard = () => {
                 </div>
               </div>
             )}
-
             {/* CONTENT: NEWS (Tin tức) */}
             {activeTab === "news" && (
               <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none h-full">
@@ -270,14 +250,14 @@ const ParentDashboard = () => {
                   <Bell className="w-6 h-6 text-primary" /> Tin tức & Sự kiện nội bộ
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
                     {[
                         { title: "Chào mừng Ngày Giải phóng 30/04 & 01/05", date: "24/03/2026", desc: "Trung tâm thông báo lịch nghỉ lễ cho học sinh từ ngày 30/04 đến hết 03/05. Các lớp sẽ quay lại học bình thường vào 04/05.", type: "Thông báo" },
                         { title: "Workshop: Luyện kỹ năng Speaking cùng chuyên gia", date: "22/03/2026", desc: "Sự kiện đặc biệt dành riêng cho học viên IELTS Mastery vào sáng Chủ Nhật này. Đăng ký tham gia ngay tại quầy lễ tân.", type: "Sự kiện" },
                         { title: "Ra mắt tính năng Cổng thông tin Phụ huynh Pro", date: "20/03/2026", desc: "MENGLISH chính thức cập nhật giao diện dashboard mới giúp phụ huynh theo dõi con em dễ dàng hơn trên thiết bị di động.", type: "Cập nhật" },
                         { title: "Tin tuyển sinh: Khoá học hè Summer Fun 2026", date: "15/03/2026", desc: "Đăng ký sớm nhận ưu đãi 20% học phí trọn gói cùng bộ quà tặng độc quyền từ Menglish.", type: "Khuyến mãi" },
                     ].map((news, i) => (
-                        <div key={i} className="group border rounded-md shadow-sm overflow-hidden flex flex-col hover:border-primary/50 transition-all cursor-pointer hover:shadow-md">
+                        <div key={i} className="group border rounded-2xl bg-white shadow-sm overflow-hidden flex flex-col hover:border-primary/50 transition-all cursor-pointer hover:shadow-md">
                             <div className="h-32 bg-secondary/30 relative flex items-center justify-center overflow-hidden">
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/20" />
                                 <Bell className="w-12 h-12 text-primary/20 group-hover:scale-110 transition-transform" />

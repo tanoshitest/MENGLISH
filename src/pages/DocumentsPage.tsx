@@ -3,7 +3,9 @@ import { useRole } from "@/contexts/RoleContext";
 import { documents, classes, teachers } from "@/data/mockData";
 import { 
   FileText, Download, Eye, Trash2, Search, Filter, Plus, 
-  ShieldCheck, X, Check, Users, School, Globe, Loader2, CheckCircle2 
+  ShieldCheck, X, Check, Users, School, Globe, Loader2, CheckCircle2,
+  Printer, EyeOff, FileText as FileIcon, AlertCircle, ChevronLeft, ChevronRight,
+  Maximize2, Minimize2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -22,9 +24,18 @@ import { Label } from "@/components/ui/label";
 const DocumentsPage = () => {
   const { isAdmin, isTeacher } = useRole();
   const activeTeacherId = "TCH001"; 
-  const [items, setItems] = useState([...documents]);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [items, setItems] = useState([...documents].map(doc => ({ ...doc, type: "pptx" })));
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [selectedDocForView, setSelectedDocForView] = useState<any>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const slides = [
+    { title: "WELCOME TO MENGLISH", subtitle: "Chương trình IELTS B1 Foundation", type: "intro" },
+    { title: "MỤC TIÊU BÀI HỌC", subtitle: "Learning Objectives", type: "goals" },
+    { title: "SƠ ĐỒ TƯ DUY", subtitle: "Topic: Environment & Ecology", type: "visual" },
+    { title: "BÀI TẬP VẬN DỤNG", subtitle: "Practice Session", type: "practice" },
+  ];
 
   // Interactive Demo State
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -116,6 +127,44 @@ const DocumentsPage = () => {
     toast.success("Đã cập nhật phân quyền cho tài liệu: " + selectedDoc.title);
     setShowPermissionModal(false);
   };
+
+  const viewerRef = React.useRef<HTMLDivElement>(null);
+
+  const toggleFullScreen = () => {
+    if (!viewerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      viewerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+    }
+  };
+
+  React.useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (selectedDocForView) {
+        if (e.key.toLowerCase() === 'f') toggleFullScreen();
+        if (e.key === 'ArrowRight' || e.key === ' ') setCurrentSlide(prev => (prev + 1) % slides.length);
+        if (e.key === 'ArrowLeft') setCurrentSlide(prev => Math.max(0, prev - 1));
+        if (e.key === 'Escape' && isFullScreen) setIsFullScreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [selectedDocForView, isFullScreen, slides.length]);
 
   return (
     <div className="p-4 md:p-6 space-y-4">
@@ -279,7 +328,11 @@ const DocumentsPage = () => {
                       </td>
                       <td className="px-4 py-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="p-2 hover:bg-secondary rounded-md transition-colors text-muted-foreground hover:text-foreground" title="Xem">
+                          <button 
+                            onClick={() => setSelectedDocForView(doc)}
+                            className="p-2 hover:bg-secondary rounded-md transition-colors text-muted-foreground hover:text-foreground" 
+                            title="Xem"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
                           {isAdmin && (
@@ -482,6 +535,194 @@ const DocumentsPage = () => {
                   <Check className="w-3.5 h-3.5" /> Lưu cập nhật
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Document Viewer Modal - Demo for Teachers vs Admin */}
+      <AnimatePresence>
+        {selectedDocForView && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setSelectedDocForView(null)}
+               className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
+            />
+            <motion.div 
+              ref={viewerRef}
+              initial={{ scale: 0.95, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 30 }}
+              className={`relative w-full ${isFullScreen ? 'h-screen max-w-none rounded-none border-none' : 'max-w-5xl h-[85vh] rounded-[3rem] border border-slate-200'} bg-white shadow-2xl overflow-hidden flex flex-col`}
+            >
+              {/* Toolbar */}
+              <div className="bg-slate-50/80 border-b p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-2xl bg-white shadow-sm ${getIconColor(selectedDocForView.type)}`}>
+                    <FileIcon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-800 tracking-tight leading-tight">{selectedDocForView.title}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">{selectedDocForView.type} Document</span>
+                      <span className="w-1 h-1 rounded-full bg-slate-300" />
+                      <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Added by: {selectedDocForView.addedBy}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={toggleFullScreen}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                    title="Toàn màn hình (F)"
+                  >
+                    {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                    {isFullScreen ? "Thu nhỏ" : "Toàn màn hình"}
+                  </button>
+
+                  <div className="flex items-center bg-white border border-slate-200 rounded-xl px-4 py-1.5 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-3 italic">Slide {currentSlide + 1} / {slides.length}</span>
+                    <div className="flex gap-1 border-l pl-3 border-slate-100">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setCurrentSlide(prev => Math.max(0, prev - 1)) }}
+                        disabled={currentSlide === 0}
+                        className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setCurrentSlide(prev => Math.min(slides.length - 1, prev + 1)) }}
+                        disabled={currentSlide === slides.length - 1}
+                        className="p-1 hover:bg-slate-100 rounded disabled:opacity-30"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="w-px h-8 bg-slate-200 mx-2" />
+                  <button 
+                    onClick={() => { setSelectedDocForView(null); setCurrentSlide(0); }}
+                    className="p-3 hover:bg-slate-200 transition-colors rounded-2xl text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Slide Content Area (16:9) */}
+              <div 
+                className="flex-1 bg-slate-100 flex items-center justify-center p-8 sm:p-12 relative overflow-hidden group/slide cursor-pointer"
+                onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
+              >
+                  {/* PPTX Layout Container */}
+                  <div className="w-full h-full max-w-[1200px] max-h-[675px] aspect-video bg-white shadow-2xl rounded-sm overflow-hidden relative flex flex-col group">
+                     
+                     <AnimatePresence mode="wait">
+                        <motion.div 
+                          key={currentSlide}
+                          initial={{ x: 300, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          exit={{ x: -300, opacity: 0 }}
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          className="flex-1 flex flex-col"
+                        >
+                           {/* Slide Styles Based on Content */}
+                           {slides[currentSlide].type === "intro" ? (
+                              <div className="flex-1 bg-slate-900 flex flex-col items-center justify-center text-center p-20 relative overflow-hidden">
+                                 <div className="absolute top-0 left-0 w-full h-2 bg-primary" />
+                                 <motion.div 
+                                    initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                                    className="w-24 h-24 rounded-3xl bg-white/10 flex items-center justify-center mb-8 border border-white/20"
+                                 >
+                                    <FileIcon className="w-10 h-10 text-white" />
+                                 </motion.div>
+                                 <h1 className="text-6xl font-black text-white italic tracking-tighter mb-4">{slides[currentSlide].title}</h1>
+                                 <div className="w-20 h-1 bg-primary mb-6" />
+                                 <p className="text-xl font-bold text-slate-400 uppercase tracking-widest italic">{slides[currentSlide].subtitle}</p>
+                                 <div className="absolute bottom-10 right-10 text-[10px] font-black text-white/20 tracking-widest uppercase italic font-mono">Internal ID: #DOC_X0421</div>
+                              </div>
+                           ) : slides[currentSlide].type === "goals" ? (
+                              <div className="flex-1 p-20 flex flex-col space-y-12">
+                                 <div className="flex justify-between items-start">
+                                    <div>
+                                       <h2 className="text-4xl font-black text-slate-800 italic underline decoration-primary/30 underline-offset-8 leading-none mb-4">{slides[currentSlide].title}</h2>
+                                       <p className="text-sm font-black text-primary uppercase tracking-widest">{slides[currentSlide].subtitle}</p>
+                                    </div>
+                                    <FileIcon className="w-8 h-8 text-slate-200" />
+                                 </div>
+                                 <div className="grid grid-cols-2 gap-12 pt-4">
+                                    <div className="space-y-6">
+                                       {[1,2,3].map(i => (
+                                          <div key={i} className="flex gap-4">
+                                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-black text-xs text-primary shrink-0 mt-0.5">{i}</div>
+                                             <p className="text-lg font-bold text-slate-600 leading-snug">Hệ thống hoá kiến thức từ vựng trọng tâm cấp độ B1.</p>
+                                          </div>
+                                       ))}
+                                    </div>
+                                    <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100 flex flex-col justify-between">
+                                       <p className="text-sm font-bold text-slate-400 italic">"Lưu ý cho giảng viên: Cần phân bổ thời gian tối thiểu 15 phút cho phần này để học viên nắm vững lý thuyết."</p>
+                                       <div className="flex items-center gap-3">
+                                          <div className="w-10 h-10 rounded-full bg-slate-200" />
+                                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Supervisor</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           ) : (
+                              <div className="flex-1 flex flex-col p-20 space-y-8">
+                                 <h2 className="text-4xl font-black text-slate-800 italic">{slides[currentSlide].title}</h2>
+                                 <div className="flex-1 bg-slate-100 rounded-[3rem] border-2 border-dashed border-slate-200 flex items-center justify-center relative overflow-hidden">
+                                    <div className="text-center relative z-10 transition-transform hover:scale-105 duration-500">
+                                       <FileIcon className="w-20 h-20 text-slate-300 mx-auto mb-4" />
+                                       <p className="text-sm font-black text-slate-400 italic uppercase tracking-widest">Minh họa trực quan bài giảng</p>
+                                    </div>
+                                    <div className="absolute top-10 right-10 w-40 h-40 bg-primary/5 rounded-full" />
+                                    <div className="absolute bottom-[-20px] left-[-20px] w-64 h-64 bg-slate-300/10 rounded-full" />
+                                 </div>
+                                 <div className="grid grid-cols-3 gap-6">
+                                    {[1,2,3].map(i => (
+                                       <div key={i} className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                          <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.8, delay: i * 0.2 }} className="h-full bg-primary/20" />
+                                       </div>
+                                    ))}
+                                 </div>
+                              </div>
+                           )}
+                        </motion.div>
+                     </AnimatePresence>
+
+                     {/* Progress Indicator */}
+                     <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {slides.map((_, i) => (
+                           <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 bg-primary" : "w-1.5 bg-slate-300"}`} />
+                        ))}
+                     </div>
+                  </div>
+
+                  {/* Watermark for Teachers */}
+                  {!isAdmin && (
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-[0.03] flex items-center justify-center rotate-45">
+                       <p className="text-8xl font-black text-slate-900 whitespace-nowrap">MENGLISH ACADEMIC CENTER • PPTX PROTECTED • VIEW ONLY</p>
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/5 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest opacity-0 group-hover/slide:opacity-100 transition-all cursor-default">
+                    Click anywhere on slide to advance
+                  </div>
+              </div>
+
+              {/* View Status Footer */}
+              {!isAdmin && (
+                <div className="bg-amber-50 p-4 border-t border-amber-100 flex items-center justify-center gap-2">
+                   <AlertCircle className="w-4 h-4 text-amber-500" />
+                   <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest italic">Bạn đang ở chế độ xem học liệu trực tuyến. Download bị vô hiệu hóa để bảo mật quyền sở hữu trí tuệ.</p>
+                </div>
+              )}
             </motion.div>
           </div>
         )}

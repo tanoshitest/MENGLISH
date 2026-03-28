@@ -3,6 +3,9 @@ import type { Role } from "@/data/mockData";
 
 interface RoleContextType {
   role: Role;
+  isLoggedIn: boolean;
+  login: (r: Role) => void;
+  logout: () => void;
   toggleRole: () => void;
   changeRole: (r: Role) => void;
   isAdmin: boolean;
@@ -13,6 +16,10 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("menglish_is_logged_in") === "true";
+  });
+
   const [role, setRole] = useState<Role>(() => {
     try {
       const savedRole = localStorage.getItem("menglish_user_role");
@@ -27,7 +34,17 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     localStorage.setItem("menglish_user_role", role);
-  }, [role]);
+    localStorage.setItem("menglish_is_logged_in", isLoggedIn.toString());
+  }, [role, isLoggedIn]);
+
+  const login = useCallback((r: Role) => {
+    setRole(r);
+    setIsLoggedIn(true);
+  }, []);
+
+  const logout = useCallback(() => {
+    setIsLoggedIn(false);
+  }, []);
 
   const toggleRole = useCallback(() => setRole((r) => {
     if (r === "admin") return "teacher";
@@ -40,6 +57,9 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <RoleContext.Provider value={{ 
       role, 
+      isLoggedIn,
+      login,
+      logout,
       toggleRole, 
       changeRole,
       isAdmin: role === "admin", 

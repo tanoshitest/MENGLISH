@@ -9,7 +9,7 @@ import {
   Fingerprint, Wallet, MessageCircle, ClipboardCheck, History,
   PieChart, MessageSquareX, BarChart3, Repeat, GraduationCap as StudentIcon,
   CircleDollarSign, Layers, CalendarClock, TrendingUp, HandCoins, Building2,
-  Users2, Clock, BellRing, UserMinus, ShieldAlert, LineChart
+  Users2, Clock, BellRing, UserMinus, ShieldAlert, LineChart, LogOut
 } from "lucide-react";
 import { notifications } from "@/data/mockData";
 import {
@@ -34,51 +34,29 @@ interface NavItem {
 const navItems: NavItem[] = [
   // Dashboard removed as per user request
   { label: "Lớp học của tôi", path: "/my-classes", icon: BookOpen, teacherOnly: true },
-  { label: "Quản lý khóa học", path: "/courses", icon: BookOpen, adminOnly: true },
+  { label: "Quản lý lớp học", path: "/courses", icon: BookOpen, adminOnly: true },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap, adminOnly: true },
   { label: "Quản lý User", path: "/users", icon: UserCog, adminOnly: true },
-  { label: "Tài chính", path: "/financial", icon: DollarSign, adminOnly: true },
-  { label: "Phân công công việc", path: "/tasks", icon: ClipboardList },
-  { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
-  { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint },
+  { label: "Quản lý hàng hoá", path: "/inventory", icon: Layers, adminOnly: true },
+  { label: "Phân công công việc", path: "/tasks", icon: ClipboardList },
+  { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint, teacherOnly: true },
+  { label: "Báo cáo", path: "/admin-reports", icon: BarChart3, adminOnly: true },
   // Parent Items
   { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
   { label: "Lớp học & Kết quả", path: "/parent-portal?tab=grades", icon: BookOpen, parentOnly: true },
   { label: "Học phí & Lịch sử", path: "/parent-portal?tab=finance", icon: Wallet, parentOnly: true },
-  { label: "Tin tức & Sự kiện", path: "/parent-portal?tab=news", icon: Bell, parentOnly: true },
   { label: "Báo cáo học tập", path: "/parent-portal?tab=reports", icon: ClipboardList, parentOnly: true },
   { label: "Liên hệ Trung tâm", path: "/parent-portal?tab=contact", icon: MessageCircle, parentOnly: true },
 ];
 
-const reportItems = [
-  { label: "Tin chưa gửi được", path: "/reports/failed-sms", icon: MessageSquareX },
-  { label: "Biểu đồ học viên", path: "/reports/student-charts", icon: BarChart3 },
-  { label: "Báo cáo chuyển lớp", path: "/reports/transfers", icon: Repeat },
-  { label: "Báo cáo học thử", path: "/reports/trials", icon: Layers },
-  { label: "Báo cáo âm học phí", path: "/reports/negative-tuition", icon: ShieldAlert },
-  { label: "Báo cáo tổng lớp", path: "/reports/class-summary", icon: School },
-  { label: "Phân bổ học phí tháng", path: "/reports/monthly-allocation", icon: CalendarClock },
-  { label: "Báo cáo điểm danh", path: "/reports/attendance-report", icon: ClipboardCheck },
-  { label: "Kết quả học tập", path: "/reports/academic-results", icon: GraduationCap },
-  { label: "Bảng chấm công", path: "/reports/timesheets", icon: Fingerprint },
-  { label: "Lương", path: "/reports/payroll", icon: CircleDollarSign },
-  { label: "Báo cáo phòng", path: "/reports/room-usage", icon: Building2 },
-  { label: "Lớp, học viên", path: "/reports/class-students", icon: Users2 },
-  { label: "Học viên trong ngày", path: "/reports/daily-students", icon: Clock },
-  { label: "Nhắc hạn học phí", path: "/reports/tuition-reminder", icon: BellRing },
-  { label: "Nợ học phí", path: "/reports/tuition-debt", icon: HandCoins },
-  { label: "Nợ đặt cọc", path: "/reports/deposit-debt", icon: UserMinus },
-  { label: "Lợi nhuận", path: "/reports/profit", icon: TrendingUp },
-];
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { role, toggleRole, changeRole, isAdmin, isTeacher, isParent } = useRole();
+  const { role, login, logout, isAdmin, isTeacher, isParent } = useRole();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
    const [showNotifications, setShowNotifications] = useState(false);
-  const [reportsOpen, setReportsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [crmOpen, setCrmOpen] = useState(true);
 
@@ -135,10 +113,17 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
 
             {filteredNav.map((item) => {
-              const active = location.pathname === item.path;
+              const active = item.path.includes('?') 
+                ? (location.pathname + location.search) === item.path
+                : location.pathname === item.path && !location.search;
+              
+              // Special case: if we are at exactly /parent-portal without any tab param, highlight the first tab
+              const isFirstParentTab = item.path === "/parent-portal" && location.pathname === "/parent-portal" && !location.search;
+              const isTrulyActive = active || isFirstParentTab;
+
               const label = item.path === "/tasks"
                 ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
-                : item.path === "/classes" 
+                : item.path === "/courses" 
                 ? (isAdmin ? "Quản lý lớp học" : "Lớp đc phân công")
                 : item.path === "/schedule"
                 ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
@@ -151,8 +136,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   onClick={() => navigate(item.path)}
                   title={isCollapsed ? label : ""}
                   className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-md text-sm transition-colors ${
-                    active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
+                    isTrulyActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold shadow-sm"
                       : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                   }`}
                 >
@@ -162,49 +147,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               );
             })}
 
-            {/* Reports Collapsible */}
-            {isAdmin && (
-              <div className="space-y-0.5">
-                <button
-                  onClick={() => isCollapsed ? (setIsCollapsed(false), setReportsOpen(true)) : setReportsOpen(!reportsOpen)}
-                  title={isCollapsed ? "Báo cáo" : ""}
-                  className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-md text-sm transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground ${reportsOpen ? "font-bold" : ""}`}
-                >
-                  <PieChart className="w-4 h-4 flex-shrink-0" />
-                  {!isCollapsed && (
-                    <>
-                      Báo cáo
-                      <ChevronRight className={`w-3 h-3 ml-auto transition-transform duration-200 ${reportsOpen ? "rotate-90" : ""}`} />
-                    </>
-                  )}
-                </button>
-                <AnimatePresence>
-                  {reportsOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden bg-sidebar-accent/20 rounded-lg ml-2"
-                    >
-                      {reportItems.map((item) => (
-                        <button
-                          key={item.path}
-                          onClick={() => navigate(item.path)}
-                          className={`w-full flex items-center gap-3 px-4 py-1.5 text-[11px] font-medium transition-colors ${
-                            location.pathname === item.path
-                              ? "text-primary bg-primary/5 font-bold"
-                              : "text-sidebar-foreground hover:bg-sidebar-accent/30"
-                          }`}
-                        >
-                          <item.icon className="w-3 h-3 opacity-60" />
-                          {item.label}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
         </nav>
         <div className="p-3 border-t border-sidebar-border relative">
           {!isCollapsed && <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>}
@@ -225,17 +167,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
               <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/crm"); toast.success("Đã chuyển sang Admin"); }}>
-                <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
-                Admin
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/my-classes"); toast.success("Đã chuyển sang Giảng viên"); }}>
-                <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
-                Giảng viên
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { changeRole("parent"); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
-                <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-                Phụ huynh
+              <DropdownMenuItem onClick={() => { logout(); navigate("/"); toast.info("Đã đăng xuất"); }}>
+                <LogOut className="w-4 h-4 mr-2 text-rose-500" />
+                <span className="text-rose-500 font-bold">Đăng xuất</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -278,8 +212,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
                       : item.path === "/schedule"
                         ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
-                      : item.path === "/documents"
-                        ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
                       : item.path === "/users"
                         ? "Quản lý User"
                       : item.label;
@@ -306,106 +238,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <header className="h-14 bg-card border-b flex items-center justify-between px-4 flex-shrink-0" style={{ boxShadow: "var(--topbar-shadow)" }}>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-muted-foreground mr-1">
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="odoo-breadcrumb">
-              {currentPage ? (
-                <>
-                  <currentPage.icon className="w-4 h-4" />
-                  <span className="font-medium text-foreground">
-                      {currentPage.path === "/tasks"
-                        ? (isAdmin ? "Phân công công việc" : "Công việc của tôi")
-                      : currentPage.path === "/schedule"
-                        ? (isAdmin ? "Quản lý lịch dạy" : "Lịch dạy của tôi")
-                      : currentPage.path === "/timekeeping"
-                        ? (isAdmin ? "Quản lý chấm công" : "Chấm công của tôi")
-                      : currentPage.path === "/documents"
-                        ? (isAdmin ? "Quản lý tài liệu" : "Tài liệu của tôi")
-                      : currentPage.path === "/users"
-                        ? "Quản lý User"
-                      : currentPage.label}
-                  </span>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                   <ChevronRight className="w-3 h-3 text-muted-foreground" />
-                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Chi tiết</span>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Notifications */}
-            <div className="relative">
-              <button 
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="p-2 hover:bg-secondary rounded-full transition-colors relative"
-              >
-                <Bell className="w-5 h-5 text-muted-foreground" />
-                {notifications.filter(n => (n.role === "all" || n.role === role) && !n.isRead).length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full border-2 border-card" />
-                )}
-              </button>
+        {/* Floating Toggle Button for Mobile Menu */}
+        <button 
+          onClick={() => setSidebarOpen(true)} 
+          className="lg:hidden fixed top-4 right-4 z-50 p-2.5 bg-primary text-white rounded-full shadow-2xl active:scale-90 transition-transform"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
 
-              <AnimatePresence>
-                {showNotifications && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-10" 
-                      onClick={() => setShowNotifications(false)} 
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-80 bg-card border rounded-lg shadow-xl z-20 overflow-hidden"
-                    >
-                      <div className="p-3 border-b bg-secondary/10 flex items-center justify-between">
-                        <span className="font-bold text-sm">Thông báo</span>
-                        <button className="text-[10px] text-primary hover:underline">Đánh dấu đã đọc</button>
-                      </div>
-                      <div className="max-h-[400px] overflow-y-auto">
-                        {notifications
-                          .filter(n => n.role === "all" || n.role === role)
-                          .map((n) => (
-                            <div 
-                              key={n.id} 
-                              className={`p-4 border-b last:border-0 hover:bg-secondary/20 transition-colors cursor-pointer ${!n.isRead ? "bg-primary/5 border-l-2 border-l-primary" : ""}`}
-                            >
-                              <div className="flex justify-between items-start mb-1">
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${
-                                  n.type === "warning" ? "bg-destructive/10 text-destructive" : 
-                                  n.type === "success" ? "bg-success/10 text-success" : 
-                                  "bg-primary/10 text-primary"
-                                }`}>
-                                  {n.type}
-                                </span>
-                                <span className="text-[10px] text-muted-foreground">{n.time}</span>
-                              </div>
-                              <p className="text-xs font-bold mb-0.5">{n.title}</p>
-                              <p className="text-[11px] text-muted-foreground leading-relaxed">{n.content}</p>
-                            </div>
-                          ))}
-                        {notifications.filter(n => n.role === "all" || n.role === role).length === 0 && (
-                          <div className="p-8 text-center text-sm text-muted-foreground">Không có thông báo nào.</div>
-                        )}
-                      </div>
-                      <div className="p-2 border-t text-center">
-                        <button className="text-xs text-muted-foreground hover:text-primary">Xem tất cả thông báo</button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </header>
-
-        {/* Page content - Native App Scrolling for All */}
+        {/* Page content - Full Screen Mode */}
         <main className="flex-1 overflow-hidden">
           <div className="h-full">
             {children}
