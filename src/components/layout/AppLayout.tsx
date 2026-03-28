@@ -38,10 +38,12 @@ const navItems: NavItem[] = [
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap, adminOnly: true },
   { label: "Quản lý User", path: "/users", icon: UserCog, adminOnly: true },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
+  { label: "Quản lý tài liệu", path: "/documents", icon: FileText, adminOnly: true },
   { label: "Quản lý hàng hoá", path: "/inventory", icon: Layers, adminOnly: true },
   { label: "Phân công công việc", path: "/tasks", icon: ClipboardList },
   { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint, teacherOnly: true },
   { label: "Báo cáo", path: "/admin-reports", icon: BarChart3, adminOnly: true },
+  { label: "Cấu hình", path: "/settings", icon: Settings, adminOnly: true },
   // Parent Items
   { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
   { label: "Lớp học & Kết quả", path: "/parent-portal?tab=grades", icon: BookOpen, parentOnly: true },
