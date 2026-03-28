@@ -13,42 +13,44 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#2185d5] flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Top Header Section */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-10 z-10"
+        className="text-center mb-6 z-10 flex flex-col items-center"
       >
-        <h1 className="text-6xl font-black text-white tracking-tight mb-2 uppercase">MENGLISH LMS</h1>
-        <p className="text-lg font-bold text-white/90">Hệ thống quản lý trung tâm tiếng Anh</p>
+        <img 
+          src="/logo_me.png" 
+          alt="MENGLISH Logo" 
+          className="h-40 w-auto object-contain"
+        />
       </motion.div>
 
       {/* Central Login Card */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-[480px] bg-white/10 backdrop-blur-md border-[3px] border-white/20 rounded-[3rem] p-12 shadow-2xl relative z-10"
+        className="w-full max-w-[420px] bg-white/10 backdrop-blur-md border-[3px] border-white/20 rounded-[3rem] p-8 shadow-2xl relative z-10"
       >
-        <p className="text-[11px] font-black text-white/70 text-center uppercase tracking-[0.3em] mb-8">Vui lòng chọn vai trò</p>
+        <p className="text-[10px] font-black text-white/70 text-center uppercase tracking-[0.3em] mb-6">Vui lòng chọn vai trò</p>
         
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => handleLogin("admin")}
-            className="w-full py-4 bg-white text-[#2185d5] rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-xl shadow-black/5"
+            className="w-full py-3 bg-white text-[#2185d5] rounded-2xl font-black text-base hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-xl shadow-black/5"
           >
             Quản trị viên (Admin)
           </button>
           
           <button
             onClick={() => handleLogin("teacher")}
-            className="w-full py-4 bg-white/20 text-white rounded-2xl font-black text-lg hover:bg-white/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-lg"
+            className="w-full py-3 bg-white/20 text-white rounded-2xl font-black text-base hover:bg-white/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-lg"
           >
             Giảng viên (Teacher)
           </button>
           
           <button
             onClick={() => handleLogin("parent")}
-            className="w-full py-4 bg-white/20 text-white rounded-2xl font-black text-lg hover:bg-white/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-lg"
+            className="w-full py-3 bg-white/20 text-white rounded-2xl font-black text-base hover:bg-white/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none outline-none shadow-lg"
           >
             Phụ huynh (Parent)
           </button>
@@ -60,10 +62,10 @@ const LoginPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="absolute bottom-12 text-center"
+        className="mt-12 text-center z-10"
       >
-        <p className="text-[11px] font-medium text-white/60">
-          Prototype owned by <span className="font-bold text-white/80">Tanoshi Vietnam</span>
+        <p className="text-[13px] font-medium text-white/70 tracking-wide">
+          Prototype owned by <span className="font-bold text-white">Tanoshi Vietnam</span>
         </p>
       </motion.div>
 

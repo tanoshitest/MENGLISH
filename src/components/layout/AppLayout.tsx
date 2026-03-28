@@ -74,8 +74,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Universal Sidebar - (Admin Style for All) */}
       <aside className={`hidden lg:flex flex-col ${isCollapsed ? 'w-16' : 'w-60'} bg-sidebar border-r border-sidebar-border flex-shrink-0 transition-all duration-300 ease-in-out relative group`}>
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2'} px-4 py-4 border-b border-sidebar-border h-14`}>
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center flex-shrink-0">
-            <School className="w-4 h-4 text-primary-foreground" />
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-sidebar-border overflow-hidden p-1">
+            <img src="/logo_me.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           {!isCollapsed && (
             <motion.span 
@@ -83,7 +83,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               animate={{ opacity: 1, x: 0 }}
               className="font-bold text-sidebar-primary text-sm truncate"
             >
-              MENGLISH PROTOTYPE
+              MENGLISH
             </motion.span>
           )}
           
@@ -196,10 +196,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-sidebar-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-                    <School className="w-4 h-4 text-primary-foreground" />
+                  <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-sidebar-border overflow-hidden p-1">
+                    <img src="/logo_me.png" alt="Logo" className="w-full h-full object-contain" />
                   </div>
-                  <span className="font-bold text-sidebar-primary text-sm">MENGLISH PROTOTYPE</span>
+                  <span className="font-bold text-sidebar-primary text-sm">MENGLISH</span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)} className="text-sidebar-foreground">
                   <X className="w-5 h-5" />
