@@ -202,27 +202,54 @@ export const classes: ClassItem[] = [
 // ---- CRM Leads ----
 export interface Lead {
   id: string;
+  stt: number;
   name: string;
+  dob: string;
   phone: string;
-  email: string;
-  source: string;
-  interest: string;
+  customerGroup: string;
+  program: {
+    name: string;
+    sessions?: number;
+    fee?: number;
+    collectionDate?: string;
+  };
   assignee: string;
+  followUpHistory: string;
+  source: string;
+  category: "nurturing" | "completed" | "raw" | "student";
   stage: "new" | "nurturing" | "test" | "closed";
-  value: number;
-  createdDate: string;
-  note: string;
 }
 
-export const leads: Lead[] = [
-  { id: "L001", name: "Hoàng Thị Yến", phone: "0981112233", email: "yen@gmail.com", source: "Facebook Ads", interest: "IELTS 6.5", assignee: "Trần Thị Lan", stage: "new", value: 15000000, createdDate: "2025-03-20", note: "Liên hệ lại chiều nay" },
-  { id: "L002", name: "Đặng Văn Kiên", phone: "0972223344", email: "kien@gmail.com", source: "Giới thiệu", interest: "Tiếng Anh giao tiếp", assignee: "Phạm Thị Hoa", stage: "nurturing", value: 8000000, createdDate: "2025-03-18", note: "Đã gọi 2 lần, quan tâm lớp tối" },
-  { id: "L003", name: "Bùi Minh Tú", phone: "0963334455", email: "tu@gmail.com", source: "Website", interest: "TOEIC 700+", assignee: "Trần Thị Lan", stage: "nurturing", value: 10000000, createdDate: "2025-03-15", note: "Hẹn test đầu vào T7" },
-  { id: "L004", name: "Lý Thanh Hà", phone: "0954445566", email: "ha@gmail.com", source: "Walk-in", interest: "English Starter cho con", assignee: "Phạm Thị Hoa", stage: "test", value: 6000000, createdDate: "2025-03-12", note: "Con 8 tuổi, đã test A1" },
-  { id: "L005", name: "Ngô Quang Vinh", phone: "0945556677", email: "vinh@gmail.com", source: "Facebook Ads", interest: "IELTS 7.0", assignee: "Trần Thị Lan", stage: "closed", value: 18000000, createdDate: "2025-03-05", note: "Đã đóng học phí, xếp lớp CLS003" },
-  { id: "L006", name: "Phan Thị Ngọc", phone: "0936667788", email: "ngoc@gmail.com", source: "Zalo", interest: "Giao tiếp cơ bản", assignee: "Phạm Thị Hoa", stage: "new", value: 7000000, createdDate: "2025-03-22", note: "Mới inbox hỏi thông tin" },
-  { id: "L007", name: "Trịnh Đức Anh", phone: "0927778899", email: "ducanh@gmail.com", source: "Giới thiệu", interest: "IELTS 5.5", assignee: "Trần Thị Lan", stage: "test", value: 12000000, createdDate: "2025-03-10", note: "Test xong, chờ báo kết quả" },
-];
+const stagesList: Lead["stage"][] = ["new", "nurturing", "test", "closed"];
+const names = ["NGUYỄN THANH VÂN", "TRẦN HOÀNG KHẢI", "ĐINH HÀ LINH", "NGUYỄN BẢO HÂN", "HOÀNG MINH TÚ", "PHẠM ĐỨC ANH", "LÊ THỊ HỒNG", "VŨ QUANG MINH", "ĐẶNG THU THẢO", "BÙI TIẾN DŨNG", "TRỊNH QUỐC BẢO", "LÊ MINH CHÂU", "PHAN THANH TÙNG", "LÝ THU HÀ", "NGUYỄN TUẤN KIỆT"];
+const sources = ["FACEBOOK", "PHỤ HUYNH CŨ GIỚI THIỆU", "VÃNG LAI", "MARKETING", "TIKTOK", "GOOGLE ADS"];
+const staffNames = ["Nguyễn Bích Ngọc", "Nguyễn Thuỳ Linh", "Trần Minh Quân", "Phạm Hồng Nhung", "Lê Gia Huy"];
+const groups = ["ĐÃ CHỐT THÀNH CÔNG", "CHỜ XẾP LỚP", "Chưa phân nhóm", "TIỀM NĂNG CAO", "KHÁCH HÀNG VIP"];
+
+export const leads: Lead[] = stagesList.flatMap((stage, stageIdx) => 
+  Array.from({ length: 40 }).map((_, i) => {
+    const name = names[i % names.length] + " " + (i + 1 + stageIdx * 40);
+    return {
+      id: `L-${stage}-${i}`,
+      stt: i + 1 + stageIdx * 40,
+      name: name,
+      dob: "01/01/2018",
+      phone: `09${Math.floor(Math.random() * 90000000 + 10000000)}`,
+      customerGroup: stage === "closed" ? "ĐÃ CHỐT THÀNH CÔNG" : groups[i % groups.length],
+      program: {
+        name: i % 3 === 0 ? "Tiểu học" : i % 3 === 1 ? "Mẫu giáo" : "Trung học cơ sở",
+        sessions: Math.floor(Math.random() * 20 + 10),
+        fee: Math.floor(Math.random() * 3000000 + 1000000),
+        collectionDate: "24/10/2025"
+      },
+      assignee: staffNames[i % staffNames.length],
+      followUpHistory: "26/12 15:00:",
+      source: sources[i % sources.length],
+      category: stage === "closed" ? "completed" : "nurturing",
+      stage: stage
+    };
+  })
+);
 
 // ---- Courses ----
 export interface Course {
@@ -589,3 +616,59 @@ export const mockMakeUpRecords: MakeUpRecord[] = [
   { id: "MUP002", studentId: "STU002", absentDate: "2025-03-24", status: "pending", note: "Kẹt xe nghỉ có phép" },
   { id: "MUP003", studentId: "STU004", absentDate: "2025-03-24", status: "scheduled", makeUpDate: "2025-03-26", learnWith: "CLS002", note: "Học bù cùng lớp 4CLC" },
 ];
+
+// ---- CRM Sales Reports ----
+export interface SalesStats {
+  id: string;
+  staffName: string;
+  customers: number;
+  saleAmount: number;
+  commissionRate: number;
+  totalCommission: number;
+  kpi: number; // Percentage
+  month: string;
+}
+
+export const salesData: SalesStats[] = [
+  {
+    id: "S1",
+    staffName: "Nguyễn Bích Ngọc",
+    customers: 1,
+    saleAmount: 3550000,
+    commissionRate: 3,
+    totalCommission: 106500,
+    kpi: 75,
+    month: "3/2026"
+  },
+  {
+    id: "S2",
+    staffName: "Nguyễn Thuỳ Linh",
+    customers: 4,
+    saleAmount: 15445000,
+    commissionRate: 3,
+    totalCommission: 463350,
+    kpi: 92,
+    month: "3/2026"
+  },
+  {
+    id: "S3",
+    staffName: "Trần Minh Quân",
+    customers: 2,
+    saleAmount: 8200000,
+    commissionRate: 3,
+    totalCommission: 246000,
+    kpi: 60,
+    month: "2/2026"
+  },
+  {
+    id: "S4",
+    staffName: "Phạm Hồng Nhung",
+    customers: 3,
+    saleAmount: 12000000,
+    commissionRate: 3,
+    totalCommission: 360000,
+    kpi: 85,
+    month: "2/2026"
+  }
+];
+

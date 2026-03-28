@@ -5,8 +5,9 @@ import { ClassDetailContent } from "./ClassDetailPage";
 import { useSearchParams } from "react-router-dom";
 import { 
   GraduationCap, BookOpen, Clock, MessageCircle, 
-  UploadCloud, CheckCircle, AlertCircle, Send, CheckSquare, FileText, ChevronRight, Wallet, Bell, Calendar
+  UploadCloud, CheckCircle, AlertCircle, Send, CheckSquare, FileText, ChevronRight, Wallet, Bell, Calendar, ClipboardList, FilePlus, Printer, MessageSquare
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -14,6 +15,7 @@ const ParentDashboard = () => {
   const { isParent } = useRole();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "info"; 
+  const [selectedReport, setSelectedReport] = useState<any>(null); 
   const [message, setMessage] = useState("");
   const [uploadingId, setUploadingId] = useState<string | null>(null);
 
@@ -47,6 +49,7 @@ const ParentDashboard = () => {
     { id: "info", label: "Thông tin học viên", icon: GraduationCap },
     { id: "grades", label: "Lớp học & Kết quả", icon: BookOpen },
     { id: "finance", label: "Học phí & Lịch sử", icon: Wallet },
+    { id: "reports", label: "Báo cáo định kỳ", icon: ClipboardList },
     { id: "news", label: "Tin tức & Sự kiện", icon: Bell },
     { id: "contact", label: "Liên hệ Trung tâm", icon: MessageCircle }
   ];
@@ -190,6 +193,76 @@ const ParentDashboard = () => {
               </div>
             )}
 
+            {/* CONTENT: REPORTS (Báo cáo) */}
+            {activeTab === "reports" && (
+              <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none">
+                <h2 className="font-bold text-xl flex items-center gap-2 mb-8 border-b pb-3">
+                  <ClipboardList className="w-6 h-6 text-primary" /> Báo cáo học tập & Đánh giá định kỳ
+                </h2>
+
+                <div className="mb-8 p-6 bg-primary/5 border border-primary/10 rounded-2xl relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-4 opacity-10">
+                      <FilePlus className="w-16 h-16 text-primary" />
+                   </div>
+                   <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="max-w-md">
+                         <p className="font-black text-xs text-primary uppercase tracking-widest mb-1.5">Yêu cầu báo cáo mới</p>
+                         <p className="text-sm text-muted-foreground leading-relaxed">
+                            Quý phụ huynh có thể yêu cầu Trung tâm tổng hợp và gửi báo cáo học tập mới nhất theo giai đoạn mong muốn.
+                         </p>
+                      </div>
+                      <button 
+                         onClick={() => toast.success("Yêu cầu của bạn đã được gửi tới giáo viên chủ nhiệm!")}
+                         className="px-6 py-2.5 bg-primary text-white text-[11px] font-black uppercase rounded-xl hover:scale-105 transition-all shadow-md shadow-primary/20"
+                      >
+                         Gửi yêu cầu ngay
+                      </button>
+                   </div>
+                </div>
+
+                <h3 className="font-bold text-sm mb-6 uppercase text-muted-foreground flex items-center gap-2">
+                    <FileText className="w-4 h-4" /> Danh sách báo cáo đã hoàn thành
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                        { title: "Báo cáo Tổng kết Học kỳ 1 - 2024", date: "15/01/2025", type: "Học kỳ", status: "Mới" },
+                        { title: "Báo cáo Học tập Tháng 12/2024", date: "30/12/2024", type: "Tháng", status: "Vừa đọc" },
+                        { title: "Báo cáo Giữa kỳ 1 - 2024", date: "15/10/2024", type: "Giữa kỳ", status: "Đã xem" },
+                        { title: "Báo cáo Đánh giá đầu vào", date: "01/09/2024", type: "Đầu vào", status: "Lưu trữ" },
+                    ].map((report, i) => (
+                        <div key={i} className="group p-6 border rounded-2xl hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg bg-card relative overflow-hidden">
+                            {report.status === "Mới" && (
+                               <div className="absolute top-0 right-0 bg-rose-500 text-white text-[8px] font-black uppercase px-3 py-1 rounded-bl-xl shadow-sm">
+                                  {report.status}
+                               </div>
+                            )}
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-12 h-12 rounded-xl bg-secondary/50 flex items-center justify-center text-primary transition-transform group-hover:scale-110">
+                                    <ClipboardList className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{report.type}</span>
+                                    <h4 className="font-bold text-sm leading-tight mt-0.5">{report.title}</h4>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between mt-6 pt-4 border-t border-dashed">
+                                <span className="text-[10px] text-muted-foreground font-medium italic">Ngày nhận: {report.date}</span>
+                                <div className="flex items-center gap-3">
+                                   <button 
+                                      onClick={() => setSelectedReport(report)}
+                                      className="text-[10px] font-black text-primary hover:underline uppercase tracking-tight"
+                                   >
+                                      XEM ONLINE
+                                   </button>
+                                   <button className="text-[10px] font-black text-muted-foreground hover:text-foreground uppercase tracking-tight">TẢI VỀ</button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
             {/* CONTENT: NEWS (Tin tức) */}
             {activeTab === "news" && (
               <div className="p-8 animate-in fade-in slide-in-from-right-4 duration-300 focus:outline-none h-full">
@@ -320,6 +393,112 @@ const ParentDashboard = () => {
         </div>
 
       </div>
+
+      {/* Report Detail Modal */}
+      <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="w-5 h-5 text-primary" />
+              {selectedReport?.title}
+            </DialogTitle>
+            <DialogDescription>
+              Báo cáo định kỳ dành cho học sinh: Đăng Khoa Bing (STU001)
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 mt-4 pb-4">
+            {/* KPI Summary */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-3 bg-secondary/30 rounded-lg text-center">
+                <p className="text-[10px] font-black uppercase text-muted-foreground">Chuyên cần</p>
+                <p className="text-lg font-bold text-success">98%</p>
+              </div>
+              <div className="p-3 bg-secondary/30 rounded-lg text-center">
+                <p className="text-[10px] font-black uppercase text-muted-foreground">Điểm trung bình</p>
+                <p className="text-lg font-bold text-primary">8.5</p>
+              </div>
+              <div className="p-3 bg-secondary/30 rounded-lg text-center">
+                <p className="text-[10px] font-black uppercase text-muted-foreground">Thái độ</p>
+                <p className="text-lg font-bold text-kpi-orange">Rất tốt</p>
+              </div>
+              <div className="p-3 bg-secondary/30 rounded-lg text-center">
+                <p className="text-[10px] font-black uppercase text-muted-foreground">Xếp loại</p>
+                <p className="text-lg font-bold">Giỏi</p>
+              </div>
+            </div>
+
+            {/* Skills Assessment */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black uppercase text-muted-foreground flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5 text-primary" /> Đánh giá kỹ năng
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                {[
+                  { skill: "Listening", level: "Tiến bộ nhanh", score: 8.5 },
+                  { skill: "Speaking", level: "Tự tin, trôi chảy", score: 8.0 },
+                  { skill: "Reading", level: "Đọc hiểu tốt", score: 9.0 },
+                  { skill: "Writing", level: "Ngữ pháp vững", score: 8.5 },
+                ].map((s, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="font-bold">{s.skill}</span>
+                      <span className="text-muted-foreground">{s.level}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                       <div className="h-full bg-primary" style={{ width: `${s.score * 10}%` }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Teacher's Comments */}
+            <div className="space-y-3 p-4 bg-primary/5 border border-primary/10 rounded-xl relative">
+              <h4 className="text-xs font-black uppercase text-primary flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Nhận xét từ giáo viên chủ nhiệm
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed italic">
+                "Đăng Khoa Bing thể hiện tinh thần tham gia lớp học rất tích cực. Bé có khả năng phản xạ nghe nói tốt, đặc biệt là trong các hoạt động trò chơi đội nhóm. Trong kỳ vừa rồi, kỹ năng Reading của bé đã có sự bứt phá rõ rệt với vốn từ vựng phong phú hơn. Ba mẹ nên duy trì khuyến khích bé xem phim tiếng Anh tại nhà để củng cố thêm phát âm tự nhiên."
+              </p>
+              <div className="flex items-center gap-2 mt-4">
+                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold">SM</div>
+                 <div>
+                    <p className="text-xs font-bold">Cô Sarah Miller</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-black">Giáo viên chủ nhiệm</p>
+                 </div>
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            <div className="p-4 border border-dashed rounded-xl space-y-2">
+              <h4 className="text-xs font-black uppercase text-muted-foreground flex items-center gap-2">
+                <FileText className="w-4 h-4" /> Lộ trình & Tư vấn tiếp theo
+              </h4>
+              <ul className="text-xs text-muted-foreground space-y-1 ml-4 list-disc">
+                <li>Tiếp tục luyện tập các bài tập bổ trợ trên App hàng tuần.</li>
+                <li>Đăng ký tham gia câu lạc bộ Speaking vào sáng Chủ nhật.</li>
+                <li>Chuẩn bị cho kỳ thi Cambridge MOVERS vào tháng 06/2025.</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="border-t pt-4">
+            <button 
+              onClick={() => setSelectedReport(null)}
+              className="px-4 py-2 border rounded-lg text-xs font-bold uppercase hover:bg-secondary transition-colors"
+            >
+              Đóng
+            </button>
+            <button 
+               onClick={() => toast.success("Đang chuẩn bị bản in...")}
+               className="px-4 py-2 bg-primary text-white text-xs font-bold uppercase rounded-lg hover:opacity-90 flex items-center gap-2 shadow-md shadow-primary/20"
+            >
+              <Printer className="w-3.5 h-3.5" /> In báo cáo
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

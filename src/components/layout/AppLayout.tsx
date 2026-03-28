@@ -32,7 +32,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "CRM & Tuyển sinh", path: "/crm", icon: Users },
+  // Dashboard removed as per user request
   { label: "Lớp học của tôi", path: "/my-classes", icon: BookOpen, teacherOnly: true },
   { label: "Quản lý khóa học", path: "/courses", icon: BookOpen, adminOnly: true },
   { label: "Quản lý học sinh", path: "/students", icon: GraduationCap, adminOnly: true },
@@ -42,6 +42,13 @@ const navItems: NavItem[] = [
   { label: "Quản lý tài liệu", path: "/documents", icon: FileText },
   { label: "Lịch dạy", path: "/schedule", icon: Calendar },
   { label: "Ghi chú chấm công", path: "/timekeeping", icon: Fingerprint },
+  // Parent Items
+  { label: "Thông tin học viên", path: "/parent-portal", icon: GraduationCap, parentOnly: true },
+  { label: "Lớp học & Kết quả", path: "/parent-portal?tab=grades", icon: BookOpen, parentOnly: true },
+  { label: "Học phí & Lịch sử", path: "/parent-portal?tab=finance", icon: Wallet, parentOnly: true },
+  { label: "Tin tức & Sự kiện", path: "/parent-portal?tab=news", icon: Bell, parentOnly: true },
+  { label: "Báo cáo học tập", path: "/parent-portal?tab=reports", icon: ClipboardList, parentOnly: true },
+  { label: "Liên hệ Trung tâm", path: "/parent-portal?tab=contact", icon: MessageCircle, parentOnly: true },
 ];
 
 const reportItems = [
@@ -70,8 +77,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+   const [showNotifications, setShowNotifications] = useState(false);
   const [reportsOpen, setReportsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [crmOpen, setCrmOpen] = useState(true);
 
   const filteredNav = navItems.filter((item) => {
     if (isParent) return item.parentOnly;
@@ -85,14 +94,46 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Universal Sidebar - (Admin Style for All) */}
-      <aside className="hidden lg:flex flex-col w-60 bg-sidebar border-r border-sidebar-border flex-shrink-0">
-        <div className="flex items-center gap-2 px-5 py-4 border-b border-sidebar-border">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
+      <aside className={`hidden lg:flex flex-col ${isCollapsed ? 'w-16' : 'w-60'} bg-sidebar border-r border-sidebar-border flex-shrink-0 transition-all duration-300 ease-in-out relative group`}>
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2'} px-4 py-4 border-b border-sidebar-border h-14`}>
+          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center flex-shrink-0">
             <School className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="font-bold text-sidebar-primary text-sm">MENGLISH PROTOTYPE</span>
+          {!isCollapsed && (
+            <motion.span 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="font-bold text-sidebar-primary text-sm truncate"
+            >
+              MENGLISH PROTOTYPE
+            </motion.span>
+          )}
+          
+          {/* Collapse Toggle Button - Floating on edge or in header */}
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="absolute -right-3 top-20 bg-white border border-sidebar-border shadow-sm rounded-full p-1 text-sidebar-foreground hover:text-primary transition-colors z-50 lg:flex hidden"
+          >
+            <ChevronRight className={`w-3 h-3 transition-transform duration-300 ${isCollapsed ? "" : "rotate-180"}`} />
+          </button>
         </div>
-        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 font-medium">
+            {/* CRM Collapsible - NOW ON TOP */}
+            {isAdmin && (
+              <button
+                onClick={() => navigate("/crm")}
+                title={isCollapsed ? "CRM tuyển sinh" : ""}
+                className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-md font-bold text-sm transition-colors ${
+                  location.pathname.startsWith("/crm")
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                }`}
+              >
+                <Users2 className="w-4 h-4 flex-shrink-0" />
+                {!isCollapsed && <span>CRM tuyển sinh</span>}
+              </button>
+            )}
+
             {filteredNav.map((item) => {
               const active = location.pathname === item.path;
               const label = item.path === "/tasks"
@@ -108,14 +149,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                  title={isCollapsed ? label : ""}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-md text-sm transition-colors ${
                     active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
                       : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                   }`}
                 >
                   <item.icon className="w-4 h-4 flex-shrink-0" />
-                  {label}
+                  {!isCollapsed && <span>{label}</span>}
                 </button>
               );
             })}
@@ -124,12 +166,17 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {isAdmin && (
               <div className="space-y-0.5">
                 <button
-                  onClick={() => setReportsOpen(!reportsOpen)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground ${reportsOpen ? "font-bold" : ""}`}
+                  onClick={() => isCollapsed ? (setIsCollapsed(false), setReportsOpen(true)) : setReportsOpen(!reportsOpen)}
+                  title={isCollapsed ? "Báo cáo" : ""}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2 rounded-md text-sm transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground ${reportsOpen ? "font-bold" : ""}`}
                 >
                   <PieChart className="w-4 h-4 flex-shrink-0" />
-                  Báo cáo
-                  <ChevronRight className={`w-3 h-3 ml-auto transition-transform duration-200 ${reportsOpen ? "rotate-90" : ""}`} />
+                  {!isCollapsed && (
+                    <>
+                      Báo cáo
+                      <ChevronRight className={`w-3 h-3 ml-auto transition-transform duration-200 ${reportsOpen ? "rotate-90" : ""}`} />
+                    </>
+                  )}
                 </button>
                 <AnimatePresence>
                   {reportsOpen && (
@@ -145,7 +192,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                           onClick={() => navigate(item.path)}
                           className={`w-full flex items-center gap-3 px-4 py-1.5 text-[11px] font-medium transition-colors ${
                             location.pathname === item.path
-                              ? "text-primary bg-primary/5"
+                              ? "text-primary bg-primary/5 font-bold"
                               : "text-sidebar-foreground hover:bg-sidebar-accent/30"
                           }`}
                         >
@@ -160,25 +207,29 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             )}
         </nav>
         <div className="p-3 border-t border-sidebar-border relative">
-          <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>
+          {!isCollapsed && <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground hover:bg-primary hover:text-primary-foreground transition-colors outline-none cursor-pointer"
+                className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-2 px-3'} py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground hover:bg-primary hover:text-primary-foreground transition-colors outline-none cursor-pointer`}
               >
-                <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
-                {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
-                <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
+                {!isCollapsed && (
+                  <>
+                    {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
+                    <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
+                  </>
+                )}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
               <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
+              <DropdownMenuItem onClick={() => { changeRole("admin"); navigate("/crm"); toast.success("Đã chuyển sang Admin"); }}>
                 <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
                 Admin
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
+              <DropdownMenuItem onClick={() => { changeRole("teacher"); navigate("/my-classes"); toast.success("Đã chuyển sang Giảng viên"); }}>
                 <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
                 Giảng viên
               </DropdownMenuItem>
@@ -238,7 +289,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       onClick={() => { navigate(item.path); setSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                         active
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-bold"
                           : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                       }`}
                     >
@@ -248,36 +299,6 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   );
                 })}
               </nav>
-              <div className="p-3 border-t border-sidebar-border">
-                <div className="text-xs text-sidebar-muted mb-1 px-3">Vai trò hiện tại</div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-sidebar-accent text-sidebar-accent-foreground outline-none cursor-pointer"
-                    >
-                      <div className={`w-2 h-2 rounded-full ${isAdmin ? "bg-kpi-blue" : isTeacher ? "bg-kpi-green" : "bg-purple-500"}`} />
-                      {isAdmin ? "Admin" : isTeacher ? "Giảng viên" : "Phụ huynh"}
-                      <ChevronRight className="w-3 h-3 ml-auto opacity-50" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[200px] mb-2 z-[60]">
-                    <DropdownMenuLabel>Chọn Vai trò</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => { changeRole("admin"); setSidebarOpen(false); navigate("/"); toast.success("Đã chuyển sang Admin"); }}>
-                      <div className="w-2 h-2 rounded-full bg-kpi-blue mr-2" />
-                      Admin
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { changeRole("teacher"); setSidebarOpen(false); navigate("/"); toast.success("Đã chuyển sang Giảng viên"); }}>
-                      <div className="w-2 h-2 rounded-full bg-kpi-green mr-2" />
-                      Giảng viên
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => { changeRole("parent"); setSidebarOpen(false); navigate("/parent-portal"); toast.success("Đã chuyển sang Phụ huynh"); }}>
-                      <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-                      Phụ huynh
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
             </motion.aside>
           </>
         )}
