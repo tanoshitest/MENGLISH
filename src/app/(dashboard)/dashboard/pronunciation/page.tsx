@@ -3,10 +3,9 @@
 import React from 'react';
 import { Card, Breadcrumb, Typography, Divider, Row, Col, List, Tag } from 'antd';
 import { HomeOutlined, AudioOutlined, HistoryOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { MockPronunciationRecorder } from '../../../components/pronunciation/MockPronunciationRecorder';
-import { mockSubmissions } from '../../../lib/mockData';
-
-const { Title, Text, Paragraph } = Typography;
+import { MockPronunciationRecorder } from '@/components/pronunciation/MockPronunciationRecorder';
+import { mockSubmissions, PronunciationSubmission } from '@/lib/mockData';
+import Link from 'next/link';
 
 export default function PronunciationPage() {
   return (
@@ -15,8 +14,8 @@ export default function PronunciationPage() {
       <Breadcrumb 
         className="mb-6"
         items={[
-          { title: <HomeOutlined />, href: '/' },
-          { title: 'Lớp học & Kết quả', href: '/dashboard' },
+          { title: <Link href="/"><HomeOutlined /></Link> },
+          { title: <Link href="/dashboard">Lớp học & Kết quả</Link> },
           { title: 'Nộp bài phát âm' }
         ]}
       />
@@ -25,13 +24,13 @@ export default function PronunciationPage() {
         <Col xs={24} lg={16}>
           {/* Main Title */}
           <div className="mb-6">
-            <Title level={2} className="flex items-center gap-2">
+            <Typography.Title level={2} className="flex items-center gap-2">
               <AudioOutlined className="text-blue-500" />
               Nộp bài phát âm mới
-            </Title>
-            <Paragraph type="secondary">
+            </Typography.Title>
+            <Typography.Paragraph type="secondary">
               Ghi âm giọng đọc của bạn để giáo viên nhận xét và đánh giá kỹ năng phát âm.
-            </Paragraph>
+            </Typography.Paragraph>
           </div>
 
           {/* Recorder Section */}
@@ -64,22 +63,22 @@ export default function PronunciationPage() {
             className="shadow-sm border-0 sticky top-6"
           >
             <List
-              dataSource={mockSubmissions.slice(0, 5)}
-              renderItem={(item) => (
+              dataSource={mockSubmissions}
+              renderItem={(item: PronunciationSubmission) => (
                 <List.Item className="px-0 py-4 border-b last:border-0 border-zinc-100 block">
                   <div className="flex justify-between items-start mb-2">
-                    <Text strong className="text-xs truncate max-w-[150px]">
+                    <Typography.Text strong className="text-xs truncate max-w-[150px]">
                       {item.textPrompt}
-                    </Text>
+                    </Typography.Text>
                     {item.status === 'reviewed' ? (
-                      <Tag color="success" icon={<CheckCircleOutlined />}>8.5</Tag>
+                      <Tag color="success" icon={<CheckCircleOutlined />}>{item.score}</Tag>
                     ) : (
                       <Tag color="processing" icon={<ClockCircleOutlined />}>Đang chờ</Tag>
                     )}
                   </div>
-                  <Text type="secondary" className="text-[10px] block">
+                  <Typography.Text type="secondary" className="text-[10px] block">
                     Đã nộp: {item.submittedAt}
-                  </Text>
+                  </Typography.Text>
                   {item.feedback && (
                     <div className="mt-2 p-2 bg-zinc-50 rounded text-xs italic text-zinc-500">
                       "{item.feedback}"

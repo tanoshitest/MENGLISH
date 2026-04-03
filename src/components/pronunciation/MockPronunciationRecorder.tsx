@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button, Card, Progress, Typography, Space, message } from 'antd';
 import { AudioOutlined, StopOutlined, SendOutlined, RetweetOutlined } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
-
 interface MockPronunciationRecorderProps {
   textPrompt: string;
   onSuccess?: () => void;
@@ -72,10 +70,10 @@ export const MockPronunciationRecorder: React.FC<MockPronunciationRecorderProps>
     <Card className="shadow-sm border-0 bg-white/80 backdrop-blur-md">
       <Space direction="vertical" size="large" className="w-full text-center">
         <div>
-          <Text type="secondary" className="block mb-2">Đọc to câu sau:</Text>
-          <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
+          <Typography.Text type="secondary" className="block mb-2">Đọc to câu sau:</Typography.Text>
+          <Typography.Title level={4} style={{ margin: 0, color: '#1890ff' }}>
             "{textPrompt}"
-          </Title>
+          </Typography.Title>
         </div>
 
         <div className="py-8">
@@ -99,10 +97,10 @@ export const MockPronunciationRecorder: React.FC<MockPronunciationRecorderProps>
             )}
           </div>
           
-          <Title level={3} className="m-0 tabular-nums">
+          <Typography.Title level={3} className="m-0 tabular-nums">
             {formatTime(recordingTime)}
-          </Title>
-          {isRecording && <Text type="danger" className="text-xs">Đang thu âm...</Text>}
+          </Typography.Title>
+          {isRecording && <Typography.Text type="danger" className="text-xs">Đang thu âm...</Typography.Text>}
         </div>
 
         <Space size="middle">
@@ -166,7 +164,7 @@ export const MockPronunciationRecorder: React.FC<MockPronunciationRecorderProps>
               showInfo={false} 
               strokeColor="#ff4d4f"
             />
-            <Text type="secondary" className="text-xs">Giới hạn 60 giây</Text>
+            <Typography.Text type="secondary" className="text-xs">Giới hạn 60 giây</Typography.Text>
           </div>
         )}
       </Space>

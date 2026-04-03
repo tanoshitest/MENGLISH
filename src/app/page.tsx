@@ -2,7 +2,7 @@ import { Button, Card, Typography, Space } from 'antd';
 import Link from 'next/link';
 import { UserOutlined, TeamOutlined, AudioOutlined } from '@ant-design/icons';
 
-const { Title, Text, Paragraph } = Typography;
+
 
 export default function Home() {
   return (
@@ -15,13 +15,13 @@ export default function Home() {
             </div>
           </div>
           
-          <Title level={1} className="mb-4" style={{ fontWeight: 800 }}>
+          <Typography.Title level={1} className="mb-4" style={{ fontWeight: 800 }}>
             MENGLISH <span className="text-blue-600">Pronunciation Demo</span>
-          </Title>
-          <Paragraph type="secondary" className="text-lg max-w-2xl mx-auto mb-12">
+          </Typography.Title>
+          <Typography.Paragraph type="secondary" className="text-lg max-w-2xl mx-auto mb-12">
             Chào mừng bạn đến với bản demo tính năng Nộp bài phát âm. 
             Vui lòng chọn vai trò để trải nghiệm quy trình nộp bài và duyệt bài.
-          </Paragraph>
+          </Typography.Paragraph>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Parent Entry */}
@@ -37,8 +37,8 @@ export default function Home() {
                   </div>
                 }
               >
-                <Title level={3}>Dành cho Phụ huynh</Title>
-                <Text type="secondary">Nộp bài ghi âm, xem nhận xét từ giáo viên và theo dõi kết quả học tập.</Text>
+                <Typography.Title level={3}>Dành cho Phụ huynh</Typography.Title>
+                <Typography.Text type="secondary">Nộp bài ghi âm, xem nhận xét từ giáo viên và theo dõi kết quả học tập.</Typography.Text>
                 <div className="mt-6">
                   <Button type="primary" size="large" shape="round" block className="bg-blue-600">
                     Vào giao diện Phụ huynh
@@ -60,8 +60,8 @@ export default function Home() {
                   </div>
                 }
               >
-                <Title level={3}>Dành cho Giáo viên</Title>
-                <Text type="secondary">Duyệt các bài phát âm của học sinh, nghe lại và để lại lời bình giảng.</Text>
+                <Typography.Title level={3}>Dành cho Giáo viên</Typography.Title>
+                <Typography.Text type="secondary">Duyệt các bài phát âm của học sinh, nghe lại và để lại lời bình giảng.</Typography.Text>
                 <div className="mt-6">
                   <Button type="primary" size="large" shape="round" block color="green" className="bg-green-600 hover:bg-green-500">
                     Vào giao diện Giáo viên

@@ -3,10 +3,7 @@
 import React, { useState } from 'react';
 import { Card, Table, Tag, Button, Space, Typography, Modal, Input, Rate, Avatar, message, Badge } from 'antd';
 import { PlayCircleOutlined, EditOutlined, CheckCircleOutlined, SoundOutlined, FilterOutlined } from '@ant-design/icons';
-import { mockSubmissions, PronunciationSubmission } from '../../../lib/mockData';
-
-const { Title, Text } = Typography;
-const { TextArea } = Input;
+import { mockSubmissions, PronunciationSubmission } from '@/lib/mockData';
 
 export default function TeacherReviewPage() {
   const [submissions, setSubmissions] = useState<PronunciationSubmission[]>(mockSubmissions);
@@ -43,7 +40,7 @@ export default function TeacherReviewPage() {
       render: (text: string, record: PronunciationSubmission) => (
         <Space>
           <Avatar src={record.avatarUrl} size="small" />
-          <Text strong>{text}</Text>
+          <Typography.Text strong>{text}</Typography.Text>
         </Space>
       ),
     },
@@ -52,13 +49,13 @@ export default function TeacherReviewPage() {
       dataIndex: 'textPrompt',
       key: 'textPrompt',
       width: 300,
-      render: (text: string) => <Text type="secondary" className="text-xs truncate block max-w-xs italic">"{text}"</Text>,
+      render: (text: string) => <Typography.Text type="secondary" className="text-xs truncate block max-w-xs italic">"{text}"</Typography.Text>,
     },
     {
       title: 'Ngày nộp',
       dataIndex: 'submittedAt',
       key: 'submittedAt',
-      render: (text: string) => <Text type="secondary" className="text-xs">{text}</Text>,
+      render: (text: string) => <Typography.Text type="secondary" className="text-xs">{text}</Typography.Text>,
     },
     {
       title: 'Trạng thái',
@@ -99,12 +96,12 @@ export default function TeacherReviewPage() {
     <div className="p-6 max-w-7xl mx-auto min-h-screen bg-transparent">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <Title level={2} className="m-0">
+          <Typography.Title level={2} className="m-0">
             Duyệt bài phát âm
-          </Title>
-          <Text type="secondary">
-            Tổng số: {submissions.length} bài | <Text type="warning">{submissions.filter(s => s.status === 'pending').length} bài chờ duyệt</Text>
-          </Text>
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            Tổng số: {submissions.length} bài | <Typography.Text type="warning">{submissions.filter(s => s.status === 'pending').length} bài chờ duyệt</Typography.Text>
+          </Typography.Text>
         </div>
         <Button icon={<FilterOutlined />}>Lọc kết quả</Button>
       </div>
@@ -136,7 +133,7 @@ export default function TeacherReviewPage() {
       >
         <div className="py-4 space-y-4">
           <div>
-            <Text type="secondary" className="block mb-1">Đề bài:</Text>
+            <Typography.Text type="secondary" className="block mb-1">Đề bài:</Typography.Text>
             <div className="p-3 bg-zinc-50 rounded italic text-zinc-600 border border-zinc-100">
               "{selectedSubmission?.textPrompt}"
             </div>
@@ -156,7 +153,7 @@ export default function TeacherReviewPage() {
           </div>
 
           <div>
-            <Text strong className="block mb-2">Đánh giá chung (Điểm số):</Text>
+            <Typography.Text strong className="block mb-2">Đánh giá chung (Điểm số):</Typography.Text>
             <div className="flex items-center gap-4">
               <Rate 
                 allowHalf 
@@ -164,13 +161,13 @@ export default function TeacherReviewPage() {
                 onChange={(v) => setScore(v * 2)} 
                 character={({ index = 0 }) => (index + 1) * 2}
               />
-              <Text strong className="text-xl text-blue-500">{score.toFixed(1)}/10</Text>
+              <Typography.Text strong className="text-xl text-blue-500">{score.toFixed(1)}/10</Typography.Text>
             </div>
           </div>
 
           <div>
-            <Text strong className="block mb-2">Lời khuyên của giáo viên:</Text>
-            <TextArea 
+            <Typography.Text strong className="block mb-2">Lời khuyên của giáo viên:</Typography.Text>
+            <Input.TextArea 
               rows={4} 
               placeholder="Nhập nhận xét chi tiết về phát âm, trọng âm, âm đuôi..." 
               value={feedbackText}

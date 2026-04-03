@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Layout, Menu, Typography, Avatar, Space, Badge } from 'antd';
+import { Layout, Menu, Typography, Avatar, Space, Badge, Card, Divider } from 'antd';
 import {
   UserOutlined,
   BookOutlined,
@@ -17,8 +17,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -49,7 +48,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
+      <Layout.Sider 
         collapsible 
         collapsed={collapsed} 
         onCollapse={(value) => setCollapsed(value)}
@@ -60,11 +59,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       >
         <div className="p-6 text-center border-b border-white/10 mb-4">
           {!collapsed ? (
-            <Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 800, letterSpacing: '1px' }}>
+            <Typography.Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 800, letterSpacing: '1px' }}>
               ME<span className="text-blue-400">NGLISH</span>
-            </Title>
+            </Typography.Title>
           ) : (
-            <Title level={4} style={{ color: '#fff', margin: 0 }}>ME</Title>
+            <Typography.Title level={4} style={{ color: '#fff', margin: 0 }}>ME</Typography.Title>
           )}
         </div>
         <Menu 
@@ -81,15 +80,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               Vai trò hiện tại
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <Text strong style={{ color: '#fff' }}>{isTeacherView ? 'Giáo viên' : 'Phụ huynh'}</Text>
+                <Typography.Text strong style={{ color: '#fff' }}>{isTeacherView ? 'Giáo viên' : 'Phụ huynh'}</Typography.Text>
               </div>
             </Card>
           </div>
         )}
-      </Sider>
+      </Layout.Sider>
       
       <Layout className="bg-[#f8fafc]">
-        <Header className="bg-white px-8 flex items-center justify-end shadow-sm z-10" style={{ height: 64 }}>
+        <Layout.Header className="bg-white px-8 flex items-center justify-end shadow-sm z-10" style={{ height: 64 }}>
           <Space size="large">
             <Badge dot>
               <BellOutlined style={{ fontSize: 20 }} />
@@ -98,17 +97,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <Space className="cursor-pointer">
               <Avatar icon={<UserOutlined />} className="bg-blue-600 shadow-md" />
               <div className="hidden sm:block leading-none">
-                <Text strong className="block text-xs">Thanh Nguyen</Text>
-                <Text type="secondary" className="text-[10px]">{isTeacherView ? 'Teacher Account' : 'Parent Account'}</Text>
+                <Typography.Text strong className="block text-xs">Thanh Nguyen</Typography.Text>
+                <Typography.Text type="secondary" className="text-[10px]">{isTeacherView ? 'Teacher Account' : 'Parent Account'}</Typography.Text>
               </div>
               <DownOutlined style={{ fontSize: 10, color: '#888' }} />
             </Space>
           </Space>
-        </Header>
+        </Layout.Header>
         
-        <Content className="m-0 overflow-y-auto" style={{ backgroundColor: '#fdfdfd' }}>
+        <Layout.Content className="m-0 overflow-y-auto" style={{ backgroundColor: '#fdfdfd' }}>
           {children}
-        </Content>
+        </Layout.Content>
       </Layout>
 
       <style jsx global>{`

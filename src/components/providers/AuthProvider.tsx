@@ -11,37 +11,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const supabase = createClient();
 
   useEffect(() => {
-    async function getUser() {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authUser.id)
-          .single();
-        setUser(data);
-      }
-      setLoading(false);
-    }
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        setUser(data);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
+    // Mock user for demo purposes
+    setUser({
+      id: 'mock-user-id',
+      email: 'demo@menglishtest.edu.vn',
+      full_name: 'Demo Teacher',
+      role: 'admin',
+      is_active: true,
+      created_at: new Date().toISOString()
     });
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+    setLoading(false);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
